@@ -1,0 +1,144 @@
+"use client";
+
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { cn, formatPrice } from "@/lib/utils";
+
+const featuredProduct = {
+  name: "Forest Cedar Body Wash",
+  slug: "forest-cedar-body-wash",
+  price: 28,
+  fragrance: "Forest & Cedar",
+};
+
+export default function Hero() {
+  return (
+    <section className="relative overflow-hidden pt-18">
+      <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-8 lg:py-28">
+        {/* Left column */}
+        <div className="flex flex-col gap-8">
+          <div className="flex items-center gap-4">
+            <span className="label-caps text-terra">Premium Botanical Bath</span>
+            <span className="h-px max-w-16 flex-1 bg-gold" aria-hidden />
+          </div>
+
+          <h1 className="font-serif text-5xl font-light leading-[1.08] text-green lg:text-6xl xl:text-7xl">
+            Where Ritual Meets{" "}
+            <em className="not-italic text-terra italic">Luxury</em>
+          </h1>
+
+          <p className="max-w-md text-base leading-relaxed text-muted">
+            Handcrafted soaps and body care infused with botanical essences.
+            Transform your daily cleanse into a moment of calm, intention, and
+            indulgence.
+          </p>
+
+          <div className="flex flex-wrap items-center gap-4">
+            <Link
+              href="#collections"
+              className="inline-flex items-center justify-center gap-2 bg-terra px-8 py-4 text-sm label-caps text-white transition-colors duration-250 hover:bg-terra-2"
+              style={{ borderRadius: 0 }}
+            >
+              Explore Collection
+              <ArrowRight size={16} />
+            </Link>
+            <Link
+              href="#ritual"
+              className="inline-flex items-center justify-center border border-green/30 bg-transparent px-8 py-4 text-sm label-caps text-green transition-colors duration-250 hover:border-green hover:bg-green/5"
+              style={{ borderRadius: 0 }}
+            >
+              Discover Our Ritual
+            </Link>
+          </div>
+        </div>
+
+        {/* Right column — green panel with botanical SVG */}
+        <div className="relative">
+          <div className="relative aspect-[4/5] overflow-hidden bg-green lg:aspect-square">
+            <svg
+              viewBox="0 0 400 400"
+              className="absolute inset-0 h-full w-full"
+              aria-hidden
+            >
+              <path
+                d="M200 380 C200 380 80 280 80 180 C80 100 130 40 200 40 C270 40 320 100 320 180 C320 280 200 380 200 380Z"
+                fill="none"
+                stroke="rgba(201,169,110,0.35)"
+                strokeWidth="1"
+                className="animate-draw-stroke"
+                style={{ strokeDasharray: 800, strokeDashoffset: 800 }}
+              />
+              <path
+                d="M200 340 C200 340 120 260 120 180 C120 120 155 80 200 80 C245 80 280 120 280 180 C280 260 200 340 200 340Z"
+                fill="none"
+                stroke="rgba(201,169,110,0.22)"
+                strokeWidth="1"
+                className="animate-draw-stroke"
+                style={{
+                  strokeDasharray: 600,
+                  strokeDashoffset: 600,
+                  animationDelay: "0.4s",
+                }}
+              />
+              <path
+                d="M200 60 L200 320 M160 140 Q200 100 240 140 M150 200 Q200 160 250 200 M155 260 Q200 220 245 260"
+                fill="none"
+                stroke="rgba(247,243,237,0.28)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                className="animate-draw-stroke"
+                style={{
+                  strokeDasharray: 500,
+                  strokeDashoffset: 500,
+                  animationDelay: "0.8s",
+                }}
+              />
+              <path
+                d="M120 200 Q160 160 200 180 Q240 200 280 200"
+                fill="none"
+                stroke="rgba(201,169,110,0.18)"
+                strokeWidth="1"
+                strokeLinecap="round"
+                className="animate-draw-stroke"
+                style={{
+                  strokeDasharray: 300,
+                  strokeDashoffset: 300,
+                  animationDelay: "1.2s",
+                }}
+              />
+              <circle cx="200" cy="180" r="5" fill="rgba(201,169,110,0.55)" />
+            </svg>
+
+            <div className="absolute inset-0 bg-gradient-to-t from-green-3/50 via-transparent to-green-3/10" />
+          </div>
+
+          {/* Floating featured product card */}
+          <div
+            className={cn(
+              "absolute -bottom-6 -left-4 w-64 animate-floatUp border border-green/10 bg-white p-5 shadow-xl",
+              "lg:-bottom-8 lg:-left-8 lg:w-72"
+            )}
+            style={{ borderRadius: "2px" }}
+          >
+            <span className="label-caps text-gold">Featured</span>
+            <h3 className="mt-2 font-serif text-xl text-green">
+              {featuredProduct.name}
+            </h3>
+            <p className="mt-1 text-sm text-muted">{featuredProduct.fragrance}</p>
+            <div className="mt-4 flex items-center justify-between">
+              <span className="font-serif text-lg text-terra">
+                {formatPrice(featuredProduct.price)}
+              </span>
+              <Link
+                href={`/products/${featuredProduct.slug}`}
+                className="label-caps text-green transition-colors duration-250 hover:text-terra"
+              >
+                View →
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

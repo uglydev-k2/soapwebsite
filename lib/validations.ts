@@ -1,0 +1,94 @@
+import { z } from "zod";
+
+export const productSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().min(1, "Slug is required"),
+  description: z.string().min(1, "Description is required"),
+  price: z.coerce.number().positive("Price must be positive"),
+  comparePrice: z.coerce.number().positive().optional().nullable(),
+  category: z.enum([
+    "SOAP",
+    "BODY_WASH",
+    "LOTION",
+    "SCRUB",
+    "AROMATHERAPY",
+    "GIFT_SET",
+  ]),
+  stock: z.coerce.number().int().min(0),
+  images: z.array(z.string()).default([]),
+  ingredients: z.string().optional().nullable(),
+  fragrance: z.string().optional().nullable(),
+  featured: z.boolean().default(false),
+  active: z.boolean().default(true),
+});
+
+export const orderUpdateSchema = z.object({
+  status: z.enum([
+    "PENDING",
+    "PROCESSING",
+    "SHIPPED",
+    "DELIVERED",
+    "CANCELLED",
+    "REFUNDED",
+  ]),
+  notes: z.string().optional().nullable(),
+});
+
+export const customerUpdateSchema = z.object({
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+  email: z.string().email(),
+  phone: z.string().optional().nullable(),
+});
+
+export const newsletterSchema = z.object({
+  email: z.string().email("Please enter a valid email"),
+});
+
+export const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+});
+
+export const storeSettingsSchema = z.object({
+  name: z.string().min(1),
+  tagline: z.string().optional(),
+  email: z.string().email(),
+  phone: z.string().optional().nullable(),
+  address: z.string().optional().nullable(),
+  flatShippingRate: z.coerce.number().min(0),
+  freeShippingThreshold: z.coerce.number().min(0),
+  notifyNewOrder: z.boolean(),
+  notifyOrderShipped: z.boolean(),
+  notifyLowStock: z.boolean(),
+  notifyNewCustomer: z.boolean(),
+});
+
+export const adminInviteSchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(1, "Name is required"),
+});
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1),
+    newPassword: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string().min(1),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+export const checkoutSchema = z.object({
+  email: z.string().email(),
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+  phone: z.string().optional(),
+});
+
+export type ProductFormData = z.infer<typeof productSchema>;
+export type OrderUpdateData = z.infer<typeof orderUpdateSchema>;
+export type CustomerUpdateData = z.infer<typeof customerUpdateSchema>;
+export type AdminInviteData = z.infer<typeof adminInviteSchema>;
+export type StoreSettingsData = z.infer<typeof storeSettingsSchema>;
