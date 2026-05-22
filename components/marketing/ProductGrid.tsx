@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import { getFeaturedProducts } from "@/lib/products";
 import ProductCard from "./ProductCard";
 import type { ProductWithMeta } from "@/types";
 
@@ -18,13 +18,7 @@ export default async function ProductGrid({
   subtitle = "Curated Favorites",
   showViewAll = true,
 }: ProductGridProps) {
-  const items =
-    products ??
-    (await prisma.product.findMany({
-      where: { featured: true, active: true },
-      take: limit,
-      orderBy: { createdAt: "desc" },
-    }));
+  const items = products ?? (await getFeaturedProducts(limit));
 
   if (items.length === 0) {
     return null;
@@ -42,7 +36,7 @@ export default async function ProductGrid({
           </div>
           {showViewAll && (
             <Link
-              href="/shop"
+              href="/collections"
               className="label-caps text-green transition-colors hover:text-terra"
             >
               View All →

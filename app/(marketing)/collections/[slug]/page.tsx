@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { prisma } from "@/lib/prisma";
+import { getProductBySlug } from "@/lib/products";
 import { notFound } from "next/navigation";
 import { formatPrice, getCategoryLabel } from "@/lib/utils";
 import AddToCartButton from "@/components/marketing/AddToCartButton";
@@ -11,7 +11,7 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }) {
-  const product = await prisma.product.findUnique({ where: { slug: params.slug } });
+  const product = await getProductBySlug(params.slug);
   return { title: product ? `${product.name} — MsVee Soaps` : "Product" };
 }
 
@@ -20,9 +20,7 @@ export default async function ProductDetailPage({
 }: {
   params: { slug: string };
 }) {
-  const product = await prisma.product.findUnique({
-    where: { slug: params.slug, active: true },
-  });
+  const product = await getProductBySlug(params.slug);
   if (!product) notFound();
 
   const gradient = getCategoryGradient(product.category);

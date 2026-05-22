@@ -86,11 +86,16 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 
 ## Deploy (Vercel)
 
-1. Connect repo to Vercel
-2. Add all env vars from `.env.example`
-3. Use Vercel Postgres or external PostgreSQL for `DATABASE_URL`
-4. Run migrations: `npx prisma db push` (or add to build command)
-5. Configure Stripe webhook endpoint: `https://your-domain.com/api/stripe/webhook`
+1. Connect repo to Vercel (https://github.com/uglydev-k2/soapwebsite)
+2. Add a **PostgreSQL** database (Vercel Postgres, Neon, or Supabase) and set **`DATABASE_URL`**
+3. Add required env vars from `.env.example`:
+   - `AUTH_SECRET` or `NEXTAUTH_SECRET` (same value: `openssl rand -base64 32`)
+   - `NEXTAUTH_URL` = your production URL (e.g. `https://your-app.vercel.app`)
+4. Redeploy — the build runs `prisma db push` to create tables
+5. Seed once locally or via CLI: `DATABASE_URL="..." npm run db:seed`
+6. Configure Stripe webhook: `https://your-domain.com/api/stripe/webhook`
+
+If you see **Application error** on the homepage, `DATABASE_URL` is usually missing or the DB is unreachable. Check Vercel → Project → Settings → Environment Variables.
 
 ## Features
 

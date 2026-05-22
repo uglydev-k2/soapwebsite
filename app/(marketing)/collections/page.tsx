@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { prisma } from "@/lib/prisma";
+import { getActiveProducts } from "@/lib/products";
 import ProductCard from "@/components/marketing/ProductCard";
 import { Suspense } from "react";
 import { CardSkeleton } from "@/components/ui/Skeleton";
@@ -10,10 +10,7 @@ export const metadata = {
 };
 
 async function CollectionsList() {
-  const products = await prisma.product.findMany({
-    where: { active: true },
-    orderBy: { name: "asc" },
-  });
+  const products = await getActiveProducts();
 
   if (products.length === 0) {
     return (
