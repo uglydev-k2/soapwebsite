@@ -7,6 +7,8 @@ import { ShoppingBag, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 
+import type { NavbarAuthUser } from "@/lib/navbar-auth";
+
 const navLinks = [
   { label: "Collections", href: "#collections" },
   { label: "Our Ritual", href: "#ritual" },
@@ -29,7 +31,11 @@ function Logo({ dark = false }: { dark?: boolean }) {
   );
 }
 
-export default function Navbar() {
+export default function Navbar({
+  initialUser = null,
+}: {
+  initialUser?: NavbarAuthUser | null;
+}) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const itemCount = useCartStore((s) => s.itemCount());
@@ -78,7 +84,7 @@ export default function Navbar() {
 
           <div className="flex items-center gap-3 sm:gap-4">
             <div className="hidden md:block">
-              <UserMenu />
+              <UserMenu initialUser={initialUser} />
             </div>
             <Link
               href="/cart"
@@ -166,7 +172,7 @@ export default function Navbar() {
         </ul>
 
         <div className="border-t border-cream/10 p-6 space-y-4">
-          <UserMenu />
+          <UserMenu initialUser={initialUser} />
           <Link
             href="#collections"
             onClick={() => setMobileOpen(false)}

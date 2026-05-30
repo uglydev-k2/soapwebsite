@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { User, Settings, LogOut } from "lucide-react";
+import { User, Package, LogOut } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { toNavbarAuthUser, type NavbarAuthUser, type Profile } from "@/lib/navbar-auth";
 import { getInitials } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -14,53 +15,66 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/DropdownMenu";
-import type { Profile } from "@/lib/profile";
 
-export function UserMenu() {
+interface UserMenuProps {
+  initialUser?: NavbarAuthUser | null;
+}
+
+export function UserMenu({ initialUser = null }: UserMenuProps) {
   const router = useRouter();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<NavbarAuthUser | null>(initialUser);
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {
-      setLoading(false);
       return;
     }
 
     const supabase = createClient();
 
-    async function loadProfile() {
+    async function syncFromSession(
+      sessionUser: {
+        id: string;
+        email?: string;
+        user_metadata?: Record<string, unknown>;
+      } | null
+    ) {
+      if (!sessionUser) {
+        setUser(null);
+        return;
+      }
+
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        if (!user) {
-          setProfile(null);
-          setLoading(false);
-          return;
-        }
-
-        const { data } = await supabase
+        const { data: profile } = await supabase
           .from("profiles")
           .select("id, email, full_name, avatar_url, role, created_at")
-          .eq("id", user.id)
-          .single();
+          .eq("id", sessionUser.id)
+          .maybeSingle();
 
-        setProfile(data as Profile | null);
-        setLoading(false);
+        setUser(
+          toNavbarAuthUser(
+            {
+              id: sessionUser.id,
+              email: sessionUser.email,
+              user_metadata: sessionUser.user_metadata ?? {},
+            },
+            profile as Profile | null
+          )
+        );
       } catch {
-        setProfile(null);
-        setLoading(false);
+        setUser(
+          toNavbarAuthUser({
+            id: sessionUser.id,
+            email: sessionUser.email,
+            user_metadata: sessionUser.user_metadata ?? {},
+          })
+        );
       }
     }
 
-    loadProfile();
-
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      loadProfile();
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      syncFromSession(session?.user ?? null);
     });
 
     return () => subscription.unsubscribe();
@@ -68,6 +82,7 @@ export function UserMenu() {
 
   const handleLogout = async () => {
     if (!isSupabaseConfigured()) {
+      router.refresh();
       router.push("/login");
       return;
     }
@@ -77,13 +92,11 @@ export function UserMenu() {
     } catch {
       /* ignore */
     }
-    router.push("/login");
     router.refresh();
+    router.push("/login");
   };
 
-  if (loading) return null;
-
-  if (!profile) {
+  if (!user) {
     return (
       <Link
         href="/login"
@@ -94,7 +107,7 @@ export function UserMenu() {
     );
   }
 
-  const displayName = profile.full_name || profile.email;
+  const displayName = user.full_name || user.email;
   const initials = getInitials(displayName);
 
   return (
@@ -105,10 +118,10 @@ export function UserMenu() {
           className="flex items-center gap-2 rounded-full focus:outline-none focus:ring-2 focus:ring-terra/40"
           aria-label="Account menu"
         >
-          {profile.avatar_url ? (
+          {user.avatar_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={profile.avatar_url}
+              src={user.avatar_url}
               alt={displayName}
               className="h-8 w-8 rounded-full object-cover border border-green/10"
             />
@@ -122,19 +135,19 @@ export function UserMenu() {
       <DropdownMenuContent align="end">
         <div className="px-3 py-2">
           <p className="text-sm font-medium text-text truncate">{displayName}</p>
-          <p className="text-xs text-muted truncate">{profile.email}</p>
+          <p className="text-xs text-muted truncate">{user.email}</p>
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/account" className="flex items-center gap-2">
             <User size={14} />
-            Profile
+            My Account
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/account#settings" className="flex items-center gap-2">
-            <Settings size={14} />
-            Settings
+          <Link href="/dashboard" className="flex items-center gap-2">
+            <Package size={14} />
+            Orders
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -143,7 +156,7 @@ export function UserMenu() {
           className="flex items-center gap-2 text-terra"
         >
           <LogOut size={14} />
-          Logout
+          Sign Out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

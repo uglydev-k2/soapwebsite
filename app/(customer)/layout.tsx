@@ -1,11 +1,16 @@
 import Link from "next/link";
 import { UserMenu } from "@/components/auth/UserMenu";
+import { getNavbarAuthUser } from "@/lib/profile";
 
-export default function CustomerLayout({
+export const dynamic = "force-dynamic";
+
+export default async function CustomerLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const initialUser = await getNavbarAuthUser();
+
   return (
     <div className="min-h-screen bg-cream">
       <header className="border-b border-green/10 bg-cream/85 backdrop-blur-md">
@@ -30,7 +35,7 @@ export default function CustomerLayout({
             >
               Shop
             </Link>
-            <UserMenu />
+            <UserMenu initialUser={initialUser} />
           </nav>
         </div>
       </header>

@@ -56,8 +56,8 @@ export function LoginForm({
         return;
       }
 
-      router.push("/dashboard");
       router.refresh();
+      router.push("/dashboard");
     } catch {
       setError("Unable to sign in. Please try again.");
       setLoading(false);

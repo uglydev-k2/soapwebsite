@@ -53,8 +53,8 @@ export function SignupForm() {
       }
 
       if (authData.session) {
-        router.push("/dashboard");
         router.refresh();
+        router.push("/dashboard");
         return;
       }
 
