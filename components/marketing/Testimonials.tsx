@@ -1,4 +1,9 @@
 import { cn } from "@/lib/utils";
+import {
+  AnimatedSectionHeader,
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/motion/ScrollReveal";
 
 const testimonials = [
   {
@@ -48,42 +53,38 @@ export default function Testimonials() {
   return (
     <section className="bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <span className="label-caps text-terra">Kind Words</span>
-          <h2 className="mt-4 font-serif text-4xl font-light text-green lg:text-5xl">
-            Loved by Ritualists
-          </h2>
-        </div>
+        <AnimatedSectionHeader eyebrow="Kind Words" title="Loved by Ritualists" />
 
-        <div className="mt-16 grid gap-8 lg:grid-cols-3">
+        <StaggerContainer className="mt-16 grid gap-8 lg:grid-cols-3">
           {testimonials.map((testimonial) => (
-            <blockquote
-              key={testimonial.name}
-              className={cn(
-                "flex flex-col border border-green/10 bg-cream p-8",
-                "transition-shadow duration-300 hover:shadow-md"
-              )}
-            >
-              <StarRating count={testimonial.rating} />
-              <p className="mt-6 flex-1 font-serif text-lg leading-relaxed text-green">
-                &ldquo;{testimonial.quote}&rdquo;
-              </p>
-              <footer className="mt-8 border-t border-green/10 pt-6">
-                <cite className="not-italic">
-                  <span className="block font-sans text-sm font-normal text-green">
-                    {testimonial.name}
+            <StaggerItem key={testimonial.name}>
+              <blockquote
+                className={cn(
+                  "flex h-full flex-col border border-green/10 bg-cream p-8",
+                  "transition-shadow duration-300 hover:shadow-md"
+                )}
+              >
+                <StarRating count={testimonial.rating} />
+                <p className="mt-6 flex-1 font-serif text-lg leading-relaxed text-green">
+                  &ldquo;{testimonial.quote}&rdquo;
+                </p>
+                <footer className="mt-8 border-t border-green/10 pt-6">
+                  <cite className="not-italic">
+                    <span className="block font-sans text-sm font-normal text-green">
+                      {testimonial.name}
+                    </span>
+                    <span className="mt-1 block text-xs text-muted">
+                      {testimonial.location}
+                    </span>
+                  </cite>
+                  <span className="mt-3 block label-caps text-gold">
+                    {testimonial.product}
                   </span>
-                  <span className="mt-1 block text-xs text-muted">
-                    {testimonial.location}
-                  </span>
-                </cite>
-                <span className="mt-3 block label-caps text-gold">
-                  {testimonial.product}
-                </span>
-              </footer>
-            </blockquote>
+                </footer>
+              </blockquote>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </div>
     </section>
   );

@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { newsletterSchema } from "@/lib/validations";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { ScrollReveal } from "@/components/motion/ScrollReveal";
 
 type NewsletterForm = z.infer<typeof newsletterSchema>;
 
@@ -51,7 +52,7 @@ export default function Newsletter() {
 
   return (
     <section className="bg-terra py-20 lg:py-24">
-      <div className="mx-auto max-w-2xl px-6 text-center lg:px-8">
+      <ScrollReveal className="mx-auto max-w-2xl px-6 text-center lg:px-8">
         <span className="label-caps text-cream/70">Stay Connected</span>
         <h2 className="mt-4 font-serif text-4xl font-light text-cream lg:text-5xl">
           Join the Ritual
@@ -104,7 +105,7 @@ export default function Newsletter() {
             </Button>
           </form>
         )}
-      </div>
+      </ScrollReveal>
     </section>
   );
 }

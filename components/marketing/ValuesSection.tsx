@@ -1,4 +1,9 @@
 import { cn } from "@/lib/utils";
+import {
+  AnimatedSectionHeader,
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/motion/ScrollReveal";
 
 const values = [
   {
@@ -96,43 +101,39 @@ export default function ValuesSection() {
   return (
     <section className="bg-cream py-20 lg:py-28" id="about">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <span className="label-caps text-terra">Our Philosophy</span>
-          <h2 className="mt-4 font-serif text-4xl font-light text-green lg:text-5xl">
-            Crafted with Intention
-          </h2>
-          <p className="mt-4 text-muted">
-            From sourcing to packaging, every detail reflects our commitment to
-            quality, sustainability, and the art of self-care.
-          </p>
-        </div>
+        <AnimatedSectionHeader
+          eyebrow="Our Philosophy"
+          title="Crafted with Intention"
+          description="From sourcing to packaging, every detail reflects our commitment to quality, sustainability, and the art of self-care."
+        />
 
-        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <StaggerContainer className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {values.map((value) => (
-            <article
-              key={value.title}
-              className={cn(
-                "group relative overflow-hidden border border-green/10 bg-white p-8",
-                "transition-shadow duration-300 hover:shadow-lg"
-              )}
-              style={{ borderRadius: "2px" }}
-            >
-              <div
+            <StaggerItem key={value.title}>
+              <article
                 className={cn(
-                  "absolute inset-x-0 top-0 h-0.5 origin-left scale-x-0 bg-green",
-                  "transition-transform duration-300 group-hover:scale-x-100"
+                  "group relative h-full overflow-hidden border border-green/10 bg-white p-8",
+                  "transition-shadow duration-300 hover:shadow-lg"
                 )}
-              />
-              <div className="text-green transition-colors duration-250 group-hover:text-terra">
-                {value.icon}
-              </div>
-              <h3 className="mt-6 font-serif text-xl text-green">{value.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted">
-                {value.description}
-              </p>
-            </article>
+                style={{ borderRadius: "2px" }}
+              >
+                <div
+                  className={cn(
+                    "absolute inset-x-0 top-0 h-0.5 origin-left scale-x-0 bg-green",
+                    "transition-transform duration-300 group-hover:scale-x-100"
+                  )}
+                />
+                <div className="text-green transition-colors duration-250 group-hover:text-terra">
+                  {value.icon}
+                </div>
+                <h3 className="mt-6 font-serif text-xl text-green">{value.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-muted">
+                  {value.description}
+                </p>
+              </article>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </div>
     </section>
   );

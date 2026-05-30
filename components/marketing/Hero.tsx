@@ -2,7 +2,15 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 import { cn, formatPrice } from "@/lib/utils";
+import { BotanicalParticles } from "@/components/motion/BotanicalParticles";
+import { EASE_OUT, fadeUp, staggerContainer } from "@/lib/motion";
 
 const featuredProduct = {
   name: "Forest Cedar Body Wash",
@@ -11,32 +19,67 @@ const featuredProduct = {
   fragrance: "Forest & Cedar",
 };
 
+const headlineWords = [
+  { text: "Where", accent: false },
+  { text: "Ritual", accent: false },
+  { text: "Meets", accent: false },
+  { text: "Luxury", accent: true },
+];
+
 export default function Hero() {
+  const reduced = useReducedMotion();
+  const { scrollY } = useScroll();
+  const panelY = useTransform(scrollY, [0, 500], [0, reduced ? 0 : 48]);
+  const panelScale = useTransform(scrollY, [0, 500], [1, reduced ? 1 : 1.03]);
+
   return (
     <section className="relative overflow-hidden pt-18">
       <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-8 lg:py-28">
-        {/* Left column */}
-        <div className="flex flex-col gap-8">
-          <div className="flex items-center gap-4">
+        <motion.div
+          className="flex flex-col gap-8"
+          initial={reduced ? false : "hidden"}
+          animate="show"
+          variants={staggerContainer(0.08, 0.1)}
+        >
+          <motion.div className="flex items-center gap-4" variants={fadeUp}>
             <span className="label-caps text-terra">Premium Botanical Bath</span>
             <span className="h-px max-w-16 flex-1 bg-gold" aria-hidden />
-          </div>
+          </motion.div>
 
           <h1 className="font-serif text-5xl font-light leading-[1.08] text-green lg:text-6xl xl:text-7xl">
-            Where Ritual Meets{" "}
-            <em className="not-italic text-terra italic">Luxury</em>
+            {headlineWords.map((word, index) => (
+              <motion.span
+                key={word.text}
+                className={cn(
+                  "inline-block mr-[0.28em]",
+                  word.accent && "text-terra italic"
+                )}
+                initial={reduced ? false : { opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.45,
+                  delay: reduced ? 0 : 0.15 + index * 0.08,
+                  ease: EASE_OUT,
+                }}
+              >
+                {word.text}
+              </motion.span>
+            ))}
           </h1>
 
-          <p className="max-w-md text-base leading-relaxed text-muted">
+          <motion.p
+            className="max-w-md text-base leading-relaxed text-muted"
+            variants={fadeUp}
+          >
             Handcrafted soaps and body care infused with botanical essences.
             Transform your daily cleanse into a moment of calm, intention, and
             indulgence.
-          </p>
+          </motion.p>
 
-          <div className="flex flex-wrap items-center gap-4">
+          <motion.div className="flex flex-wrap items-center gap-4" variants={fadeUp}>
             <Link
               href="#collections"
-              className="inline-flex items-center justify-center gap-2 bg-terra px-8 py-4 text-sm label-caps text-white transition-colors duration-250 hover:bg-terra-2"
+              className="cta-shimmer inline-flex items-center justify-center gap-2 bg-terra px-8 py-4 text-sm label-caps text-white transition-colors duration-250 hover:bg-terra-2"
               style={{ borderRadius: 0 }}
             >
               Explore Collection
@@ -49,12 +92,15 @@ export default function Hero() {
             >
               Discover Our Ritual
             </Link>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        {/* Right column — green panel with botanical SVG */}
         <div className="relative">
-          <div className="relative aspect-[4/5] overflow-hidden bg-green lg:aspect-square">
+          <motion.div
+            className="relative aspect-[4/5] overflow-hidden bg-green lg:aspect-square"
+            style={{ y: panelY, scale: panelScale }}
+          >
+            <BotanicalParticles />
             <svg
               viewBox="0 0 400 400"
               className="absolute inset-0 h-full w-full"
@@ -93,32 +139,20 @@ export default function Hero() {
                   animationDelay: "0.8s",
                 }}
               />
-              <path
-                d="M120 200 Q160 160 200 180 Q240 200 280 200"
-                fill="none"
-                stroke="rgba(201,169,110,0.18)"
-                strokeWidth="1"
-                strokeLinecap="round"
-                className="animate-draw-stroke"
-                style={{
-                  strokeDasharray: 300,
-                  strokeDashoffset: 300,
-                  animationDelay: "1.2s",
-                }}
-              />
               <circle cx="200" cy="180" r="5" fill="rgba(201,169,110,0.55)" />
             </svg>
-
             <div className="absolute inset-0 bg-gradient-to-t from-green-3/50 via-transparent to-green-3/10" />
-          </div>
+          </motion.div>
 
-          {/* Floating featured product card */}
-          <div
+          <motion.div
             className={cn(
-              "absolute -bottom-6 -left-4 w-64 animate-floatUp border border-green/10 bg-white p-5 shadow-xl",
+              "absolute -bottom-6 -left-4 w-64 border border-green/10 bg-white p-5 shadow-xl",
               "lg:-bottom-8 lg:-left-8 lg:w-72"
             )}
             style={{ borderRadius: "2px" }}
+            initial={reduced ? false : { opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, delay: 0.45, ease: EASE_OUT }}
           >
             <span className="label-caps text-gold">Featured</span>
             <h3 className="mt-2 font-serif text-xl text-green">
@@ -130,13 +164,13 @@ export default function Hero() {
                 {formatPrice(featuredProduct.price)}
               </span>
               <Link
-                href={`/products/${featuredProduct.slug}`}
+                href={`/collections/${featuredProduct.slug}`}
                 className="label-caps text-green transition-colors duration-250 hover:text-terra"
               >
                 View →
               </Link>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

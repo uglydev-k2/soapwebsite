@@ -4,6 +4,11 @@ import { getActiveProducts } from "@/lib/products";
 import ProductCard from "@/components/marketing/ProductCard";
 import { Suspense } from "react";
 import { CardSkeleton } from "@/components/ui/Skeleton";
+import {
+  AnimatedSectionHeader,
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/motion/ScrollReveal";
 
 export const metadata = {
   title: "Collections — MsVee Soaps",
@@ -14,45 +19,47 @@ async function CollectionsList() {
 
   if (products.length === 0) {
     return (
-      <div className="text-center py-24">
-        <p className="font-serif text-2xl text-green mb-2">Our collection is growing</p>
+      <div className="py-24 text-center">
+        <p className="mb-2 font-serif text-2xl text-green">
+          Our collection is growing
+        </p>
         <p className="text-muted">Check back soon for new botanical rituals.</p>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+    <StaggerContainer className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+      {products.map((product, index) => (
+        <StaggerItem key={product.id}>
+          <ProductCard product={product} index={index} />
+        </StaggerItem>
       ))}
-    </div>
+    </StaggerContainer>
   );
 }
 
 export default function CollectionsPage() {
   return (
-    <section className="pt-32 pb-24 px-6 bg-cream min-h-screen">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <p className="label-caps text-terra mb-4">Shop All</p>
-          <h1 className="font-serif text-4xl md:text-5xl font-light text-green tracking-wide">
-            Our Collections
-          </h1>
-          <p className="text-muted mt-4 max-w-lg mx-auto">
-            Hand-crafted botanical bath and body essentials, made in small batches with clean ingredients.
-          </p>
-        </div>
+    <section className="min-h-screen bg-cream px-6 pb-24 pt-32">
+      <div className="mx-auto max-w-6xl">
+        <AnimatedSectionHeader
+          eyebrow="Shop All"
+          title="Our Collections"
+          description="Hand-crafted botanical bath and body essentials, made in small batches with clean ingredients."
+        />
         <Suspense
           fallback={
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3">
               <CardSkeleton />
               <CardSkeleton />
               <CardSkeleton />
             </div>
           }
         >
-          <CollectionsList />
+          <div className="mt-16">
+            <CollectionsList />
+          </div>
         </Suspense>
       </div>
     </section>

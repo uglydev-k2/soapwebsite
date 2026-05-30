@@ -42,7 +42,7 @@ const config: Config = {
         slight: "2px",
       },
       animation: {
-        marquee: "marquee 30s linear infinite",
+        marquee: "marquee 45s linear infinite",
         "draw-stroke": "drawStroke 2s ease forwards",
         floatUp: "floatUp 0.8s ease-out forwards",
         shake: "shake 0.5s ease-in-out",

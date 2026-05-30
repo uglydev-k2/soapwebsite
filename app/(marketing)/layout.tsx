@@ -1,6 +1,5 @@
-import Navbar from "@/components/marketing/Navbar";
-import Footer from "@/components/marketing/Footer";
 import { getNavbarAuthUser } from "@/lib/profile";
+import { MarketingShell } from "@/components/marketing/MarketingShell";
 
 export const dynamic = "force-dynamic";
 
@@ -11,11 +10,5 @@ export default async function MarketingLayout({
 }) {
   const initialUser = await getNavbarAuthUser();
 
-  return (
-    <>
-      <Navbar initialUser={initialUser} />
-      <main>{children}</main>
-      <Footer />
-    </>
-  );
+  return <MarketingShell initialUser={initialUser}>{children}</MarketingShell>;
 }
