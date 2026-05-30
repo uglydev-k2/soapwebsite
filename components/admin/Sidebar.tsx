@@ -7,7 +7,9 @@ import { signOut, useSession } from "next-auth/react";
 import { LogOut, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { hasPermission, type Permission } from "@/lib/rbac";
-import type { ApiResponse } from "@/types";
+import { createClient } from "@/lib/supabase/client";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
+import type { ApiResponse, AdminSession } from "@/types";
 
 interface NavItem {
   label: string;
@@ -73,10 +75,39 @@ function getInitials(name?: string | null): string {
 
 export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const { data: session } = useSession();
-  const user = session?.user;
-  const role = (user as { role?: string } | undefined)?.role;
+  const { data: nextAuthSession } = useSession();
+  const [supabaseAdmin, setSupabaseAdmin] = useState<AdminSession | null>(null);
   const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchAdminSession() {
+      try {
+        const res = await fetch("/api/admin/me");
+        const json = (await res.json()) as ApiResponse<AdminSession | null>;
+        if (!cancelled && res.ok && json.data) {
+          setSupabaseAdmin(json.data);
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+    fetchAdminSession();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const nextAuthUser = nextAuthSession?.user;
+  const nextAuthRole = (nextAuthUser as { role?: string } | undefined)?.role;
+
+  const displayName =
+    nextAuthUser?.name ??
+    supabaseAdmin?.name ??
+    supabaseAdmin?.email ??
+    "Admin";
+  const role = nextAuthRole ?? supabaseAdmin?.role;
+  const authSource = nextAuthRole ? "nextauth" : supabaseAdmin?.source;
 
   useEffect(() => {
     let cancelled = false;
@@ -176,10 +207,10 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
       <div className="border-t border-white/10 p-4">
         <div className="mb-3 flex items-center gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center bg-terra font-sans text-xs font-medium text-white">
-            {getInitials(user?.name)}
+            {getInitials(displayName)}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm text-cream">{user?.name ?? "Admin"}</p>
+            <p className="truncate text-sm text-cream">{displayName}</p>
             <p className="truncate text-xs text-cream/50">
               {role?.replace(/_/g, " ") ?? "Admin"}
             </p>
@@ -187,7 +218,19 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
         </div>
         <button
           type="button"
-          onClick={() => signOut({ callbackUrl: "/admin/login" })}
+          onClick={async () => {
+            if (authSource === "supabase" && isSupabaseConfigured()) {
+              try {
+                const supabase = createClient();
+                await supabase.auth.signOut();
+              } catch {
+                /* ignore */
+              }
+              window.location.href = "/";
+              return;
+            }
+            signOut({ callbackUrl: "/admin/login" });
+          }}
           className="flex w-full items-center justify-center gap-2 border border-white/15 px-3 py-2 text-xs text-cream/70 transition-colors hover:border-gold/40 hover:text-cream"
         >
           <LogOut size={14} />

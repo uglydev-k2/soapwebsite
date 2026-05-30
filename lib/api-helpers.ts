@@ -1,13 +1,13 @@
-import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import type { ApiResponse } from "@/types";
 import { hasPermission, type Permission } from "@/lib/rbac";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { getAdminSession } from "@/lib/admin-auth";
 
 export async function requireAdmin(permission?: Permission) {
   try {
-    const session = await auth();
-    if (!session?.user) {
+    const adminSession = await getAdminSession();
+    if (!adminSession) {
       return {
         session: null,
         error: NextResponse.json<ApiResponse<null>>(
@@ -17,8 +17,7 @@ export async function requireAdmin(permission?: Permission) {
       };
     }
 
-    const role = (session.user as { role?: string }).role;
-    if (permission && !hasPermission(role, permission)) {
+    if (permission && !hasPermission(adminSession.role, permission)) {
       return {
         session: null,
         error: NextResponse.json<ApiResponse<null>>(
@@ -27,6 +26,15 @@ export async function requireAdmin(permission?: Permission) {
         ),
       };
     }
+
+    const session = {
+      user: {
+        id: adminSession.id,
+        email: adminSession.email,
+        name: adminSession.name,
+        role: adminSession.role,
+      },
+    };
 
     return { session, error: null };
   } catch (error) {

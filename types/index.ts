@@ -50,3 +50,11 @@ export interface DashboardKpis {
   totalCustomers: number;
   newCustomersToday: number;
 }
+
+export type AdminSession = {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string;
+  source: "nextauth" | "supabase";
+};

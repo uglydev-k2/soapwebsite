@@ -110,6 +110,27 @@ export function canAccessAdmin(role: string | undefined): boolean {
   return hasPermission(role, "dashboard:read");
 }
 
+/** Map Supabase profiles.role → Prisma admin RBAC role */
+export function mapSupabaseProfileRole(
+  profileRole: string | undefined | null
+): AdminRole | null {
+  if (!profileRole) return null;
+  const normalized = profileRole.toLowerCase().trim();
+  if (normalized === "superadmin" || normalized === "super_admin") {
+    return "SUPER_ADMIN";
+  }
+  if (normalized === "admin") return "ADMIN";
+  if (normalized === "moderator") return "MODERATOR";
+  return null;
+}
+
+export function isSupabaseProfileAdmin(
+  profileRole: string | undefined | null
+): boolean {
+  const mapped = mapSupabaseProfileRole(profileRole);
+  return mapped !== null && canAccessAdmin(mapped);
+}
+
 /** Route → minimum permission */
 export const ROUTE_PERMISSIONS: Record<string, Permission> = {
   "/admin": "dashboard:read",

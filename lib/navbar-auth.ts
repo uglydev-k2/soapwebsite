@@ -1,4 +1,5 @@
 import type { User } from "@supabase/supabase-js";
+import { isSupabaseProfileAdmin } from "@/lib/rbac";
 
 export type Profile = {
   id: string;
@@ -14,6 +15,8 @@ export type NavbarAuthUser = {
   email: string;
   full_name: string | null;
   avatar_url: string | null;
+  role: string;
+  isAdmin: boolean;
 };
 
 export function toNavbarAuthUser(
@@ -25,10 +28,14 @@ export function toNavbarAuthUser(
     avatar_url?: string;
   };
 
+  const role = profile?.role ?? "user";
+
   return {
     id: user.id,
     email: profile?.email ?? user.email ?? "",
     full_name: profile?.full_name ?? metadata.full_name ?? null,
     avatar_url: profile?.avatar_url ?? metadata.avatar_url ?? null,
+    role,
+    isAdmin: isSupabaseProfileAdmin(role),
   };
 }

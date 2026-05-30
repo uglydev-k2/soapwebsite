@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { User, Package, LogOut } from "lucide-react";
+import { User, Package, LogOut, LayoutDashboard } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { toNavbarAuthUser, type NavbarAuthUser, type Profile } from "@/lib/navbar-auth";
@@ -138,6 +138,14 @@ export function UserMenu({ initialUser = null }: UserMenuProps) {
           <p className="text-xs text-muted truncate">{user.email}</p>
         </div>
         <DropdownMenuSeparator />
+        {user.isAdmin && (
+          <DropdownMenuItem asChild>
+            <Link href="/admin" className="flex items-center gap-2">
+              <LayoutDashboard size={14} />
+              Admin Dashboard
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem asChild>
           <Link href="/account" className="flex items-center gap-2">
             <User size={14} />

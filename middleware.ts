@@ -8,6 +8,7 @@ import {
   getRequiredPermission,
   hasPermission,
 } from "@/lib/rbac";
+import type { AdminRole } from "@/lib/rbac";
 
 const CUSTOMER_AUTH_PAGES = ["/login", "/signup"];
 const CUSTOMER_PROTECTED_PREFIXES = ["/dashboard", "/account"];
@@ -15,25 +16,34 @@ const CUSTOMER_PROTECTED_PREFIXES = ["/dashboard", "/account"];
 async function handleAdminAuth(
   request: NextRequest,
   pathname: string,
-  fallback: NextResponse
+  fallback: NextResponse,
+  supabaseAdminRole: AdminRole | null
 ): Promise<NextResponse | null> {
   if (!pathname.startsWith("/admin")) {
     return null;
   }
 
   const secret = getAuthSecret();
-  if (!secret) {
-    console.error("[middleware] Missing AUTH_SECRET / NEXTAUTH_SECRET for admin routes");
-    return NextResponse.next();
-  }
-
-  const token = await getToken({ req: request, secret });
-  const isLoggedIn = !!token;
-  const role = token?.role as string | undefined;
   const isLoginPage = pathname === "/admin/login";
 
+  let role: string | undefined;
+  let isLoggedIn = false;
+
+  if (secret) {
+    const token = await getToken({ req: request, secret });
+    if (token?.role && canAccessAdmin(token.role as string)) {
+      isLoggedIn = true;
+      role = token.role as string;
+    }
+  }
+
+  if (!isLoggedIn && supabaseAdminRole) {
+    isLoggedIn = true;
+    role = supabaseAdminRole;
+  }
+
   if (isLoginPage) {
-    if (isLoggedIn && canAccessAdmin(role)) {
+    if (isLoggedIn) {
       return NextResponse.redirect(new URL("/admin", request.url));
     }
     return fallback;
@@ -64,7 +74,8 @@ export async function middleware(request: NextRequest) {
       const adminResult = await handleAdminAuth(
         request,
         request.nextUrl.pathname,
-        NextResponse.next()
+        NextResponse.next(),
+        null
       );
       return adminResult ?? NextResponse.next();
     } catch (error) {
@@ -75,7 +86,7 @@ export async function middleware(request: NextRequest) {
 
   try {
     const pathname = request.nextUrl.pathname;
-    const { supabaseResponse, user } = await updateSession(request);
+    const { supabaseResponse, user, adminRole } = await updateSession(request);
 
     if (user && CUSTOMER_AUTH_PAGES.some((path) => pathname === path)) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
@@ -93,7 +104,8 @@ export async function middleware(request: NextRequest) {
     const adminResult = await handleAdminAuth(
       request,
       pathname,
-      supabaseResponse
+      supabaseResponse,
+      adminRole
     );
     if (adminResult) {
       return adminResult;
