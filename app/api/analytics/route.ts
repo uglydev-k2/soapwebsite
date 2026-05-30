@@ -1,15 +1,32 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, jsonResponse } from "@/lib/api-helpers";
-import { subDays, startOfDay, format } from "date-fns";
+import { withApiHandler } from "@/lib/api-handler";
+import { isDatabaseConfigured } from "@/lib/env";
 
-export async function GET(request: NextRequest) {
+export const GET = withApiHandler("analytics", async (request: NextRequest) => {
   const { error } = await requireAdmin();
   if (error) return error;
 
-  const range = request.nextUrl.searchParams.get("range") || "30d";
+  if (!isDatabaseConfigured()) {
+    return jsonResponse({
+      revenueOverTime: [],
+      ordersByStatus: [],
+      topProducts: [],
+      customerAcquisition: [],
+      categoryBreakdown: [],
+      monthlyRevenue: [],
+      totalRevenue: 0,
+      totalOrders: 0,
+    });
+  }
+
+  const { searchParams } = request.nextUrl;
+  const range = searchParams.get("range") || "30d";
   const days = range === "7d" ? 7 : range === "90d" ? 90 : 30;
-  const since = startOfDay(subDays(new Date(), days));
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+  since.setHours(0, 0, 0, 0);
 
   const orders = await prisma.order.findMany({
     where: { createdAt: { gte: since }, status: { notIn: ["CANCELLED", "REFUNDED"] } },
@@ -22,7 +39,10 @@ export async function GET(request: NextRequest) {
   const customersByWeek: Record<string, number> = {};
 
   for (const order of orders) {
-    const dayKey = format(order.createdAt, "MMM d");
+    const dayKey = order.createdAt.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
     revenueByDay[dayKey] = (revenueByDay[dayKey] || 0) + order.total;
     statusCounts[order.status] = (statusCounts[order.status] || 0) + 1;
 
@@ -39,7 +59,10 @@ export async function GET(request: NextRequest) {
     where: { createdAt: { gte: since } },
   });
   for (const c of newCustomers) {
-    const weekKey = format(c.createdAt, "MMM d");
+    const weekKey = c.createdAt.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
     customersByWeek[weekKey] = (customersByWeek[weekKey] || 0) + 1;
   }
 
@@ -59,14 +82,15 @@ export async function GET(request: NextRequest) {
     count,
   }));
 
+  const totalOrderRevenue = orders.reduce((s, o) => s + o.total, 0);
   const topProducts = Object.values(productRevenue)
     .sort((a, b) => b.revenue - a.revenue)
     .slice(0, 10)
     .map((p) => ({
       name: p.name,
       revenue: p.revenue,
-      percent: orders.length
-        ? Math.round((p.revenue / orders.reduce((s, o) => s + o.total, 0)) * 100)
+      percent: totalOrderRevenue
+        ? Math.round((p.revenue / totalOrderRevenue) * 100)
         : 0,
     }));
 
@@ -90,10 +114,10 @@ export async function GET(request: NextRequest) {
     customerAcquisition,
     categoryBreakdown,
     monthlyRevenue,
-    totalRevenue: orders.reduce((s, o) => s + o.total, 0),
+    totalRevenue: totalOrderRevenue,
     totalOrders: orders.length,
   });
-}
+});
 
 async function getMonthlyRevenue() {
   const months = [];
@@ -113,7 +137,7 @@ async function getMonthlyRevenue() {
     });
 
     months.push({
-      month: format(start, "MMM"),
+      month: start.toLocaleString("en-US", { month: "short" }),
       revenue: result._sum.total || 0,
     });
   }

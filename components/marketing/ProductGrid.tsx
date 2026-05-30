@@ -18,7 +18,16 @@ export default async function ProductGrid({
   subtitle = "Curated Favorites",
   showViewAll = true,
 }: ProductGridProps) {
-  const items = products ?? (await getFeaturedProducts(limit));
+  let items: ProductWithMeta[] = products ?? [];
+
+  if (!products) {
+    try {
+      items = await getFeaturedProducts(limit);
+    } catch (error) {
+      console.error("[msvee] ProductGrid failed:", error);
+      items = [];
+    }
+  }
 
   if (items.length === 0) {
     return null;

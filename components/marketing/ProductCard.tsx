@@ -53,7 +53,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
         style={{ borderRadius: "2px" }}
       >
         <Link
-          href={`/products/${product.slug}`}
+          href={`/collections/${product.slug}`}
           className="relative block aspect-[3/4] overflow-hidden"
         >
           {product.images[0] ? (
@@ -114,7 +114,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
           </span>
           <h3 className="mt-1 font-serif text-lg text-green">
             <Link
-              href={`/products/${product.slug}`}
+              href={`/collections/${product.slug}`}
               className="transition-colors duration-250 hover:text-terra"
             >
               {product.name}

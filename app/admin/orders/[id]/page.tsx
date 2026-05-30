@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { AdminShell } from "@/components/admin/AdminShell";
 import { OrderDetail } from "@/components/admin/OrderDetail";
-import { prisma } from "@/lib/prisma";
+import { getAdminOrder } from "@/lib/admin-data";
 import { notFound } from "next/navigation";
 
 export default async function OrderDetailPage({
@@ -10,13 +10,7 @@ export default async function OrderDetailPage({
 }: {
   params: { id: string };
 }) {
-  const order = await prisma.order.findUnique({
-    where: { id: params.id },
-    include: {
-      customer: true,
-      items: { include: { product: true } },
-    },
-  });
+  const order = await getAdminOrder(params.id);
   if (!order) notFound();
 
   return (

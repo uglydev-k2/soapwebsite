@@ -1,7 +1,40 @@
 import { prisma } from "@/lib/prisma";
+import { safeDbQuery } from "@/lib/db";
 import { subDays, startOfDay } from "date-fns";
+import type { OrderStatus } from "@prisma/client";
+
+const EMPTY_DASHBOARD = {
+  kpis: {
+    totalRevenue: 0,
+    revenueChange: 0,
+    totalOrders: 0,
+    ordersChange: 0,
+    totalProducts: 0,
+    lowStockCount: 0,
+    totalCustomers: 0,
+    newCustomersToday: 0,
+  },
+  recentOrders: [] as Awaited<
+    ReturnType<
+      typeof prisma.order.findMany<{
+        include: {
+          customer: { select: { firstName: true; lastName: true; email: true } };
+          items: true;
+        };
+      }>
+    >
+  >,
+  monthlyRevenue: [] as { month: string; revenue: number }[],
+  categoryBreakdown: [] as { category: string; count: number; percentage: number }[],
+  pendingCount: 0,
+  lowStockProducts: 0,
+};
 
 export async function getDashboardData() {
+  return safeDbQuery("getDashboardData", fetchDashboardData, EMPTY_DASHBOARD);
+}
+
+async function fetchDashboardData() {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
@@ -23,12 +56,12 @@ export async function getDashboardData() {
     pendingCount,
   ] = await Promise.all([
     prisma.order.aggregate({
-      where: { status: { notIn: ["CANCELLED", "REFUNDED"] } },
+      where: { status: { notIn: ["CANCELLED", "REFUNDED"] as OrderStatus[] } },
       _sum: { total: true },
     }),
     prisma.order.aggregate({
       where: {
-        status: { notIn: ["CANCELLED", "REFUNDED"] },
+        status: { notIn: ["CANCELLED", "REFUNDED"] as OrderStatus[] },
         createdAt: { gte: lastMonthStart, lt: monthStart },
       },
       _sum: { total: true },
@@ -54,7 +87,7 @@ export async function getDashboardData() {
 
   const monthRevenue = await prisma.order.aggregate({
     where: {
-      status: { notIn: ["CANCELLED", "REFUNDED"] },
+      status: { notIn: ["CANCELLED", "REFUNDED"] as OrderStatus[] },
       createdAt: { gte: monthStart },
     },
     _sum: { total: true },
@@ -102,7 +135,7 @@ async function getMonthlyRevenue() {
     const result = await prisma.order.aggregate({
       where: {
         createdAt: { gte: start, lt: end },
-        status: { notIn: ["CANCELLED", "REFUNDED"] },
+        status: { notIn: ["CANCELLED", "REFUNDED"] as OrderStatus[] },
       },
       _sum: { total: true },
     });

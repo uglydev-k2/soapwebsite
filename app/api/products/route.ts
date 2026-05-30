@@ -1,10 +1,16 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, jsonResponse, errorResponse } from "@/lib/api-helpers";
+import { withApiHandler } from "@/lib/api-handler";
 import { productSchema } from "@/lib/validations";
 import type { Prisma } from "@prisma/client";
+import { isDatabaseConfigured } from "@/lib/env";
 
-export async function GET(request: NextRequest) {
+export const GET = withApiHandler("products.list", async (request: NextRequest) => {
+  if (!isDatabaseConfigured()) {
+    return jsonResponse([]);
+  }
+
   const { searchParams } = request.nextUrl;
   const category = searchParams.get("category");
   const active = searchParams.get("active");
@@ -58,9 +64,9 @@ export async function GET(request: NextRequest) {
     total,
     totalPages: Math.ceil(total / limit),
   });
-}
+});
 
-export async function POST(request: NextRequest) {
+export const POST = withApiHandler("products.create", async (request: NextRequest) => {
   const { error } = await requireAdmin();
   if (error) return error;
 
@@ -77,4 +83,4 @@ export async function POST(request: NextRequest) {
 
   const product = await prisma.product.create({ data: parsed.data });
   return jsonResponse(product, undefined, 201);
-}
+});

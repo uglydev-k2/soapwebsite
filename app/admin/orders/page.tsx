@@ -2,16 +2,17 @@ export const dynamic = "force-dynamic";
 
 import { AdminShell } from "@/components/admin/AdminShell";
 import OrdersPageClient from "@/components/admin/OrdersPageClient";
-import { prisma } from "@/lib/prisma";
+import { getAdminOrders } from "@/lib/admin-data";
+import type { Prisma } from "@prisma/client";
 
 export default async function AdminOrdersPage({
   searchParams,
 }: {
   searchParams: { status?: string; search?: string };
 }) {
-  const where: Record<string, unknown> = {};
+  const where: Prisma.OrderWhereInput = {};
   if (searchParams.status && searchParams.status !== "ALL") {
-    where.status = searchParams.status;
+    where.status = searchParams.status as Prisma.OrderWhereInput["status"];
   }
   if (searchParams.search) {
     where.OR = [
@@ -20,14 +21,7 @@ export default async function AdminOrdersPage({
     ];
   }
 
-  const orders = await prisma.order.findMany({
-    where,
-    include: {
-      customer: { select: { firstName: true, lastName: true, email: true } },
-      items: true,
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const orders = await getAdminOrders(where);
 
   return (
     <AdminShell

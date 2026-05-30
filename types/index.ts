@@ -2,7 +2,23 @@ import type { Category, OrderStatus, Product, Role } from "@prisma/client";
 
 export type { Category, OrderStatus, Role };
 
-export type ProductWithMeta = Product;
+export type ProductWithMeta = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  price: number;
+  comparePrice: number | null;
+  category: Category;
+  stock: number;
+  images: string[];
+  ingredients: string | null;
+  fragrance: string | null;
+  featured: boolean;
+  active: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 export interface ApiResponse<T> {
   data?: T;

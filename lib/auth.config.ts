@@ -1,11 +1,14 @@
 import type { NextAuthConfig } from "next-auth";
+import { getAuthSecret } from "@/lib/env";
 
 /**
  * Edge-safe auth config (no Prisma). Used by middleware.
  */
 export const authConfig: NextAuthConfig = {
   trustHost: true,
-  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
+  secret:
+    getAuthSecret() ??
+    (process.env.NODE_ENV === "production" ? undefined : "development-only-secret"),
   providers: [],
   session: { strategy: "jwt", maxAge: 8 * 60 * 60 },
   pages: { signIn: "/admin/login" },

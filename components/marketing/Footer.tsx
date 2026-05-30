@@ -1,10 +1,10 @@
 import Link from "next/link";
 
 const shopLinks = [
-  { label: "All Products", href: "/shop" },
-  { label: "Bar Soaps", href: "/shop?category=SOAP" },
-  { label: "Body Wash", href: "/shop?category=BODY_WASH" },
-  { label: "Gift Sets", href: "/shop?category=GIFT_SET" },
+  { label: "All Products", href: "/collections" },
+  { label: "Bar Soaps", href: "/collections?category=SOAP" },
+  { label: "Body Wash", href: "/collections?category=BODY_WASH" },
+  { label: "Gift Sets", href: "/collections?category=GIFT_SET" },
 ];
 
 const companyLinks = [

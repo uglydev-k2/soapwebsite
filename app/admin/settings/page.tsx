@@ -2,15 +2,10 @@ export const dynamic = "force-dynamic";
 
 import { AdminShell } from "@/components/admin/AdminShell";
 import { SettingsForm } from "@/components/admin/SettingsForm";
-import { prisma } from "@/lib/prisma";
+import { getAdminSettings } from "@/lib/admin-data";
 
 export default async function AdminSettingsPage() {
-  const settings = await prisma.storeSettings.findUnique({
-    where: { id: "default" },
-  });
-  const admins = await prisma.adminUser.findMany({
-    select: { id: true, email: true, name: true, role: true, createdAt: true },
-  });
+  const { settings, admins } = await getAdminSettings();
 
   return (
     <AdminShell

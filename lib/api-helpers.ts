@@ -3,14 +3,35 @@ import { NextResponse } from "next/server";
 import type { ApiResponse } from "@/types";
 
 export async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user) {
-    return { session: null, error: NextResponse.json<ApiResponse<null>>({ error: "Unauthorized" }, { status: 401 }) };
+  try {
+    const session = await auth();
+    if (!session?.user) {
+      return {
+        session: null,
+        error: NextResponse.json<ApiResponse<null>>(
+          { error: "Unauthorized" },
+          { status: 401 }
+        ),
+      };
+    }
+    return { session, error: null };
+  } catch (error) {
+    console.error("[msvee] Auth check failed:", error);
+    return {
+      session: null,
+      error: NextResponse.json<ApiResponse<null>>(
+        { error: "Authentication service unavailable" },
+        { status: 503 }
+      ),
+    };
   }
-  return { session, error: null };
 }
 
-export function jsonResponse<T>(data: T, meta?: ApiResponse<T>["meta"], status = 200) {
+export function jsonResponse<T>(
+  data: T,
+  meta?: ApiResponse<T>["meta"],
+  status = 200
+) {
   return NextResponse.json<ApiResponse<T>>({ data, meta }, { status });
 }
 

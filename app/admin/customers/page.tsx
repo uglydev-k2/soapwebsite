@@ -2,16 +2,10 @@ export const dynamic = "force-dynamic";
 
 import { AdminShell } from "@/components/admin/AdminShell";
 import CustomersPageClient from "@/components/admin/CustomersPageClient";
-import { prisma } from "@/lib/prisma";
+import { getAdminCustomers } from "@/lib/admin-data";
 
 export default async function AdminCustomersPage() {
-  const customers = await prisma.customer.findMany({
-    include: {
-      orders: { select: { total: true } },
-      _count: { select: { orders: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const customers = await getAdminCustomers();
 
   const rows = customers.map((c) => ({
     id: c.id,

@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { AdminShell } from "@/components/admin/AdminShell";
 import { ProductForm } from "@/components/admin/ProductForm";
-import { prisma } from "@/lib/prisma";
+import { getAdminProduct } from "@/lib/admin-data";
 import { notFound } from "next/navigation";
 
 export default async function EditProductPage({
@@ -10,7 +10,7 @@ export default async function EditProductPage({
 }: {
   params: { id: string };
 }) {
-  const product = await prisma.product.findUnique({ where: { id: params.id } });
+  const product = await getAdminProduct(params.id);
   if (!product) notFound();
 
   return (
