@@ -43,6 +43,12 @@ export default function RootErrorBoundary({
             <li>
               <code>NEXTAUTH_URL</code> — your production URL
             </li>
+            <li>
+              <code>NEXT_PUBLIC_SUPABASE_URL</code> — full https:// URL from Supabase dashboard
+            </li>
+            <li>
+              <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> — Supabase anon public key
+            </li>
             <li>Run <code>npm run db:seed</code> once after first deploy</li>
           </ul>
         </details>

@@ -30,24 +30,29 @@ export function UserMenu() {
     const supabase = createClient();
 
     async function loadProfile() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
 
-      if (!user) {
+        if (!user) {
+          setProfile(null);
+          setLoading(false);
+          return;
+        }
+
+        const { data } = await supabase
+          .from("profiles")
+          .select("id, email, full_name, avatar_url, role, created_at")
+          .eq("id", user.id)
+          .single();
+
+        setProfile(data as Profile | null);
+        setLoading(false);
+      } catch {
         setProfile(null);
         setLoading(false);
-        return;
       }
-
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, email, full_name, avatar_url, role, created_at")
-        .eq("id", user.id)
-        .single();
-
-      setProfile(data as Profile | null);
-      setLoading(false);
     }
 
     loadProfile();
@@ -62,8 +67,16 @@ export function UserMenu() {
   }, []);
 
   const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    if (!isSupabaseConfigured()) {
+      router.push("/login");
+      return;
+    }
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch {
+      /* ignore */
+    }
     router.push("/login");
     router.refresh();
   };

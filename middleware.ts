@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { updateSession } from "@/lib/supabase/middleware";
 import { getAuthSecret } from "@/lib/env";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
 import {
   canAccessAdmin,
   getRequiredPermission,
@@ -55,11 +56,10 @@ async function handleAdminAuth(
 }
 
 export async function middleware(request: NextRequest) {
-  if (
-    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  ) {
-    console.error("Missing Supabase env vars in middleware");
+  if (!isSupabaseConfigured()) {
+    console.error(
+      "Missing or invalid Supabase env vars in middleware — set NEXT_PUBLIC_SUPABASE_URL (https://...) and NEXT_PUBLIC_SUPABASE_ANON_KEY"
+    );
     try {
       const adminResult = await handleAdminAuth(
         request,
