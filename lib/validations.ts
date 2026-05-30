@@ -46,9 +46,39 @@ export const newsletterSchema = z.object({
 });
 
 export const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
+  email: z.string().email("Please enter a valid email"),
+  password: z.string().min(1, "Password is required"),
 });
+
+export const signupSchema = z
+  .object({
+    name: z.string().min(1, "Name is required"),
+    email: z.string().email("Please enter a valid email"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+export const magicLinkSchema = z.object({
+  email: z.string().email("Please enter a valid email"),
+});
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email("Please enter a valid email"),
+});
+
+export const resetPasswordSchema = z
+  .object({
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 export const storeSettingsSchema = z.object({
   name: z.string().min(1),
@@ -62,6 +92,9 @@ export const storeSettingsSchema = z.object({
   notifyOrderShipped: z.boolean(),
   notifyLowStock: z.boolean(),
   notifyNewCustomer: z.boolean(),
+  maintenanceMode: z.boolean().optional().default(false),
+  featureCheckout: z.boolean().optional().default(true),
+  featureNewsletter: z.boolean().optional().default(true),
 });
 
 export const adminInviteSchema = z.object({

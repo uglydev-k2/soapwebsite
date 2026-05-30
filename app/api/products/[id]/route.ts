@@ -2,6 +2,8 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, jsonResponse, errorResponse } from "@/lib/api-helpers";
 import { productSchema } from "@/lib/validations";
+import { logAdminAction } from "@/lib/audit";
+import { getClientIp } from "@/lib/rate-limit";
 
 export async function GET(
   _request: NextRequest,
@@ -35,7 +37,7 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { error } = await requireAdmin();
+  const { session, error } = await requireAdmin();
   if (error) return error;
 
   const body = await request.json();
@@ -48,6 +50,18 @@ export async function PUT(
     where: { id: params.id },
     data: parsed.data,
   });
+
+  await logAdminAction({
+    adminId: session!.user!.id,
+    adminEmail: session!.user!.email ?? "",
+    adminRole: (session!.user as { role?: string }).role ?? "",
+    action: "UPDATE",
+    entity: "Product",
+    entityId: params.id,
+    metadata: { name: product.name },
+    ipAddress: getClientIp(request),
+  });
+
   return jsonResponse(product);
 }
 
@@ -55,7 +69,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { error } = await requireAdmin();
+  const { session, error } = await requireAdmin();
   if (error) return error;
 
   const body = await request.json();
@@ -63,6 +77,18 @@ export async function PATCH(
     where: { id: params.id },
     data: body,
   });
+
+  await logAdminAction({
+    adminId: session!.user!.id,
+    adminEmail: session!.user!.email ?? "",
+    adminRole: (session!.user as { role?: string }).role ?? "",
+    action: "UPDATE",
+    entity: "Product",
+    entityId: params.id,
+    metadata: body,
+    ipAddress: getClientIp(request),
+  });
+
   return jsonResponse(product);
 }
 
@@ -70,7 +96,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { error } = await requireAdmin();
+  const { session, error } = await requireAdmin();
   if (error) return error;
 
   const { searchParams } = request.nextUrl;
@@ -84,5 +110,17 @@ export async function DELETE(
       data: { active: false },
     });
   }
+
+  await logAdminAction({
+    adminId: session!.user!.id,
+    adminEmail: session!.user!.email ?? "",
+    adminRole: (session!.user as { role?: string }).role ?? "",
+    action: hard ? "DELETE" : "UPDATE",
+    entity: "Product",
+    entityId: params.id,
+    metadata: { hard },
+    ipAddress: getClientIp(request),
+  });
+
   return jsonResponse({ success: true });
 }

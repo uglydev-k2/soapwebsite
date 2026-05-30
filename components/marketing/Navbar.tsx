@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { UserMenu } from "@/components/auth/UserMenu";
 import { ShoppingBag, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
@@ -76,6 +77,9 @@ export default function Navbar() {
           </ul>
 
           <div className="flex items-center gap-3 sm:gap-4">
+            <div className="hidden md:block">
+              <UserMenu />
+            </div>
             <Link
               href="/cart"
               className="relative p-2 text-green transition-colors duration-250 hover:text-terra"
@@ -161,7 +165,8 @@ export default function Navbar() {
           ))}
         </ul>
 
-        <div className="border-t border-cream/10 p-6">
+        <div className="border-t border-cream/10 p-6 space-y-4">
+          <UserMenu />
           <Link
             href="#collections"
             onClick={() => setMobileOpen(false)}

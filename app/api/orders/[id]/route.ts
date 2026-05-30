@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin, jsonResponse, errorResponse } from "@/lib/api-helpers";
 import { orderUpdateSchema } from "@/lib/validations";
 import { sendTrackingEmail } from "@/lib/resend";
+import { logAdminAction } from "@/lib/audit";
+import { getClientIp } from "@/lib/rate-limit";
 
 export async function GET(
   _request: NextRequest,
@@ -26,7 +28,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { error } = await requireAdmin();
+  const { session, error } = await requireAdmin();
   if (error) return error;
 
   const body = await request.json();
@@ -44,6 +46,17 @@ export async function PATCH(
   if (parsed.data.status === "SHIPPED" && order.customer.email) {
     await sendTrackingEmail(order.customer.email, order.orderNumber);
   }
+
+  await logAdminAction({
+    adminId: session!.user!.id,
+    adminEmail: session!.user!.email ?? "",
+    adminRole: (session!.user as { role?: string }).role ?? "",
+    action: "UPDATE",
+    entity: "Order",
+    entityId: params.id,
+    metadata: { status: parsed.data.status, orderNumber: order.orderNumber },
+    ipAddress: getClientIp(request),
+  });
 
   return jsonResponse(order);
 }

@@ -21,7 +21,7 @@ interface DataTableProps<T> {
   onSelectAll?: () => void;
 }
 
-export function DataTable<T extends Record<string, unknown>>({
+export function DataTable<T extends object>({
   columns,
   data,
   keyExtractor,
@@ -86,7 +86,7 @@ export function DataTable<T extends Record<string, unknown>>({
                   <td key={col.key} className={cn("py-3 px-4", col.className)}>
                     {col.render
                       ? col.render(item)
-                      : String(item[col.key] ?? "")}
+                      : String((item as Record<string, unknown>)[col.key] ?? "")}
                   </td>
                 ))}
               </tr>

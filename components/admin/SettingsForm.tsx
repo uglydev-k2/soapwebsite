@@ -56,6 +56,9 @@ export function SettingsForm({
           notifyOrderShipped: settings.notifyOrderShipped,
           notifyLowStock: settings.notifyLowStock,
           notifyNewCustomer: settings.notifyNewCustomer,
+          maintenanceMode: settings.maintenanceMode,
+          featureCheckout: settings.featureCheckout,
+          featureNewsletter: settings.featureNewsletter,
         }
       : undefined,
   });
@@ -233,6 +236,25 @@ export function SettingsForm({
               ["notifyOrderShipped", "Order shipped"],
               ["notifyLowStock", "Low stock alerts"],
               ["notifyNewCustomer", "New customers"],
+            ] as const
+          ).map(([key, label]) => (
+            <label key={key} className="flex cursor-pointer items-center gap-3">
+              <input
+                type="checkbox"
+                {...registerStore(key)}
+                className="h-4 w-4 accent-terra"
+              />
+              <span className="text-sm text-text">{label}</span>
+            </label>
+          ))}
+        </fieldset>
+        <fieldset className="space-y-3 border-t border-green/10 pt-4">
+          <legend className="label-caps text-muted">Feature Flags</legend>
+          {(
+            [
+              ["maintenanceMode", "Maintenance mode (blocks checkout)"],
+              ["featureCheckout", "Enable checkout"],
+              ["featureNewsletter", "Enable newsletter signup"],
             ] as const
           ).map(([key, label]) => (
             <label key={key} className="flex cursor-pointer items-center gap-3">

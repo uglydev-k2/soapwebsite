@@ -1,19 +1,24 @@
 import { prisma } from "@/lib/prisma";
 import { safeDbQuery } from "@/lib/db";
 import { subDays, startOfDay } from "date-fns";
-import type { OrderStatus } from "@prisma/client";
+import { getRecentActivity } from "@/lib/audit";
 
-const EMPTY_DASHBOARD = {
+const EMPTY = {
   kpis: {
+    totalCustomers: 0,
+    activeCustomers: 0,
     totalRevenue: 0,
-    revenueChange: 0,
+    newSignupsToday: 0,
     totalOrders: 0,
-    ordersChange: 0,
+    mrr: 0,
     totalProducts: 0,
     lowStockCount: 0,
-    totalCustomers: 0,
-    newCustomersToday: 0,
+    revenueChange: 0,
+    ordersChange: 0,
   },
+  customerGrowth: [] as { month: string; count: number }[],
+  revenueByMonth: [] as { month: string; revenue: number }[],
+  customersByStatus: [] as { status: string; count: number }[],
   recentOrders: [] as Awaited<
     ReturnType<
       typeof prisma.order.findMany<{
@@ -24,14 +29,13 @@ const EMPTY_DASHBOARD = {
       }>
     >
   >,
-  monthlyRevenue: [] as { month: string; revenue: number }[],
   categoryBreakdown: [] as { category: string; count: number; percentage: number }[],
+  recentActivity: [] as Awaited<ReturnType<typeof getRecentActivity>>,
   pendingCount: 0,
-  lowStockProducts: 0,
 };
 
 export async function getDashboardData() {
-  return safeDbQuery("getDashboardData", fetchDashboardData, EMPTY_DASHBOARD);
+  return safeDbQuery("getDashboardData", fetchDashboardData, EMPTY);
 }
 
 async function fetchDashboardData() {
@@ -40,6 +44,7 @@ async function fetchDashboardData() {
   const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const weekStart = subDays(startOfDay(now), 7);
   const todayStart = startOfDay(now);
+  const thirtyDaysAgo = subDays(todayStart, 30);
 
   const [
     totalRevenue,
@@ -49,19 +54,24 @@ async function fetchDashboardData() {
     products,
     lowStockProducts,
     totalCustomers,
+    activeCustomers,
     newCustomersToday,
     recentOrders,
-    monthlyRevenue,
     categoryCounts,
     pendingCount,
+    customerGrowth,
+    revenueByMonth,
+    activeStatusCount,
+    bannedStatusCount,
+    recentActivity,
   ] = await Promise.all([
     prisma.order.aggregate({
-      where: { status: { notIn: ["CANCELLED", "REFUNDED"] as OrderStatus[] } },
+      where: { status: { notIn: ["CANCELLED", "REFUNDED"] } },
       _sum: { total: true },
     }),
     prisma.order.aggregate({
       where: {
-        status: { notIn: ["CANCELLED", "REFUNDED"] as OrderStatus[] },
+        status: { notIn: ["CANCELLED", "REFUNDED"] },
         createdAt: { gte: lastMonthStart, lt: monthStart },
       },
       _sum: { total: true },
@@ -71,6 +81,9 @@ async function fetchDashboardData() {
     prisma.product.count({ where: { active: true } }),
     prisma.product.count({ where: { stock: { lt: 10 }, active: true } }),
     prisma.customer.count(),
+    prisma.customer.count({
+      where: { status: "ACTIVE", createdAt: { gte: thirtyDaysAgo } },
+    }),
     prisma.customer.count({ where: { createdAt: { gte: todayStart } } }),
     prisma.order.findMany({
       take: 5,
@@ -80,14 +93,18 @@ async function fetchDashboardData() {
         items: true,
       },
     }),
-    getMonthlyRevenue(),
     prisma.product.groupBy({ by: ["category"], _count: true }),
     prisma.order.count({ where: { status: "PENDING" } }),
+    getCustomerGrowth(),
+    getMonthlyRevenue(),
+    prisma.customer.count({ where: { status: "ACTIVE" } }),
+    prisma.customer.count({ where: { status: "BANNED" } }),
+    getRecentActivity(10),
   ]);
 
   const monthRevenue = await prisma.order.aggregate({
     where: {
-      status: { notIn: ["CANCELLED", "REFUNDED"] as OrderStatus[] },
+      status: { notIn: ["CANCELLED", "REFUNDED"] },
       createdAt: { gte: monthStart },
     },
     _sum: { total: true },
@@ -97,36 +114,66 @@ async function fetchDashboardData() {
   const lastRev = lastMonthRevenue._sum.total || 1;
   const thisMonthRev = monthRevenue._sum.total || 0;
   const revenueChange = Math.round(((thisMonthRev - lastRev) / lastRev) * 100);
+  const mrr = thisMonthRev;
+
+  const totalCat = categoryCounts.reduce((s, c) => s + c._count, 0) || 1;
 
   return {
     kpis: {
+      totalCustomers,
+      activeCustomers,
       totalRevenue: revenue,
-      revenueChange,
+      newSignupsToday: newCustomersToday,
       totalOrders,
-      ordersChange: weekOrders,
+      mrr,
       totalProducts: products,
       lowStockCount: lowStockProducts,
-      totalCustomers,
-      newCustomersToday,
+      revenueChange,
+      ordersChange: weekOrders,
     },
+    customerGrowth,
+    revenueByMonth,
+    customersByStatus: [
+      { status: "Active", count: activeStatusCount },
+      { status: "Banned", count: bannedStatusCount },
+      {
+        status: "Inactive",
+        count: totalCustomers - activeStatusCount - bannedStatusCount,
+      },
+    ].filter((s) => s.count > 0),
     recentOrders,
-    monthlyRevenue,
-    categoryBreakdown: (() => {
-      const total = categoryCounts.reduce((s, c) => s + c._count, 0) || 1;
-      return categoryCounts.map((c) => ({
-        category: c.category,
-        count: c._count,
-        percentage: Math.round((c._count / total) * 100),
-      }));
-    })(),
+    categoryBreakdown: categoryCounts.map((c) => ({
+      category: c.category,
+      count: c._count,
+      percentage: Math.round((c._count / totalCat) * 100),
+    })),
+    recentActivity,
     pendingCount,
-    lowStockProducts,
   };
+}
+
+async function getCustomerGrowth() {
+  const months = [];
+  for (let i = 11; i >= 0; i--) {
+    const start = new Date();
+    start.setMonth(start.getMonth() - i, 1);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(start);
+    end.setMonth(end.getMonth() + 1);
+    const count = await prisma.customer.count({
+      where: { createdAt: { gte: start, lt: end } },
+    });
+    months.push({
+      month: start.toLocaleString("en-US", { month: "short" }),
+      count,
+    });
+  }
+  return months;
 }
 
 async function getMonthlyRevenue() {
   const months = [];
-  for (let i = 6; i >= 0; i--) {
+  for (let i = 11; i >= 0; i--) {
     const start = new Date();
     start.setMonth(start.getMonth() - i, 1);
     start.setHours(0, 0, 0, 0);
@@ -135,7 +182,7 @@ async function getMonthlyRevenue() {
     const result = await prisma.order.aggregate({
       where: {
         createdAt: { gte: start, lt: end },
-        status: { notIn: ["CANCELLED", "REFUNDED"] as OrderStatus[] },
+        status: { notIn: ["CANCELLED", "REFUNDED"] },
       },
       _sum: { total: true },
     });

@@ -105,6 +105,8 @@ async function main() {
   await prisma.customer.deleteMany();
   await prisma.adminUser.deleteMany();
   await prisma.newsletterSubscriber.deleteMany();
+  await prisma.auditLog.deleteMany();
+  await prisma.announcement.deleteMany();
   await prisma.storeSettings.deleteMany();
 
   const hashedPassword = await bcrypt.hash("msvee-admin-2024", 12);
@@ -117,6 +119,15 @@ async function main() {
     },
   });
 
+  await prisma.adminUser.create({
+    data: {
+      email: "moderator@msvee.co",
+      password: await bcrypt.hash("mod-2024", 12),
+      name: "Moderator",
+      role: "MODERATOR",
+    },
+  });
+
   await prisma.storeSettings.create({
     data: {
       id: "default",
@@ -125,7 +136,44 @@ async function main() {
       email: "hello@msvee.co",
       phone: "(555) 867-5309",
       address: "124 Botanical Lane, Portland, OR 97201",
+      maintenanceMode: false,
+      featureCheckout: true,
+      featureNewsletter: true,
     },
+  });
+
+  const superAdmin = await prisma.adminUser.findFirst({
+    where: { email: "admin@msvee.co" },
+  });
+
+  await prisma.auditLog.createMany({
+    data: [
+      {
+        adminId: superAdmin!.id,
+        adminEmail: "admin@msvee.co",
+        adminRole: "SUPER_ADMIN",
+        action: "CREATE",
+        entity: "StoreSettings",
+        entityId: "default",
+        metadata: { source: "seed" },
+      },
+      {
+        adminId: superAdmin!.id,
+        adminEmail: "admin@msvee.co",
+        adminRole: "SUPER_ADMIN",
+        action: "UPDATE",
+        entity: "AdminUser",
+        entityId: superAdmin!.id,
+        metadata: { note: "Initial super admin" },
+      },
+    ],
+  });
+
+  await prisma.newsletterSubscriber.createMany({
+    data: [
+      { email: "sarah.chen@email.com" },
+      { email: "elena.rodriguez@email.com" },
+    ],
   });
 
   const createdProducts = [];

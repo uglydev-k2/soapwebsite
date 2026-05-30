@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { LogOut, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { hasPermission, type Permission } from "@/lib/rbac";
 import type { ApiResponse } from "@/types";
 
 interface NavItem {
@@ -13,6 +14,7 @@ interface NavItem {
   href: string;
   icon: string;
   badge?: number;
+  permission?: Permission;
 }
 
 interface NavSection {
@@ -24,29 +26,32 @@ const navSections: NavSection[] = [
   {
     title: "OVERVIEW",
     items: [
-      { label: "Dashboard", href: "/admin", icon: "📊" },
-      { label: "Analytics", href: "/admin/analytics", icon: "📈" },
+      { label: "Dashboard", href: "/admin", icon: "📊", permission: "dashboard:read" },
+      { label: "Analytics", href: "/admin/analytics", icon: "📈", permission: "analytics:read" },
     ],
   },
   {
     title: "CATALOG",
     items: [
-      { label: "Products", href: "/admin/products", icon: "📦" },
-      { label: "Categories", href: "/admin/products?view=categories", icon: "🏷️" },
+      { label: "Products", href: "/admin/products", icon: "📦", permission: "products:read" },
+      { label: "Content", href: "/admin/content", icon: "📝", permission: "content:read" },
     ],
   },
   {
     title: "COMMERCE",
     items: [
-      { label: "Orders", href: "/admin/orders", icon: "🛒" },
-      { label: "Customers", href: "/admin/customers", icon: "👥" },
+      { label: "Orders", href: "/admin/orders", icon: "🛒", permission: "orders:read" },
+      { label: "Customers", href: "/admin/customers", icon: "👥", permission: "customers:read" },
+      { label: "Billing", href: "/admin/billing", icon: "💳", permission: "billing:read" },
     ],
   },
   {
     title: "SYSTEM",
     items: [
-      { label: "Settings", href: "/admin/settings", icon: "⚙️" },
-      { label: "My Account", href: "/admin/settings#account", icon: "👤" },
+      { label: "Admin Users", href: "/admin/users", icon: "🔐", permission: "users:read" },
+      { label: "Notifications", href: "/admin/notifications", icon: "🔔", permission: "notifications:write" },
+      { label: "Audit Logs", href: "/admin/logs", icon: "🪵", permission: "logs:read" },
+      { label: "Settings", href: "/admin/settings", icon: "⚙️", permission: "settings:read" },
     ],
   },
 ];
@@ -70,6 +75,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const user = session?.user;
+  const role = (user as { role?: string } | undefined)?.role;
   const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
 
   useEffect(() => {
@@ -82,7 +88,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           setPendingOrdersCount(json.meta?.total ?? 0);
         }
       } catch {
-        /* ignore — badge is non-critical */
+        /* ignore */
       }
     }
     fetchPending();
@@ -99,14 +105,18 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
     return pathname === base || pathname.startsWith(`${base}/`);
   };
 
-  const sections = navSections.map((section) => ({
-    ...section,
-    items: section.items.map((item) =>
-      item.label === "Orders" && pendingOrdersCount > 0
-        ? { ...item, badge: pendingOrdersCount }
-        : item
-    ),
-  }));
+  const sections = navSections
+    .map((section) => ({
+      ...section,
+      items: section.items
+        .filter((item) => !item.permission || hasPermission(role, item.permission))
+        .map((item) =>
+          item.label === "Orders" && pendingOrdersCount > 0
+            ? { ...item, badge: pendingOrdersCount }
+            : item
+        ),
+    }))
+    .filter((section) => section.items.length > 0);
 
   const sidebarContent = (
     <aside className="flex h-full w-[240px] shrink-0 flex-col bg-green-3 text-cream">
@@ -171,7 +181,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm text-cream">{user?.name ?? "Admin"}</p>
             <p className="truncate text-xs text-cream/50">
-              {(user as { role?: string })?.role?.replace("_", " ") ?? "Editor"}
+              {role?.replace(/_/g, " ") ?? "Admin"}
             </p>
           </div>
         </div>

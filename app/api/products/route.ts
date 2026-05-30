@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin, jsonResponse, errorResponse } from "@/lib/api-helpers";
 import { withApiHandler } from "@/lib/api-handler";
 import { productSchema } from "@/lib/validations";
+import { logAdminAction } from "@/lib/audit";
+import { getClientIp } from "@/lib/rate-limit";
 import type { Prisma } from "@prisma/client";
 import { isDatabaseConfigured } from "@/lib/env";
 
@@ -67,7 +69,7 @@ export const GET = withApiHandler("products.list", async (request: NextRequest) 
 });
 
 export const POST = withApiHandler("products.create", async (request: NextRequest) => {
-  const { error } = await requireAdmin();
+  const { session, error } = await requireAdmin();
   if (error) return error;
 
   const body = await request.json();
@@ -82,5 +84,17 @@ export const POST = withApiHandler("products.create", async (request: NextReques
   if (existing) return errorResponse("Slug already exists", 409);
 
   const product = await prisma.product.create({ data: parsed.data });
+
+  await logAdminAction({
+    adminId: session!.user!.id,
+    adminEmail: session!.user!.email ?? "",
+    adminRole: (session!.user as { role?: string }).role ?? "",
+    action: "CREATE",
+    entity: "Product",
+    entityId: product.id,
+    metadata: { name: product.name, slug: product.slug },
+    ipAddress: getClientIp(request),
+  });
+
   return jsonResponse(product, undefined, 201);
 });

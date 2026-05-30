@@ -13,6 +13,8 @@ export default async function AdminCustomersPage() {
     firstName: c.firstName,
     lastName: c.lastName,
     phone: c.phone,
+    status: c.status,
+    lastActiveAt: c.lastActiveAt,
     createdAt: c.createdAt,
     ordersCount: c._count.orders,
     totalSpent: c.orders.reduce((sum, o) => sum + o.total, 0),
