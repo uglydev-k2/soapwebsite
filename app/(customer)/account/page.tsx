@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getCurrentUserProfile } from "@/lib/profile";
+import { getCurrentUserProfile, getNavbarAuthUser } from "@/lib/profile";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { getInitials } from "@/lib/utils";
 
@@ -15,7 +15,10 @@ export default async function AccountPage() {
     redirect("/login");
   }
 
-  const { user, profile } = await getCurrentUserProfile();
+  const [{ user, profile }, authUser] = await Promise.all([
+    getCurrentUserProfile(),
+    getNavbarAuthUser(),
+  ]);
 
   if (!user) {
     redirect("/login");
@@ -23,6 +26,7 @@ export default async function AccountPage() {
 
   const displayName = profile?.full_name || user.email || "Account";
   const initials = getInitials(displayName);
+  const isAdmin = authUser?.isAdmin ?? false;
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-12">
@@ -45,9 +49,27 @@ export default async function AccountPage() {
           <div>
             <p className="font-serif text-xl text-green">{displayName}</p>
             <p className="text-sm text-muted">{profile?.email ?? user.email}</p>
+            <p className="text-xs text-muted mt-1 capitalize">
+              Role: {authUser?.role ?? profile?.role ?? "user"}
+            </p>
           </div>
         </div>
       </div>
+
+      {isAdmin && (
+        <div className="admin-card mb-8 border border-terra/20 bg-terra/5">
+          <h2 className="font-serif text-2xl text-green mb-2">Admin Access</h2>
+          <p className="text-sm text-muted mb-4">
+            You have admin permissions for MsVee Soaps.
+          </p>
+          <Link
+            href="/admin"
+            className="inline-flex items-center justify-center bg-terra px-6 py-3 text-sm label-caps text-white transition-colors hover:bg-terra-2"
+          >
+            Open Admin Dashboard
+          </Link>
+        </div>
+      )}
 
       <section id="settings" className="admin-card">
         <h2 className="font-serif text-2xl text-green mb-4">Settings</h2>

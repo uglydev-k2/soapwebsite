@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import { User, Package, LogOut, LayoutDashboard } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
-import { toNavbarAuthUser, type NavbarAuthUser, type Profile } from "@/lib/navbar-auth";
+import type { NavbarAuthUser } from "@/lib/navbar-auth";
 import { getInitials } from "@/lib/utils";
+import type { ApiResponse } from "@/types";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,61 +21,33 @@ interface UserMenuProps {
   initialUser?: NavbarAuthUser | null;
 }
 
+async function fetchAccountUser(): Promise<NavbarAuthUser | null> {
+  const res = await fetch("/api/account/me", { cache: "no-store" });
+  if (!res.ok) return null;
+  const json = (await res.json()) as ApiResponse<NavbarAuthUser | null>;
+  return json.data ?? null;
+}
+
 export function UserMenu({ initialUser = null }: UserMenuProps) {
   const router = useRouter();
   const [user, setUser] = useState<NavbarAuthUser | null>(initialUser);
 
   useEffect(() => {
-    if (!isSupabaseConfigured()) {
-      return;
-    }
+    if (!isSupabaseConfigured()) return;
 
     const supabase = createClient();
 
-    async function syncFromSession(
-      sessionUser: {
-        id: string;
-        email?: string;
-        user_metadata?: Record<string, unknown>;
-      } | null
-    ) {
-      if (!sessionUser) {
-        setUser(null);
-        return;
-      }
-
-      try {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("id, email, full_name, avatar_url, role, created_at")
-          .eq("id", sessionUser.id)
-          .maybeSingle();
-
-        setUser(
-          toNavbarAuthUser(
-            {
-              id: sessionUser.id,
-              email: sessionUser.email,
-              user_metadata: sessionUser.user_metadata ?? {},
-            },
-            profile as Profile | null
-          )
-        );
-      } catch {
-        setUser(
-          toNavbarAuthUser({
-            id: sessionUser.id,
-            email: sessionUser.email,
-            user_metadata: sessionUser.user_metadata ?? {},
-          })
-        );
-      }
+    async function syncUser() {
+      const accountUser = await fetchAccountUser();
+      setUser(accountUser);
     }
+
+    syncUser();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      syncFromSession(session?.user ?? null);
+    } = supabase.auth.onAuthStateChange(() => {
+      syncUser();
     });
 
     return () => subscription.unsubscribe();
@@ -155,7 +128,7 @@ export function UserMenu({ initialUser = null }: UserMenuProps) {
         <DropdownMenuItem asChild>
           <Link href="/dashboard" className="flex items-center gap-2">
             <Package size={14} />
-            Orders
+            My Dashboard
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

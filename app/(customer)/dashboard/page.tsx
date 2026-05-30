@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getCurrentUserProfile } from "@/lib/profile";
+import { getCurrentUserProfile, getNavbarAuthUser } from "@/lib/profile";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { formatDate } from "@/lib/utils";
 
@@ -16,12 +16,14 @@ export default async function DashboardPage() {
   }
 
   const { user, profile } = await getCurrentUserProfile();
+  const authUser = await getNavbarAuthUser();
 
   if (!user) {
     redirect("/login");
   }
 
   const name = profile?.full_name || user.email?.split("@")[0] || "there";
+  const isAdmin = authUser?.isAdmin ?? false;
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12">
@@ -33,6 +35,17 @@ export default async function DashboardPage() {
       </p>
 
       <div className="grid gap-6 sm:grid-cols-2">
+        {isAdmin && (
+          <div className="admin-card border border-terra/20 bg-terra/5 sm:col-span-2">
+            <p className="label-caps text-muted mb-2">Admin</p>
+            <Link
+              href="/admin"
+              className="text-terra hover:text-terra-2 font-medium"
+            >
+              Open Admin Dashboard →
+            </Link>
+          </div>
+        )}
         <div className="admin-card">
           <p className="label-caps text-muted mb-2">Account</p>
           <p className="text-text">{profile?.email ?? user.email}</p>
