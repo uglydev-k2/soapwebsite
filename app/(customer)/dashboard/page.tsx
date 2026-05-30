@@ -2,7 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUserProfile, getNavbarAuthUser } from "@/lib/profile";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
-import { formatDate } from "@/lib/utils";
+import { getSupabaseOrdersForUser } from "@/lib/supabase/orders";
+import { formatDate, formatPrice } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +25,9 @@ export default async function DashboardPage() {
 
   const name = profile?.full_name || user.email?.split("@")[0] || "there";
   const isAdmin = authUser?.isAdmin ?? false;
+  const orders = user.email
+    ? await getSupabaseOrdersForUser(user.id, user.email)
+    : [];
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12">
@@ -76,6 +80,28 @@ export default async function DashboardPage() {
           </ul>
         </div>
       </div>
+
+      {orders.length > 0 && (
+        <div className="admin-card mt-8">
+          <p className="label-caps text-muted mb-4">Recent Orders</p>
+          <ul className="space-y-4">
+            {orders.slice(0, 5).map((order) => (
+              <li
+                key={order.id}
+                className="flex flex-wrap items-center justify-between gap-3 border-b border-green/10 pb-4 last:border-0 last:pb-0"
+              >
+                <div>
+                  <p className="font-medium text-green">{order.order_number}</p>
+                  <p className="text-sm text-muted">
+                    {formatDate(order.created_at)} · {order.status}
+                  </p>
+                </div>
+                <p className="font-serif text-green">{formatPrice(Number(order.total))}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

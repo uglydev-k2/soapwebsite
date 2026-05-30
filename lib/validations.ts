@@ -113,12 +113,36 @@ export const changePasswordSchema = z
     path: ["confirmPassword"],
   });
 
-export const checkoutSchema = z.object({
-  email: z.string().email(),
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
+export const checkoutFormSchema = z.object({
+  email: z.string().email("Please enter a valid email"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
   phone: z.string().optional(),
+  line1: z.string().min(1, "Address is required"),
+  line2: z.string().optional(),
+  city: z.string().min(1, "City is required"),
+  state: z.string().min(1, "State / region is required"),
+  postalCode: z.string().min(1, "Postal code is required"),
+  country: z.string().min(2, "Country is required"),
 });
+
+export const checkoutSchema = checkoutFormSchema.extend({
+  items: z
+    .array(
+      z.object({
+        productId: z.string().min(1),
+        quantity: z.number().int().min(1),
+        price: z.number().positive(),
+        name: z.string().optional(),
+        slug: z.string().optional(),
+        image: z.string().optional(),
+      })
+    )
+    .min(1, "Cart is empty"),
+});
+
+export type CheckoutFormData = z.infer<typeof checkoutFormSchema>;
+export type CheckoutPayload = z.infer<typeof checkoutSchema>;
 
 export type ProductFormData = z.infer<typeof productSchema>;
 export type OrderUpdateData = z.infer<typeof orderUpdateSchema>;

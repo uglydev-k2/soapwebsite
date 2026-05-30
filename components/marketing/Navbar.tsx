@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { UserMenu } from "@/components/auth/UserMenu";
+import { CartDrawer } from "@/components/marketing/CartDrawer";
 import { ShoppingBag, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
@@ -38,6 +39,7 @@ export default function Navbar({
 }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
   const itemCount = useCartStore((s) => s.itemCount());
 
   useEffect(() => {
@@ -88,6 +90,10 @@ export default function Navbar({
             </div>
             <Link
               href="/cart"
+              onClick={(e) => {
+                e.preventDefault();
+                setCartOpen(true);
+              }}
               className="relative p-2 text-green transition-colors duration-250 hover:text-terra"
               aria-label={`Cart, ${itemCount} items`}
             >
@@ -183,6 +189,8 @@ export default function Navbar({
           </Link>
         </div>
       </div>
+
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </>
   );
 }
