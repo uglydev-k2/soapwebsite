@@ -46,6 +46,15 @@ export default function Hero() {
             <span className="h-px max-w-16 flex-1 bg-gold" aria-hidden />
           </motion.div>
 
+          <motion.div className="flex flex-wrap gap-2" variants={fadeUp}>
+            <span className="border border-green/15 bg-white px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-green">
+              Free shipping on $60+
+            </span>
+            <span className="border border-green/15 bg-white px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-green">
+              Free sample every order
+            </span>
+          </motion.div>
+
           <h1 className="font-serif text-5xl font-light leading-[1.08] text-green lg:text-6xl xl:text-7xl">
             {headlineWords.map((word, index) => (
               <motion.span

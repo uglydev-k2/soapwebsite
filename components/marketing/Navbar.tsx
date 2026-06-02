@@ -100,6 +100,29 @@ export default function Navbar({
           ease: EASE_OUT,
         }}
       >
+        <div className="group overflow-hidden border-b border-green/10 bg-green-3 py-2">
+          <div className="flex w-max animate-marquee items-center">
+            {[
+              "Free shipping on orders $60+",
+              "Free sample with every order",
+              "Small-batch handcrafted formulas",
+            ]
+              .concat([
+                "Free shipping on orders $60+",
+                "Free sample with every order",
+                "Small-batch handcrafted formulas",
+              ])
+              .map((item, index) => (
+                <span
+                  key={`${item}-${index}`}
+                  className="label-caps flex items-center gap-6 px-8 text-cream/90"
+                >
+                  {item}
+                  <span className="h-1.5 w-1.5 bg-gold" style={{ borderRadius: "2px" }} />
+                </span>
+              ))}
+          </div>
+        </div>
         <motion.nav
           className="mx-auto flex h-18 max-w-7xl items-center justify-between px-6 lg:px-8"
           initial={reduced ? false : "hidden"}

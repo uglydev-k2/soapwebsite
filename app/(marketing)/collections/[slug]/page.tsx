@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import { getProductBySlug } from "@/lib/products";
 import { notFound } from "next/navigation";
 import { formatPrice, getCategoryLabel } from "@/lib/utils";
-import AddToCartButton from "@/components/marketing/AddToCartButton";
+import ProductBundleSelector from "@/components/marketing/ProductBundleSelector";
 import ProductGallery from "@/components/marketing/ProductGallery";
 import ProductReviews from "@/components/marketing/ProductReviews";
 import Link from "next/link";
@@ -75,7 +75,7 @@ export default async function ProductDetailPage({
             <p className="label-caps text-muted mb-6">
               {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
             </p>
-            <AddToCartButton product={product} disabled={product.stock === 0} />
+            <ProductBundleSelector product={product} disabled={product.stock === 0} />
           </div>
         </div>
         <ProductReviews slug={product.slug} />
