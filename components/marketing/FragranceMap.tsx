@@ -128,7 +128,7 @@ export default function FragranceMap() {
           description="Each fragrance family is crafted to evoke a mood, a memory, a moment of pure botanical bliss."
         />
 
-        <StaggerContainer className="mt-16 grid gap-6 sm:grid-cols-2">
+        <StaggerContainer className="mt-16 grid grid-cols-2 gap-6">
           {fragrances.map((fragrance) => (
             <StaggerItem key={fragrance.slug}>
               <ScentCard fragrance={fragrance} />
