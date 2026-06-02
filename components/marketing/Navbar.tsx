@@ -23,11 +23,13 @@ const navLinks = [
 function Logo({ dark = false }: { dark?: boolean }) {
   return (
     <span className="inline-flex items-baseline">
-      <span className="font-serif text-2xl italic text-terra">Ms</span>
-      <span className={cn("font-serif text-2xl text-green", dark && "text-green-2")}>
+      <span className="font-serif text-xl italic text-terra sm:text-2xl">Ms</span>
+      <span
+        className={cn("font-serif text-xl text-green sm:text-2xl", dark && "text-green-2")}
+      >
         Vee
       </span>
-      <span className={cn("font-serif text-2xl text-green", dark && "text-cream")}>
+      <span className={cn("font-serif text-xl text-green sm:text-2xl", dark && "text-cream")}>
         {" "}
         Soaps
       </span>
@@ -88,7 +90,7 @@ export default function Navbar({
     <>
       <motion.header
         className={cn(
-          "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
+          "fixed inset-x-0 top-9 z-50 transition-colors duration-300 md:top-0",
           scrolled
             ? "border-b border-green/10 bg-cream/85 backdrop-blur-md shadow-sm"
             : "bg-cream/50 backdrop-blur-sm"
@@ -103,7 +105,7 @@ export default function Navbar({
           ease: EASE_OUT,
         }}
       >
-        <div className="group overflow-hidden border-b border-green/10 bg-green-3 py-2">
+        <div className="group hidden overflow-hidden border-b border-green/10 bg-green-3 py-2 md:block">
           <div className="flex w-max animate-marquee items-center">
             {[
               "Free shipping on orders $60+",
@@ -127,7 +129,7 @@ export default function Navbar({
           </div>
         </div>
         <motion.nav
-          className="mx-auto flex h-18 max-w-7xl items-center justify-between px-6 lg:px-8"
+          className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:h-18 sm:px-6 lg:px-8"
           initial={reduced ? false : "hidden"}
           animate="show"
           variants={staggerContainer(0.06, 0.05)}
@@ -152,7 +154,7 @@ export default function Navbar({
           </motion.ul>
 
           <motion.div
-            className="flex items-center gap-3 sm:gap-4"
+            className="flex items-center gap-0.5 sm:gap-3"
             variants={fadeUp}
           >
             <div className="hidden md:block">
@@ -161,7 +163,7 @@ export default function Navbar({
             <SearchDialog />
             <Link
               href="/wishlist"
-              className="relative hidden p-2 text-green transition-colors duration-250 hover:text-terra sm:block"
+              className="touch-target relative flex items-center justify-center text-green transition-colors duration-250 hover:text-terra"
               aria-label={`Wishlist, ${wishlistCount} items`}
             >
               <Heart size={20} strokeWidth={1.5} />
@@ -177,7 +179,7 @@ export default function Navbar({
             <motion.button
               type="button"
               onClick={() => setCartOpen(true)}
-              className="relative p-2 text-green transition-colors duration-250 hover:text-terra"
+              className="touch-target relative flex items-center justify-center text-green transition-colors duration-250 hover:text-terra"
               aria-label={`Cart, ${itemCount} items`}
               animate={cartBounce ? { scale: [1, 1.25, 1] } : { scale: 1 }}
               transition={{ duration: 0.4, ease: EASE_OUT }}
@@ -203,7 +205,7 @@ export default function Navbar({
 
             <button
               type="button"
-              className="p-2 text-green transition-colors hover:text-terra md:hidden"
+              className="touch-target flex items-center justify-center text-green transition-colors hover:text-terra md:hidden"
               onClick={() => setMobileOpen(true)}
               aria-label="Open menu"
               aria-expanded={mobileOpen}

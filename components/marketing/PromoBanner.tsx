@@ -17,7 +17,7 @@ export function PromoBanner() {
   if (!visible) return null;
 
   return (
-    <div className="relative bg-terra px-6 py-2.5 text-center text-xs text-white sm:text-sm">
+    <div className="fixed inset-x-0 top-0 z-[51] bg-terra px-10 py-2.5 text-center text-[11px] leading-snug text-white sm:text-sm md:static md:z-auto md:hidden">
       <p>
         Free shipping on orders $75+ ·{" "}
         <Link href="/gift-guide" className="underline underline-offset-2 hover:text-cream">

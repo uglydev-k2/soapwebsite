@@ -24,6 +24,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
 }
 
 body {
@@ -32,6 +33,44 @@ body {
   font-family: var(--font-sans);
   font-weight: 300;
   -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+/* Fixed navbar (+ optional mobile promo) clearance */
+.marketing-header-offset {
+  padding-top: 7.25rem;
+}
+
+@media (min-width: 768px) {
+  .marketing-header-offset {
+    padding-top: 8.5rem;
+  }
+}
+
+/* Space for fixed mobile Shop Now bar + home indicator */
+.marketing-main-pad {
+  padding-bottom: calc(5.75rem + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 768px) {
+  .marketing-main-pad {
+    padding-bottom: 0;
+  }
+}
+
+.marketing-footer-pad {
+  padding-bottom: calc(5.75rem + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 768px) {
+  .marketing-footer-pad {
+    padding-bottom: 0;
+  }
+}
+
+.touch-target {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
 }
 
 .grain::before {

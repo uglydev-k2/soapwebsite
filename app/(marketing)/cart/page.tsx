@@ -15,7 +15,7 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <section className="pt-32 pb-24 px-6 min-h-screen text-center">
+      <section className="marketing-header-offset min-h-screen px-4 pb-24 text-center sm:px-6">
         <h1 className="font-serif text-3xl text-green mb-4">Your cart is empty</h1>
         <p className="text-muted mb-8">Discover our botanical collection.</p>
         <Link href="/collections">
@@ -26,7 +26,7 @@ export default function CartPage() {
   }
 
   return (
-    <section className="pt-32 pb-24 px-6 min-h-screen">
+    <section className="marketing-header-offset min-h-screen px-4 pb-24 sm:px-6">
       <div className="max-w-4xl mx-auto">
         <h1 className="font-serif text-4xl font-light text-green mb-12">Your Cart</h1>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">

@@ -100,9 +100,9 @@ const values = [
 
 export default function ValuesSection() {
   return (
-    <section className="relative overflow-hidden bg-cream py-20 lg:py-28" id="about">
+    <section className="relative overflow-hidden bg-cream py-14 sm:py-20 lg:py-28" id="about">
       <AmbientOrbs />
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <AnimatedSectionHeader
           eyebrow="Our Philosophy"
           title="Crafted with Intention"

@@ -32,14 +32,14 @@ export default function ProductBundleSelector({
         <p className="font-serif text-xl text-green">{formatPrice(totalPrice)}</p>
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
         {bundleOptions.map((option) => (
           <button
             key={option.quantity}
             type="button"
             onClick={() => setSelectedQty(option.quantity)}
             className={cn(
-              "border px-3 py-2 text-left transition-all duration-250",
+              "min-h-[3rem] border px-3 py-3 text-left transition-all duration-250 sm:py-2",
               selectedQty === option.quantity
                 ? "border-terra bg-terra/5"
                 : "border-green/15 bg-white hover:border-green/40"

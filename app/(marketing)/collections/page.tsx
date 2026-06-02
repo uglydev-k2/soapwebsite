@@ -89,7 +89,7 @@ export default function CollectionsPage({
     : "featured";
 
   return (
-    <section className="min-h-screen bg-cream px-6 pb-24 pt-32">
+    <section className="marketing-header-offset min-h-screen bg-cream px-4 pb-24 sm:px-6">
       <div className="mx-auto max-w-6xl">
         <Breadcrumbs
           items={[
@@ -103,7 +103,7 @@ export default function CollectionsPage({
           description="Hand-crafted botanical bath and body essentials, made in small batches with clean ingredients."
         />
 
-        <form className="mt-10 grid gap-4 border border-green/10 bg-white p-5 sm:grid-cols-2 lg:grid-cols-5">
+        <form className="mt-10 grid gap-4 border border-green/10 bg-white p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-5">
           <label className="space-y-2 sm:col-span-2 lg:col-span-2">
             <span className="label-caps text-muted">Search</span>
             <input
@@ -158,13 +158,13 @@ export default function CollectionsPage({
             </select>
           </label>
 
-          <div className="flex items-end gap-3">
-            <Button type="submit" variant="primary" className="w-full">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+            <Button type="submit" variant="primary" className="min-h-[3rem] w-full sm:flex-1">
               Apply
             </Button>
             <Link
               href="/collections"
-              className="inline-flex w-full items-center justify-center border border-green/20 px-6 py-3 text-sm text-text transition-colors duration-250 hover:border-green"
+              className="inline-flex min-h-[3rem] w-full items-center justify-center border border-green/20 px-6 py-3 text-sm text-text transition-colors duration-250 hover:border-green sm:flex-1"
               style={{ borderRadius: 0 }}
             >
               Reset

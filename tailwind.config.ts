@@ -9,9 +9,10 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        cream: "var(--cream)",
-        "cream-2": "var(--cream-2)",
-        white: "var(--white)",
+        /* rgb + alpha so text-cream/80 etc. work on dark backgrounds */
+        cream: "rgb(247 243 237 / <alpha-value>)",
+        "cream-2": "rgb(239 233 223 / <alpha-value>)",
+        white: "rgb(255 254 249 / <alpha-value>)",
         green: {
           DEFAULT: "var(--green)",
           2: "var(--green-2)",
@@ -21,7 +22,7 @@ const config: Config = {
           DEFAULT: "var(--terra)",
           2: "var(--terra-2)",
         },
-        gold: "var(--gold)",
+        gold: "rgb(201 169 110 / <alpha-value>)",
         text: "var(--text)",
         muted: "var(--muted)",
       },

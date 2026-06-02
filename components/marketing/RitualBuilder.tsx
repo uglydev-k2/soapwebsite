@@ -50,8 +50,8 @@ export default function RitualBuilder() {
   }
 
   return (
-    <section className="bg-cream-2 py-20 lg:py-28">
-      <div className="mx-auto max-w-3xl px-6 lg:px-8">
+    <section className="bg-cream-2 py-14 sm:py-20 lg:py-28">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <AnimatedSectionHeader
           eyebrow="Ritual Builder"
           title="Build Your Perfect Routine"

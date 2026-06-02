@@ -64,11 +64,11 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-green-3 text-cream">
-      <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
-        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
+    <footer className="marketing-footer-pad bg-green-3 text-cream">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+        <div className="grid grid-cols-2 gap-8 sm:gap-12 lg:grid-cols-4">
           {/* Brand column */}
-          <div>
+          <div className="col-span-2 lg:col-span-1">
             <Link href="/" className="inline-flex items-baseline">
               <span className="font-serif text-2xl italic text-terra">Ms</span>
               <span className="font-serif text-2xl text-green-2">Vee</span>

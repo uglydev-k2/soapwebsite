@@ -24,7 +24,7 @@ function ScentCard({
       <Link
         href={fragrance.shopHref}
         className={cn(
-          "group relative block overflow-hidden border border-green/10 bg-white p-8",
+          "group relative block overflow-hidden border border-green/10 bg-white p-6 sm:p-8",
           "transition-colors duration-300 hover:border-green/30 hover:shadow-lg"
         )}
         style={{ borderRadius: "2px" }}
@@ -50,7 +50,7 @@ function ScentCard({
                 />
               ))}
             </div>
-            <h3 className="font-serif text-2xl text-green transition-colors duration-250 group-hover:text-terra">
+            <h3 className="font-serif text-xl text-green transition-colors duration-250 group-hover:text-terra sm:text-2xl">
               {fragrance.name}
             </h3>
           </div>
@@ -94,7 +94,7 @@ export default function FragranceMap() {
           description="Each fragrance family is crafted to evoke a mood, a memory, a moment of pure botanical bliss."
         />
 
-        <StaggerContainer className="mt-16 grid grid-cols-2 gap-6">
+        <StaggerContainer className="mt-12 grid grid-cols-1 gap-4 sm:mt-16 sm:grid-cols-2 sm:gap-6">
           {FRAGRANCE_PROFILES.map((fragrance) => (
             <StaggerItem key={fragrance.slug}>
               <ScentCard fragrance={fragrance} />

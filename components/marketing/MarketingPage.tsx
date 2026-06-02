@@ -19,7 +19,7 @@ export function MarketingPage({
   wide = false,
 }: MarketingPageProps) {
   return (
-    <section className="min-h-screen bg-cream px-6 pb-24 pt-32">
+    <section className="marketing-header-offset min-h-screen bg-cream px-4 pb-24 sm:px-6">
       <div
         className={cn(
           "mx-auto",
@@ -28,7 +28,7 @@ export function MarketingPage({
         )}
       >
         <p className="label-caps text-terra">{eyebrow}</p>
-        <h1 className="mt-4 font-serif text-4xl font-light tracking-wide text-green md:text-5xl">
+        <h1 className="mt-4 font-serif text-3xl font-light tracking-wide text-green sm:text-4xl md:text-5xl">
           {title}
         </h1>
         {description && (

@@ -20,7 +20,7 @@ export async function CompleteYourRitual({
       <p className="mt-2 text-sm text-muted">
         Pair with these botanical picks from the same collection.
       </p>
-      <ul className="mt-8 grid gap-4 sm:grid-cols-3">
+      <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {related.map((product) => (
           <li key={product.id}>
             <Link

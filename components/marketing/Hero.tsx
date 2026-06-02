@@ -26,17 +26,17 @@ export default function Hero() {
   const panelScale = useTransform(scrollY, [0, 500], [1, reduced ? 1 : 1.03]);
 
   return (
-    <section className="relative overflow-hidden pt-18">
-      <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-8 lg:py-28">
+    <section className="marketing-header-offset relative overflow-hidden">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-10 sm:gap-12 sm:px-6 sm:py-16 lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-8 lg:py-28">
         <motion.div
           className="flex flex-col gap-8"
           initial={reduced ? false : "hidden"}
           animate="show"
           variants={staggerContainer(0.08, 0.1)}
         >
-          <motion.div className="flex items-center gap-4" variants={fadeUp}>
+          <motion.div className="flex flex-wrap items-center gap-3 sm:gap-4" variants={fadeUp}>
             <span className="label-caps text-terra">Premium Botanical Bath</span>
-            <span className="h-px max-w-16 flex-1 bg-gold" aria-hidden />
+            <span className="hidden h-px max-w-16 flex-1 bg-gold sm:block" aria-hidden />
           </motion.div>
 
           <motion.div className="flex flex-wrap gap-2" variants={fadeUp}>
@@ -48,7 +48,7 @@ export default function Hero() {
             </span>
           </motion.div>
 
-          <h1 className="font-serif text-5xl font-light leading-[1.08] text-green lg:text-6xl xl:text-7xl">
+          <h1 className="font-serif text-[2.35rem] font-light leading-[1.1] text-green sm:text-5xl lg:text-6xl xl:text-7xl">
             {headlineWords.map((word, index) => (
               <motion.span
                 key={word.text}
@@ -78,10 +78,10 @@ export default function Hero() {
             indulgence.
           </motion.p>
 
-          <motion.div className="flex flex-wrap items-center gap-4" variants={fadeUp}>
+          <motion.div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4" variants={fadeUp}>
             <Link
               href="/collections"
-              className="cta-shimmer inline-flex items-center justify-center gap-2 bg-terra px-8 py-4 text-sm label-caps text-white transition-colors duration-250 hover:bg-terra-2"
+              className="cta-shimmer inline-flex min-h-[3rem] w-full items-center justify-center gap-2 bg-terra px-8 py-3.5 text-sm label-caps text-white transition-colors duration-250 hover:bg-terra-2 sm:w-auto"
               style={{ borderRadius: 0 }}
             >
               Explore Collection
@@ -89,7 +89,7 @@ export default function Hero() {
             </Link>
             <Link
               href="#ritual"
-              className="inline-flex items-center justify-center border border-green/30 bg-transparent px-8 py-4 text-sm label-caps text-green transition-colors duration-250 hover:border-green hover:bg-green/5"
+              className="inline-flex min-h-[3rem] w-full items-center justify-center border border-green/30 bg-transparent px-8 py-3.5 text-sm label-caps text-green transition-colors duration-250 hover:border-green hover:bg-green/5 sm:w-auto"
               style={{ borderRadius: 0 }}
             >
               Discover Our Ritual
@@ -148,9 +148,9 @@ export default function Hero() {
 
           <motion.div
             className={cn(
-              "absolute -bottom-6 -left-4 w-64 border border-green/10 bg-white p-5 shadow-xl",
-              "lg:-bottom-8 lg:-left-8 lg:w-72",
-              !reduced && "animate-float-gentle"
+              "relative mt-4 w-full border border-green/10 bg-white p-5 shadow-lg",
+              "lg:absolute lg:-bottom-8 lg:-left-8 lg:mt-0 lg:w-72",
+              !reduced && "lg:animate-float-gentle"
             )}
             style={{ borderRadius: "2px" }}
             initial={reduced ? false : { opacity: 0, y: 24 }}

@@ -38,7 +38,7 @@ export default async function CategoryCollectionPage({
   });
 
   return (
-    <section className="min-h-screen bg-cream px-6 pb-24 pt-32">
+    <section className="marketing-header-offset min-h-screen bg-cream px-4 pb-24 sm:px-6">
       <div className="mx-auto max-w-6xl">
         <Link
           href="/collections"

@@ -36,7 +36,7 @@ export default async function ProductDetailPage({
   const gradient = getCategoryGradient(product.category);
 
   return (
-    <section className="pt-32 pb-24 px-6 bg-cream min-h-screen">
+    <section className="marketing-header-offset min-h-screen bg-cream px-4 pb-24 sm:px-6">
       <TrackRecentlyViewed
         productId={product.id}
         name={product.name}
@@ -52,7 +52,7 @@ export default async function ProductDetailPage({
             { label: product.name },
           ]}
         />
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
           <ProductGallery
             name={product.name}
             images={product.images}
@@ -62,7 +62,7 @@ export default async function ProductDetailPage({
             <p className="label-caps text-terra mb-2">
               {getCategoryLabel(product.category)}
             </p>
-            <h1 className="font-serif text-4xl font-light text-green mb-4">
+            <h1 className="mb-4 font-serif text-3xl font-light text-green sm:text-4xl">
               {product.name}
             </h1>
             <div className="flex items-baseline gap-3 mb-6">
@@ -88,7 +88,7 @@ export default async function ProductDetailPage({
                 <p className="text-sm text-muted leading-relaxed">{product.ingredients}</p>
               </div>
             )}
-            <div className="mb-6 flex flex-wrap items-center gap-4">
+            <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
               <p className="label-caps text-muted">
                 {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
               </p>

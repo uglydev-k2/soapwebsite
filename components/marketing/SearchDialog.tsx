@@ -64,7 +64,7 @@ export function SearchDialog() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="p-2 text-green transition-colors duration-250 hover:text-terra"
+        className="touch-target flex items-center justify-center text-green transition-colors duration-250 hover:text-terra"
         aria-label="Search products"
       >
         <Search size={20} strokeWidth={1.5} />
@@ -81,7 +81,7 @@ export function SearchDialog() {
 
       <div
         className={cn(
-          "fixed inset-x-4 top-24 z-[110] mx-auto max-w-xl border border-green/10 bg-white shadow-2xl transition-all duration-300 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2",
+          "fixed inset-x-3 top-[7.25rem] z-[110] mx-auto max-w-xl border border-green/10 bg-white shadow-2xl transition-all duration-300 sm:inset-x-4 sm:top-28 md:inset-x-auto md:left-1/2 md:-translate-x-1/2",
           open ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-4 opacity-0"
         )}
         role="dialog"
@@ -107,7 +107,7 @@ export function SearchDialog() {
           </button>
         </div>
 
-        <div className="max-h-80 overflow-y-auto p-2">
+        <div className="max-h-[min(20rem,55vh)] overflow-y-auto p-2 sm:max-h-80">
           {query.trim().length < 2 && (
             <p className="px-3 py-6 text-center text-sm text-muted">
               Type at least 2 characters to search
