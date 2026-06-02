@@ -6,14 +6,38 @@ export const INGREDIENT_GLOSSARY = [
       "Rich in vitamins A and E; softens skin and helps lock in hydration after cleansing.",
   },
   {
+    name: "Mango Seed Butter",
+    benefit: "Deep moisture",
+    description:
+      "Lightweight, non-greasy butter rich in antioxidants; nourishes dry skin without heaviness.",
+  },
+  {
+    name: "Kokum Butter",
+    benefit: "Deep moisture",
+    description:
+      "Silky, fast-absorbing butter that melts on contact; helps restore softness without a greasy feel.",
+  },
+  {
     name: "Coconut Oil",
     benefit: "Gentle cleanse",
     description:
       "Creates a creamy lather in bar soaps while supporting the skin barrier.",
   },
   {
+    name: "Rosehip Oil",
+    benefit: "Nourishing",
+    description:
+      "Cold-pressed and rich in vitamins A and C; supports a smooth, radiant complexion after cleansing.",
+  },
+  {
+    name: "Hemp Seed Oil",
+    benefit: "Nourishing",
+    description:
+      "Lightweight oil rich in omega fatty acids; helps balance and comfort skin without clogging pores.",
+  },
+  {
     name: "Cedarwood Oil",
-    benefit: "Grounding scent",
+    benefit: "Essential oils",
     description:
       "Woody, calming aroma often used in evening rituals and forest-inspired blends.",
   },
