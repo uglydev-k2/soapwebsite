@@ -45,6 +45,13 @@ export const newsletterSchema = z.object({
   email: z.string().email("Please enter a valid email"),
 });
 
+export const contactSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Please enter a valid email"),
+  subject: z.string().min(1, "Subject is required"),
+  message: z.string().min(10, "Please include a bit more detail"),
+});
+
 export const loginSchema = z.object({
   email: z.string().email("Please enter a valid email"),
   password: z.string().min(1, "Password is required"),

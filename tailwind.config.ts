@@ -45,6 +45,8 @@ const config: Config = {
         marquee: "marquee 45s linear infinite",
         "draw-stroke": "drawStroke 2s ease forwards",
         floatUp: "floatUp 0.8s ease-out forwards",
+        "float-gentle": "floatGentle 5s ease-in-out infinite",
+        "orb-drift": "orbDrift 18s ease-in-out infinite",
         shake: "shake 0.5s ease-in-out",
       },
       keyframes: {
@@ -58,6 +60,15 @@ const config: Config = {
         floatUp: {
           "0%": { opacity: "0", transform: "translateY(24px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        floatGentle: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-8px)" },
+        },
+        orbDrift: {
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "33%": { transform: "translate(12px, -16px) scale(1.05)" },
+          "66%": { transform: "translate(-8px, 10px) scale(0.98)" },
         },
         shake: {
           "0%, 100%": { transform: "translateX(0)" },

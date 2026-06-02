@@ -9,6 +9,7 @@ interface ActiveProductOptions {
   category?: Category;
   scent?: string;
   sort?: ProductSort;
+  q?: string;
 }
 
 export async function getFeaturedProducts(limit = 4): Promise<Product[]> {
@@ -43,9 +44,14 @@ function getOrderBy(sort: ProductSort): Prisma.ProductOrderByWithRelationInput[]
   }
 }
 
+function matchesSearch(product: Product, query: string): boolean {
+  const haystack = `${product.name} ${product.description} ${product.fragrance ?? ""} ${product.ingredients ?? ""}`.toLowerCase();
+  return haystack.includes(query);
+}
+
 function applyFallbackFilters(
   products: Product[],
-  { category, scent, sort = "featured" }: ActiveProductOptions
+  { category, scent, sort = "featured", q }: ActiveProductOptions
 ): Product[] {
   let filtered = products.filter((p) => p.active);
 
@@ -59,6 +65,13 @@ function applyFallbackFilters(
       filtered = filtered.filter((p) =>
         `${p.name} ${p.fragrance ?? ""}`.toLowerCase().includes(query)
       );
+    }
+  }
+
+  if (q) {
+    const query = q.toLowerCase().trim();
+    if (query) {
+      filtered = filtered.filter((p) => matchesSearch(p, query));
     }
   }
 
@@ -91,7 +104,7 @@ function applyFallbackFilters(
 export async function getActiveProducts(
   options: ActiveProductOptions = {}
 ): Promise<Product[]> {
-  const { category, scent, sort = "featured" } = options;
+  const { category, scent, sort = "featured", q } = options;
   const products = await safeDbQuery(
     "getActiveProducts",
     () =>
@@ -104,6 +117,16 @@ export async function getActiveProducts(
                 OR: [
                   { name: { contains: scent, mode: "insensitive" } },
                   { fragrance: { contains: scent, mode: "insensitive" } },
+                ],
+              }
+            : {}),
+          ...(q
+            ? {
+                OR: [
+                  { name: { contains: q, mode: "insensitive" } },
+                  { description: { contains: q, mode: "insensitive" } },
+                  { fragrance: { contains: q, mode: "insensitive" } },
+                  { ingredients: { contains: q, mode: "insensitive" } },
                 ],
               }
             : {}),

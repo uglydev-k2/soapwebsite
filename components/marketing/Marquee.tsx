@@ -42,9 +42,17 @@ function MarqueeTrack({ ariaHidden = false }: { ariaHidden?: boolean }) {
 export default function Marquee() {
   return (
     <section
-      className="group overflow-hidden bg-green-3 py-4"
+      className="group relative overflow-hidden bg-green-3 py-4"
       aria-label="Brand values"
     >
+      <div
+        className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-green-3 to-transparent"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-green-3 to-transparent"
+        aria-hidden
+      />
       <div className="flex w-max">
         <MarqueeTrack />
         <MarqueeTrack ariaHidden />

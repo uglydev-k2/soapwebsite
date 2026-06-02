@@ -8,16 +8,9 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
-import { cn, formatPrice } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { BotanicalParticles } from "@/components/motion/BotanicalParticles";
 import { EASE_OUT, fadeUp, staggerContainer } from "@/lib/motion";
-
-const featuredProduct = {
-  name: "Forest Cedar Body Wash",
-  slug: "forest-cedar-body-wash",
-  price: 28,
-  fragrance: "Forest & Cedar",
-};
 
 const headlineWords = [
   { text: "Where", accent: false },
@@ -87,7 +80,7 @@ export default function Hero() {
 
           <motion.div className="flex flex-wrap items-center gap-4" variants={fadeUp}>
             <Link
-              href="#collections"
+              href="/collections"
               className="cta-shimmer inline-flex items-center justify-center gap-2 bg-terra px-8 py-4 text-sm label-caps text-white transition-colors duration-250 hover:bg-terra-2"
               style={{ borderRadius: 0 }}
             >
@@ -156,29 +149,27 @@ export default function Hero() {
           <motion.div
             className={cn(
               "absolute -bottom-6 -left-4 w-64 border border-green/10 bg-white p-5 shadow-xl",
-              "lg:-bottom-8 lg:-left-8 lg:w-72"
+              "lg:-bottom-8 lg:-left-8 lg:w-72",
+              !reduced && "animate-float-gentle"
             )}
             style={{ borderRadius: "2px" }}
             initial={reduced ? false : { opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.45, ease: EASE_OUT }}
           >
-            <span className="label-caps text-gold">Featured</span>
+            <span className="label-caps text-gold">The Collection</span>
             <h3 className="mt-2 font-serif text-xl text-green">
-              {featuredProduct.name}
+              Botanical Bath & Body
             </h3>
-            <p className="mt-1 text-sm text-muted">{featuredProduct.fragrance}</p>
-            <div className="mt-4 flex items-center justify-between">
-              <span className="font-serif text-lg text-terra">
-                {formatPrice(featuredProduct.price)}
-              </span>
-              <Link
-                href={`/collections/${featuredProduct.slug}`}
-                className="label-caps text-green transition-colors duration-250 hover:text-terra"
-              >
-                View →
-              </Link>
-            </div>
+            <p className="mt-1 text-sm text-muted">
+              Soaps, washes, lotions, and ritual sets — crafted in small batches.
+            </p>
+            <Link
+              href="/collections"
+              className="mt-4 inline-block label-caps text-green transition-colors duration-250 hover:text-terra"
+            >
+              Shop all →
+            </Link>
           </motion.div>
         </div>
       </div>

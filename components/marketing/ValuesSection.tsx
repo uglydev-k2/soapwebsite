@@ -1,9 +1,10 @@
-import { cn } from "@/lib/utils";
+import { AmbientOrbs } from "@/components/motion/ScrollParallax";
 import {
   AnimatedSectionHeader,
   StaggerContainer,
   StaggerItem,
 } from "@/components/motion/ScrollReveal";
+import { ValuesCard } from "@/components/marketing/ValuesCard";
 
 const values = [
   {
@@ -99,8 +100,9 @@ const values = [
 
 export default function ValuesSection() {
   return (
-    <section className="bg-cream py-20 lg:py-28" id="about">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+    <section className="relative overflow-hidden bg-cream py-20 lg:py-28" id="about">
+      <AmbientOrbs />
+      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         <AnimatedSectionHeader
           eyebrow="Our Philosophy"
           title="Crafted with Intention"
@@ -110,27 +112,11 @@ export default function ValuesSection() {
         <StaggerContainer className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {values.map((value) => (
             <StaggerItem key={value.title}>
-              <article
-                className={cn(
-                  "group relative h-full overflow-hidden border border-green/10 bg-white p-8",
-                  "transition-shadow duration-300 hover:shadow-lg"
-                )}
-                style={{ borderRadius: "2px" }}
-              >
-                <div
-                  className={cn(
-                    "absolute inset-x-0 top-0 h-0.5 origin-left scale-x-0 bg-green",
-                    "transition-transform duration-300 group-hover:scale-x-100"
-                  )}
-                />
-                <div className="text-green transition-colors duration-250 group-hover:text-terra">
-                  {value.icon}
-                </div>
-                <h3 className="mt-6 font-serif text-xl text-green">{value.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted">
-                  {value.description}
-                </p>
-              </article>
+              <ValuesCard
+                title={value.title}
+                description={value.description}
+                icon={value.icon}
+              />
             </StaggerItem>
           ))}
         </StaggerContainer>

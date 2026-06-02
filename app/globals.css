@@ -131,3 +131,11 @@ body {
     }
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-gentle,
+  .animate-orb-drift,
+  .animate-marquee {
+    animation: none !important;
+  }
+}

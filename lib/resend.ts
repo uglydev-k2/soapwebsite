@@ -66,6 +66,33 @@ export async function sendTrackingEmail(
   });
 }
 
+export async function sendContactEmail(data: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}) {
+  const resend = getResend();
+  const to = process.env.STORE_CONTACT_EMAIL || process.env.RESEND_FROM_EMAIL || "hello@msvee.co";
+  if (!resend) {
+    console.info("[msvee:contact]", data);
+    return;
+  }
+  await resend.emails.send({
+    from: process.env.RESEND_FROM_EMAIL || "hello@msvee.co",
+    to,
+    replyTo: data.email,
+    subject: `[MsVee Contact] ${data.subject}`,
+    html: `
+      <div style="font-family: Georgia, serif; color: #1C1C1C;">
+        <p><strong>From:</strong> ${data.name} &lt;${data.email}&gt;</p>
+        <p><strong>Subject:</strong> ${data.subject}</p>
+        <p style="white-space: pre-wrap;">${data.message}</p>
+      </div>
+    `,
+  });
+}
+
 export async function sendAdminInvite(email: string, name: string) {
   const resend = getResend();
   if (!resend) return;

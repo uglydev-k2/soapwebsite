@@ -11,10 +11,11 @@ const shopLinks = [
 ];
 
 const companyLinks = [
-  { label: "Our Story", href: "#about" },
-  { label: "The Ritual", href: "#ritual" },
-  { label: "Scent Guide", href: "#scents" },
-  { label: "Contact", href: "mailto:hello@msvee.co" },
+  { label: "Our Story", href: "/about" },
+  { label: "Gift Guide", href: "/gift-guide" },
+  { label: "Scent Guide", href: "/scents" },
+  { label: "Wishlist", href: "/wishlist" },
+  { label: "Contact", href: "/contact" },
 ];
 
 const supportLinks = [

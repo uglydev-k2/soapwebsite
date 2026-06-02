@@ -2,7 +2,13 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { EASE_OUT, fadeUp, staggerContainer, viewportOnce } from "@/lib/motion";
+import {
+  EASE_OUT,
+  fadeUp,
+  fadeUpScale,
+  staggerContainer,
+  viewportOnce,
+} from "@/lib/motion";
 import type { ReactNode } from "react";
 
 interface ScrollRevealProps {
@@ -70,18 +76,21 @@ export function StaggerContainer({
 export function StaggerItem({
   children,
   className,
+  variant = "scale",
 }: {
   children: ReactNode;
   className?: string;
+  variant?: "fade" | "scale";
 }) {
   const reduced = useReducedMotion();
+  const itemVariants = variant === "fade" ? fadeUp : fadeUpScale;
 
   if (reduced) {
     return <div className={className}>{children}</div>;
   }
 
   return (
-    <motion.div className={className} variants={fadeUp}>
+    <motion.div className={className} variants={itemVariants}>
       {children}
     </motion.div>
   );

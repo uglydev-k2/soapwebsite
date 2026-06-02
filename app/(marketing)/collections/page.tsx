@@ -13,6 +13,7 @@ import {
 } from "@/components/motion/ScrollReveal";
 import type { Category } from "@prisma/client";
 import { PRODUCT_CATEGORIES } from "@/lib/categories";
+import { RecentlyViewedSection } from "@/components/marketing/RecentlyViewedSection";
 
 export const metadata = {
   title: "Collections — MsVee Soaps",
@@ -39,12 +40,14 @@ async function CollectionsList({
   category,
   scent,
   sort,
+  q,
 }: {
   category?: Category;
   scent?: string;
   sort: SortValue;
+  q?: string;
 }) {
-  const products = await getActiveProducts({ category, scent, sort });
+  const products = await getActiveProducts({ category, scent, sort, q });
 
   if (products.length === 0) {
     return (
@@ -78,6 +81,7 @@ export default function CollectionsPage({
     ? (categoryQuery as Category)
     : undefined;
   const scent = parseQueryValue(searchParams?.scent)?.trim() || undefined;
+  const q = parseQueryValue(searchParams?.q)?.trim() || undefined;
   const sortQuery = parseQueryValue(searchParams?.sort);
   const sort = sortOptions.some((o) => o.value === sortQuery)
     ? (sortQuery as SortValue)
@@ -92,7 +96,17 @@ export default function CollectionsPage({
           description="Hand-crafted botanical bath and body essentials, made in small batches with clean ingredients."
         />
 
-        <form className="mt-10 grid gap-4 border border-green/10 bg-white p-5 sm:grid-cols-2 lg:grid-cols-4">
+        <form className="mt-10 grid gap-4 border border-green/10 bg-white p-5 sm:grid-cols-2 lg:grid-cols-5">
+          <label className="space-y-2 sm:col-span-2 lg:col-span-2">
+            <span className="label-caps text-muted">Search</span>
+            <input
+              name="q"
+              placeholder="Search products…"
+              defaultValue={q ?? ""}
+              className="input-admin"
+              style={{ borderRadius: "2px" }}
+            />
+          </label>
           <label className="space-y-2">
             <span className="label-caps text-muted">Category</span>
             <select
@@ -160,9 +174,10 @@ export default function CollectionsPage({
           }
         >
           <div className="mt-16">
-            <CollectionsList category={category} scent={scent} sort={sort} />
+            <CollectionsList category={category} scent={scent} sort={sort} q={q} />
           </div>
         </Suspense>
+        <RecentlyViewedSection />
       </div>
     </section>
   );

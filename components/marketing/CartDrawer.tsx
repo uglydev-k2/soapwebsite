@@ -15,8 +15,12 @@ interface CartDrawerProps {
 export function CartDrawer({ open, onClose }: CartDrawerProps) {
   const { items, updateQuantity, removeItem, subtotal } = useCartStore();
 
-  const shipping = subtotal() >= 75 ? 0 : 8;
-  const total = subtotal() + shipping + subtotal() * 0.08;
+  const sub = subtotal();
+  const freeShippingThreshold = 75;
+  const shipping = sub >= freeShippingThreshold ? 0 : 8;
+  const total = sub + shipping + sub * 0.08;
+  const shippingProgress = Math.min(100, (sub / freeShippingThreshold) * 100);
+  const amountToFreeShipping = Math.max(0, freeShippingThreshold - sub);
 
   return (
     <>
@@ -105,9 +109,24 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
 
         {items.length > 0 && (
           <div className="border-t border-green/10 px-6 py-5 space-y-3">
+            {sub < freeShippingThreshold ? (
+              <div className="space-y-2">
+                <p className="text-xs text-muted">
+                  Add {formatPrice(amountToFreeShipping)} for free shipping
+                </p>
+                <div className="h-1 overflow-hidden bg-green/10">
+                  <div
+                    className="h-full bg-terra transition-all duration-400"
+                    style={{ width: `${shippingProgress}%` }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs text-green">You qualify for free shipping</p>
+            )}
             <div className="flex justify-between text-sm">
               <span className="text-muted">Subtotal</span>
-              <span>{formatPrice(subtotal())}</span>
+              <span>{formatPrice(sub)}</span>
             </div>
             <div className="flex justify-between font-serif text-lg text-green">
               <span>Estimated total</span>

@@ -12,6 +12,7 @@ import { Modal } from "@/components/ui/Modal";
 import { useCartStore } from "@/store/cartStore";
 import { useToastStore } from "@/store/toastStore";
 import { EASE_OUT } from "@/lib/motion";
+import { WishlistButton } from "@/components/marketing/WishlistButton";
 import type { ProductWithMeta } from "@/types";
 import type { Category } from "@prisma/client";
 
@@ -118,6 +119,18 @@ export default function ProductCard({
               <ShoppingBag size={16} />
               Add to Cart
             </button>
+          </div>
+
+          <div className="absolute right-2 top-2 z-10 sm:right-3 sm:top-3">
+            <WishlistButton
+              item={{
+                productId: product.id,
+                name: product.name,
+                slug: product.slug,
+                price: product.price,
+                image: product.images[0],
+              }}
+            />
           </div>
 
           <div className="absolute left-2 top-2 flex flex-col gap-1.5 sm:left-3 sm:top-3 sm:gap-2">

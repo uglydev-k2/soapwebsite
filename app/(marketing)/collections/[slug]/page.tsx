@@ -6,6 +6,8 @@ import { formatPrice, getCategoryLabel } from "@/lib/utils";
 import ProductBundleSelector from "@/components/marketing/ProductBundleSelector";
 import ProductGallery from "@/components/marketing/ProductGallery";
 import ProductReviews from "@/components/marketing/ProductReviews";
+import { TrackRecentlyViewed } from "@/components/marketing/TrackRecentlyViewed";
+import { RecentlyViewedStrip } from "@/components/marketing/RecentlyViewedStrip";
 import Link from "next/link";
 
 export async function generateMetadata({
@@ -29,6 +31,13 @@ export default async function ProductDetailPage({
 
   return (
     <section className="pt-32 pb-24 px-6 bg-cream min-h-screen">
+      <TrackRecentlyViewed
+        productId={product.id}
+        name={product.name}
+        slug={product.slug}
+        price={product.price}
+        image={product.images[0]}
+      />
       <div className="max-w-6xl mx-auto">
         <Link
           href="/collections"
@@ -79,6 +88,7 @@ export default async function ProductDetailPage({
           </div>
         </div>
         <ProductReviews slug={product.slug} />
+        <RecentlyViewedStrip excludeSlug={product.slug} />
       </div>
     </section>
   );

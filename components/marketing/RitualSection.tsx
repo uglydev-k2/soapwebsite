@@ -1,11 +1,12 @@
-import { cn } from "@/lib/utils";
 import {
   AnimatedSectionHeader,
   ScrollReveal,
   StaggerContainer,
   StaggerItem,
 } from "@/components/motion/ScrollReveal";
+import { ScrollParallax } from "@/components/motion/ScrollParallax";
 import { CountUpStat } from "@/components/motion/CountUpStat";
+import { RitualStepCard } from "@/components/marketing/RitualStepCard";
 
 const stats = [
   { value: "12K+", label: "Happy Ritualists" },
@@ -41,7 +42,12 @@ export default function RitualSection() {
       className="relative overflow-hidden bg-white py-20 lg:py-28"
       id="ritual"
     >
-      <div className="ritual-rings pointer-events-none absolute inset-0" />
+      <ScrollParallax
+        className="pointer-events-none absolute inset-0"
+        offset={24}
+      >
+        <div className="ritual-rings h-full w-full" aria-hidden />
+      </ScrollParallax>
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid gap-16 lg:grid-cols-2 lg:gap-20">
@@ -75,21 +81,11 @@ export default function RitualSection() {
           <StaggerContainer className="grid gap-4">
             {steps.map((step) => (
               <StaggerItem key={step.number}>
-                <article
-                  className={cn(
-                    "group border border-green/15 bg-white p-8",
-                    "transition-all duration-300 hover:border-terra/35 hover:bg-cream"
-                  )}
-                  style={{ borderRadius: "2px" }}
-                >
-                  <span className="label-caps text-terra">{step.number}</span>
-                  <h3 className="mt-3 font-serif text-2xl text-green transition-colors duration-250 group-hover:text-terra">
-                    {step.title}
-                  </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-muted">
-                    {step.description}
-                  </p>
-                </article>
+                <RitualStepCard
+                  number={step.number}
+                  title={step.title}
+                  description={step.description}
+                />
               </StaggerItem>
             ))}
           </StaggerContainer>

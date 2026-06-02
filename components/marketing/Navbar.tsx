@@ -5,14 +5,16 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { CartDrawer } from "@/components/marketing/CartDrawer";
-import { ShoppingBag, Menu, X } from "lucide-react";
+import { ShoppingBag, Menu, X, Heart } from "lucide-react";
+import { SearchDialog } from "@/components/marketing/SearchDialog";
+import { useWishlistStore } from "@/store/wishlistStore";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import { EASE_OUT, fadeUp, staggerContainer } from "@/lib/motion";
 import type { NavbarAuthUser } from "@/lib/navbar-auth";
 
 const navLinks = [
-  { label: "Collections", href: "#collections" },
+  { label: "Collections", href: "/collections" },
   { label: "Our Ritual", href: "#ritual" },
   { label: "Scents", href: "#scents" },
   { label: "About", href: "#about" },
@@ -45,6 +47,7 @@ export default function Navbar({
   const [cartOpen, setCartOpen] = useState(false);
   const [cartBounce, setCartBounce] = useState(false);
   const itemCount = useCartStore((s) => s.itemCount());
+  const wishlistCount = useWishlistStore((s) => s.items.length);
   const prevCount = useRef(itemCount);
   const lastScrollY = useRef(0);
 
@@ -155,6 +158,22 @@ export default function Navbar({
             <div className="hidden md:block">
               <UserMenu initialUser={initialUser} />
             </div>
+            <SearchDialog />
+            <Link
+              href="/wishlist"
+              className="relative hidden p-2 text-green transition-colors duration-250 hover:text-terra sm:block"
+              aria-label={`Wishlist, ${wishlistCount} items`}
+            >
+              <Heart size={20} strokeWidth={1.5} />
+              {wishlistCount > 0 && (
+                <span
+                  className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center bg-gold text-[10px] font-medium text-green-3"
+                  style={{ borderRadius: "2px" }}
+                >
+                  {wishlistCount > 9 ? "9+" : wishlistCount}
+                </span>
+              )}
+            </Link>
             <motion.button
               type="button"
               onClick={() => setCartOpen(true)}
@@ -175,7 +194,7 @@ export default function Navbar({
             </motion.button>
 
             <Link
-              href="#collections"
+              href="/collections"
               className="cta-shimmer hidden items-center justify-center bg-terra px-4 py-2 text-xs label-caps text-white transition-colors duration-250 hover:bg-terra-2 md:inline-flex"
               style={{ borderRadius: 0 }}
             >
@@ -244,7 +263,15 @@ export default function Navbar({
         <div className="border-t border-cream/10 p-6 space-y-4">
           <UserMenu initialUser={initialUser} />
           <Link
-            href="#collections"
+            href="/wishlist"
+            onClick={() => setMobileOpen(false)}
+            className="inline-flex items-center gap-2 label-caps text-cream/80 hover:text-gold"
+          >
+            <Heart size={16} />
+            Wishlist{wishlistCount > 0 ? ` (${wishlistCount})` : ""}
+          </Link>
+          <Link
+            href="/collections"
             onClick={() => setMobileOpen(false)}
             className="inline-flex w-full items-center justify-center bg-terra px-8 py-4 text-sm label-caps text-white transition-colors duration-250 hover:bg-terra-2"
             style={{ borderRadius: 0 }}

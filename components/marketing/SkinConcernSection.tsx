@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { InteractiveCard } from "@/components/motion/InteractiveCard";
 import { AnimatedSectionHeader, StaggerContainer, StaggerItem } from "@/components/motion/ScrollReveal";
 
 const concerns = [
@@ -42,17 +43,21 @@ export default function SkinConcernSection() {
         <StaggerContainer className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-5" stagger={0.06}>
           {concerns.map((concern) => (
             <StaggerItem key={concern.title}>
-              <Link
-                href={concern.href}
-                className="group block h-full border border-green/12 bg-white p-6 transition-all duration-250 hover:border-terra/35 hover:shadow-sm"
-                style={{ borderRadius: "2px" }}
-              >
-                <h3 className="font-serif text-2xl text-green transition-colors duration-250 group-hover:text-terra">
-                  {concern.title}
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted">{concern.description}</p>
-                <span className="mt-6 inline-block label-caps text-green">Explore →</span>
-              </Link>
+              <InteractiveCard>
+                <Link
+                  href={concern.href}
+                  className="group block h-full border border-green/12 bg-white p-6 transition-colors duration-250 hover:border-terra/35 hover:shadow-sm"
+                  style={{ borderRadius: "2px" }}
+                >
+                  <h3 className="font-serif text-2xl text-green transition-colors duration-250 group-hover:text-terra">
+                    {concern.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted">{concern.description}</p>
+                  <span className="mt-6 inline-block label-caps text-green transition-transform duration-250 group-hover:translate-x-1 group-hover:text-terra">
+                    Explore →
+                  </span>
+                </Link>
+              </InteractiveCard>
             </StaggerItem>
           ))}
         </StaggerContainer>

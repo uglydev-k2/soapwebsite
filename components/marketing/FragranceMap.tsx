@@ -9,46 +9,12 @@ import {
   StaggerItem,
 } from "@/components/motion/ScrollReveal";
 import { EASE_OUT } from "@/lib/motion";
-
-const fragrances = [
-  {
-    name: "Forest Cedar",
-    slug: "forest-cedar",
-    description:
-      "Grounding notes of cedarwood, fir needle, and moss. Like a walk through an ancient forest.",
-    notes: ["Cedarwood", "Fir Needle", "Oakmoss"],
-    swatches: ["#2c4a3e", "#3d6454", "#6b5e52"],
-  },
-  {
-    name: "Citrus Bloom",
-    slug: "citrus-bloom",
-    description:
-      "Bright bergamot, neroli, and grapefruit zest. Uplifting and energizing for morning rituals.",
-    notes: ["Bergamot", "Neroli", "Grapefruit"],
-    swatches: ["#f5d76e", "#e8a838", "#c9a96e"],
-  },
-  {
-    name: "Warm Amber",
-    slug: "warm-amber",
-    description:
-      "Rich amber resin, vanilla orchid, and sandalwood. Wraps you in warmth and comfort.",
-    notes: ["Amber", "Vanilla", "Sandalwood"],
-    swatches: ["#b5552a", "#c9a96e", "#8c3f1e"],
-  },
-  {
-    name: "Lavender Mist",
-    slug: "lavender-mist",
-    description:
-      "Soft lavender, chamomile, and white tea. Calming and serene for evening unwind.",
-    notes: ["Lavender", "Chamomile", "White Tea"],
-    swatches: ["#9b8ab8", "#c4b5d4", "#efe9df"],
-  },
-];
+import { FRAGRANCE_PROFILES } from "@/lib/content/fragrances";
 
 function ScentCard({
   fragrance,
 }: {
-  fragrance: (typeof fragrances)[number];
+  fragrance: (typeof FRAGRANCE_PROFILES)[number];
 }) {
   const reduced = useReducedMotion();
   const tint = `${fragrance.swatches[0]}14`;
@@ -56,7 +22,7 @@ function ScentCard({
   return (
     <motion.div whileHover={reduced ? undefined : { scale: 1.02 }} transition={{ duration: 0.35, ease: EASE_OUT }}>
       <Link
-        href={`/shop?scent=${fragrance.slug}`}
+        href={fragrance.shopHref}
         className={cn(
           "group relative block overflow-hidden border border-green/10 bg-white p-8",
           "transition-colors duration-300 hover:border-green/30 hover:shadow-lg"
@@ -129,7 +95,7 @@ export default function FragranceMap() {
         />
 
         <StaggerContainer className="mt-16 grid grid-cols-2 gap-6">
-          {fragrances.map((fragrance) => (
+          {FRAGRANCE_PROFILES.map((fragrance) => (
             <StaggerItem key={fragrance.slug}>
               <ScentCard fragrance={fragrance} />
             </StaggerItem>
