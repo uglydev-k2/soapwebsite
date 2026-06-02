@@ -1,6 +1,7 @@
 import Hero from "@/components/marketing/Hero";
 import Marquee from "@/components/marketing/Marquee";
 import ValuesSection from "@/components/marketing/ValuesSection";
+import CategorySection from "@/components/marketing/CategorySection";
 import ProductGrid from "@/components/marketing/ProductGrid";
 import { ProductGridSkeleton } from "@/components/marketing/ProductGridSkeleton";
 import RitualSection from "@/components/marketing/RitualSection";
@@ -17,6 +18,7 @@ export default function HomePage() {
       <Hero />
       <Marquee />
       <ValuesSection />
+      <CategorySection />
       <Suspense fallback={<ProductGridSkeleton />}>
         <ProductGrid />
       </Suspense>

@@ -1,10 +1,13 @@
 import Link from "next/link";
 
+import { PRODUCT_CATEGORIES } from "@/lib/categories";
+
 const shopLinks = [
   { label: "All Products", href: "/collections" },
-  { label: "Bar Soaps", href: "/collections?category=SOAP" },
-  { label: "Body Wash", href: "/collections?category=BODY_WASH" },
-  { label: "Gift Sets", href: "/collections?category=GIFT_SET" },
+  ...PRODUCT_CATEGORIES.map((c) => ({
+    label: c.label,
+    href: `/collections/category/${c.slug}`,
+  })),
 ];
 
 const companyLinks = [

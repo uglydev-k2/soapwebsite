@@ -12,19 +12,11 @@ import {
   StaggerItem,
 } from "@/components/motion/ScrollReveal";
 import type { Category } from "@prisma/client";
+import { PRODUCT_CATEGORIES } from "@/lib/categories";
 
 export const metadata = {
   title: "Collections — MsVee Soaps",
 };
-
-const categoryOptions: { value: Category; label: string }[] = [
-  { value: "SOAP", label: "Bar Soaps" },
-  { value: "BODY_WASH", label: "Body Wash" },
-  { value: "LOTION", label: "Lotion" },
-  { value: "SCRUB", label: "Scrub" },
-  { value: "AROMATHERAPY", label: "Aromatherapy" },
-  { value: "GIFT_SET", label: "Gift Sets" },
-];
 
 const sortOptions = [
   { value: "featured", label: "Featured" },
@@ -82,7 +74,7 @@ export default function CollectionsPage({
   searchParams?: Record<string, string | string[] | undefined>;
 }) {
   const categoryQuery = parseQueryValue(searchParams?.category);
-  const category = categoryOptions.some((o) => o.value === categoryQuery)
+  const category = PRODUCT_CATEGORIES.some((o) => o.value === categoryQuery)
     ? (categoryQuery as Category)
     : undefined;
   const scent = parseQueryValue(searchParams?.scent)?.trim() || undefined;
@@ -110,7 +102,7 @@ export default function CollectionsPage({
               style={{ borderRadius: "2px" }}
             >
               <option value="">All Categories</option>
-              {categoryOptions.map((option) => (
+              {PRODUCT_CATEGORIES.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>

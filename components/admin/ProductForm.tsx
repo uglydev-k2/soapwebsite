@@ -9,19 +9,11 @@ import { X } from "lucide-react";
 import type { Product } from "@prisma/client";
 import { UploadButton } from "@/lib/uploadthing";
 import { productSchema, type ProductFormData } from "@/lib/validations";
-import { categoryLabels, cn, slugify } from "@/lib/utils";
+import { cn, slugify } from "@/lib/utils";
+import { PRODUCT_CATEGORIES } from "@/lib/categories";
 import { useToastStore } from "@/store/toastStore";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-
-const CATEGORIES = [
-  "SOAP",
-  "BODY_WASH",
-  "LOTION",
-  "SCRUB",
-  "AROMATHERAPY",
-  "GIFT_SET",
-] as const;
 
 interface ProductFormProps {
   product?: Product | null;
@@ -182,9 +174,9 @@ export function ProductForm({ product, className }: ProductFormProps) {
                 {...register("category")}
                 className="admin-input w-full"
               >
-                {CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {categoryLabels[cat]}
+                {PRODUCT_CATEGORIES.map((cat) => (
+                  <option key={cat.value} value={cat.value}>
+                    {cat.label}
                   </option>
                 ))}
               </select>
