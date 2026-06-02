@@ -180,7 +180,7 @@ export function SettingsForm({
         onSubmit={handleStoreSubmit(saveStore)}
         className="admin-card space-y-4 lg:col-span-2"
       >
-        <h2 className="font-serif text-xl font-light text-green">Store Settings</h2>
+        <h2 className="font-serif text-xl font-medium text-green">Store Settings</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <Input
             label="Store Name"
@@ -277,7 +277,7 @@ export function SettingsForm({
         className="admin-card space-y-4"
         id="account"
       >
-        <h2 className="font-serif text-xl font-light text-green">Change Password</h2>
+        <h2 className="font-serif text-xl font-medium text-green">Change Password</h2>
         <Input
           label="Current Password"
           type="password"
@@ -305,7 +305,7 @@ export function SettingsForm({
       </form>
 
       <div className="admin-card space-y-4">
-        <h2 className="font-serif text-xl font-light text-green">Invite Admin</h2>
+        <h2 className="font-serif text-xl font-medium text-green">Invite Admin</h2>
         <form onSubmit={handleInviteSubmit(sendInvite)} className="space-y-4">
           <Input
             label="Name"

@@ -70,7 +70,7 @@ export default function Testimonials() {
                 </p>
                 <footer className="mt-8 border-t border-green/10 pt-6">
                   <cite className="not-italic">
-                    <span className="block font-sans text-sm font-normal text-green">
+                    <span className="block font-sans text-sm font-medium text-green">
                       {testimonial.name}
                     </span>
                     <span className="mt-1 block text-xs text-muted">

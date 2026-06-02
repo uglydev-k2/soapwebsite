@@ -125,14 +125,14 @@ export function AnimatedSectionHeader({
         </span>
         <h2
           className={cn(
-            "mt-4 font-serif text-3xl font-light sm:text-4xl lg:text-5xl",
+            "mt-4 font-serif text-3xl font-medium sm:text-4xl lg:text-5xl",
             isDark ? "text-cream" : "text-green"
           )}
         >
           {title}
         </h2>
         {description && (
-          <p className={cn("mt-4 text-sm sm:text-base", isDark ? "text-cream/85" : "text-muted")}>
+          <p className={cn("mt-4 text-sm sm:text-base", isDark ? "text-cream" : "text-text/95")}>
             {description}
           </p>
         )}
@@ -156,7 +156,7 @@ export function AnimatedSectionHeader({
       </motion.span>
       <motion.h2
         className={cn(
-          "mt-4 font-serif text-3xl font-light sm:text-4xl lg:text-5xl",
+          "mt-4 font-serif text-3xl font-medium sm:text-4xl lg:text-5xl",
           isDark ? "text-cream" : "text-green"
         )}
         variants={fadeUp}
@@ -179,7 +179,7 @@ export function AnimatedSectionHeader({
         <motion.p
           className={cn(
             "mt-4 text-sm sm:text-base",
-            isDark ? "text-cream/85" : "text-muted"
+            isDark ? "text-cream" : "text-text/95"
           )}
           variants={fadeUp}
         >

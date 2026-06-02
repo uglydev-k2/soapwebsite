@@ -62,7 +62,7 @@ export default async function ProductDetailPage({
             <p className="label-caps text-terra mb-2">
               {getCategoryLabel(product.category)}
             </p>
-            <h1 className="mb-4 font-serif text-3xl font-light text-green sm:text-4xl">
+            <h1 className="mb-4 font-serif text-3xl font-medium text-green sm:text-4xl">
               {product.name}
             </h1>
             <div className="flex items-baseline gap-3 mb-6">

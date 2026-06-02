@@ -48,7 +48,7 @@ export default function Hero() {
             </span>
           </motion.div>
 
-          <h1 className="font-serif text-[2.35rem] font-light leading-[1.1] text-green sm:text-5xl lg:text-6xl xl:text-7xl">
+          <h1 className="font-serif text-[2.35rem] font-medium leading-[1.1] text-green sm:text-5xl lg:text-6xl xl:text-7xl">
             {headlineWords.map((word, index) => (
               <motion.span
                 key={word.text}
@@ -70,7 +70,7 @@ export default function Hero() {
           </h1>
 
           <motion.p
-            className="max-w-md text-base leading-relaxed text-muted"
+            className="max-w-md text-base leading-relaxed text-text"
             variants={fadeUp}
           >
             Handcrafted soaps and body care infused with botanical essences.

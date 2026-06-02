@@ -54,10 +54,10 @@ export default function Newsletter() {
     <section className="bg-terra py-20 lg:py-24">
       <ScrollReveal className="mx-auto max-w-2xl px-6 text-center lg:px-8">
         <span className="label-caps text-cream/70">Stay Connected</span>
-        <h2 className="mt-4 font-serif text-4xl font-light text-cream lg:text-5xl">
+        <h2 className="mt-4 font-serif text-4xl font-medium text-cream lg:text-5xl">
           Join the Ritual
         </h2>
-        <p className="mt-4 text-cream/80">
+        <p className="mt-4 text-cream/90">
           Be the first to know about new scents, seasonal collections, and
           exclusive offers. No spam — just botanical goodness.
         </p>

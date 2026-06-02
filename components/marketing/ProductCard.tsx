@@ -148,7 +148,7 @@ export default function ProductCard({
 
         <div className="flex flex-1 flex-col p-3 sm:p-5">
           <motion.span
-            className="label-caps text-muted"
+            className="label-caps text-green/75"
             initial={reduced ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: reduced ? 0 : 0.2 + index * 0.06 }}

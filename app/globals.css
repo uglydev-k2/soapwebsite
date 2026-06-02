@@ -6,14 +6,14 @@
   --cream: #f7f3ed;
   --cream-2: #efe9df;
   --white: #fffef9;
-  --green: #2c4a3e;
-  --green-2: #3d6454;
+  --green: #1f342c;
+  --green-2: #2f4a3f;
   --green-3: #1a2e26;
-  --terra: #b5552a;
-  --terra-2: #8c3f1e;
-  --gold: #c9a96e;
-  --text: #1c1c1c;
-  --muted: #6b5e52;
+  --terra: #963f1a;
+  --terra-2: #7a3316;
+  --gold: #a88a4a;
+  --text: #121212;
+  --muted: #3a3530;
   --font-serif: var(--font-cormorant), Georgia, serif;
   --font-sans: var(--font-jost), system-ui, sans-serif;
 }
@@ -27,13 +27,38 @@ html {
   overflow-x: clip;
 }
 
-body {
-  color: var(--text);
-  background: var(--cream);
-  font-family: var(--font-sans);
-  font-weight: 300;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: clip;
+@layer base {
+  html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    color: var(--text);
+    background: var(--cream);
+    font-family: var(--font-sans);
+    font-weight: 500;
+    line-height: 1.6;
+    -webkit-font-smoothing: auto;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--green);
+    font-weight: 500;
+  }
+
+  p {
+    font-weight: 500;
+  }
+
+  strong {
+    font-weight: 600;
+  }
 }
 
 /* Fixed navbar (+ optional mobile promo) clearance */
@@ -79,16 +104,16 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 9999;
-  opacity: 0.04;
+  opacity: 0;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 
 @layer utilities {
   .label-caps {
     font-family: var(--font-sans);
-    font-weight: 400;
-    font-size: 0.72rem;
-    letter-spacing: 0.18em;
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
   }
 

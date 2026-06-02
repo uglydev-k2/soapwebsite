@@ -4,7 +4,7 @@ export default function NotFound() {
   return (
     <section className="flex min-h-screen flex-col items-center justify-center bg-cream px-6 text-center">
       <p className="label-caps text-terra">404</p>
-      <h1 className="mt-4 font-serif text-5xl font-light text-green">Page not found</h1>
+      <h1 className="mt-4 font-serif text-5xl font-medium text-green">Page not found</h1>
       <p className="mt-4 max-w-md text-muted">
         This path doesn&apos;t exist — but your next ritual is waiting in our collections.
       </p>

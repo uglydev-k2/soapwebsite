@@ -14,17 +14,17 @@ const config: Config = {
         "cream-2": "rgb(239 233 223 / <alpha-value>)",
         white: "rgb(255 254 249 / <alpha-value>)",
         green: {
-          DEFAULT: "var(--green)",
-          2: "var(--green-2)",
-          3: "var(--green-3)",
+          DEFAULT: "rgb(31 52 44 / <alpha-value>)",
+          2: "rgb(47 74 63 / <alpha-value>)",
+          3: "rgb(26 46 38 / <alpha-value>)",
         },
         terra: {
           DEFAULT: "var(--terra)",
           2: "var(--terra-2)",
         },
         gold: "rgb(201 169 110 / <alpha-value>)",
-        text: "var(--text)",
-        muted: "var(--muted)",
+        text: "rgb(18 18 18 / <alpha-value>)",
+        muted: "rgb(58 53 48 / <alpha-value>)",
       },
       fontFamily: {
         serif: ["var(--font-serif)", "Georgia", "serif"],

@@ -74,7 +74,7 @@ export default function Footer() {
               <span className="font-serif text-2xl text-green-2">Vee</span>
               <span className="font-serif text-2xl text-green-2"> Soaps</span>
             </Link>
-            <p className="mt-4 text-sm leading-relaxed text-cream/60">
+            <p className="mt-4 text-sm leading-relaxed text-cream/90">
               Premium botanical bath products handcrafted with intention. Where
               ritual meets luxury.
             </p>
@@ -102,7 +102,7 @@ export default function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-cream/60 transition-colors hover:text-cream"
+                    className="text-sm text-cream/85 transition-colors hover:text-cream"
                   >
                     {link.label}
                   </Link>
@@ -119,7 +119,7 @@ export default function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-cream/60 transition-colors hover:text-cream"
+                    className="text-sm text-cream/85 transition-colors hover:text-cream"
                   >
                     {link.label}
                   </Link>
@@ -136,7 +136,7 @@ export default function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-cream/60 transition-colors hover:text-cream"
+                    className="text-sm text-cream/85 transition-colors hover:text-cream"
                   >
                     {link.label}
                   </Link>

@@ -36,7 +36,7 @@ export default function TrustPressSection() {
           {press.map((name) => (
             <li
               key={name}
-              className="font-serif text-base text-green/40 transition-colors hover:text-green/70 sm:text-xl"
+              className="font-serif text-base text-green/60 transition-colors hover:text-green sm:text-xl"
             >
               {name}
             </li>

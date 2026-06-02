@@ -78,7 +78,7 @@ export function Topbar({
             </span>
           ))}
         </nav>
-        <h1 className="font-serif text-2xl font-light text-green">{title}</h1>
+        <h1 className="font-serif text-2xl font-medium text-green">{title}</h1>
         <p className="mt-0.5 text-xs text-muted">{today}</p>
         </div>
       </div>

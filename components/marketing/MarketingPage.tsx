@@ -28,11 +28,11 @@ export function MarketingPage({
         )}
       >
         <p className="label-caps text-terra">{eyebrow}</p>
-        <h1 className="mt-4 font-serif text-3xl font-light tracking-wide text-green sm:text-4xl md:text-5xl">
+        <h1 className="mt-4 font-serif text-3xl font-medium tracking-wide text-green sm:text-4xl md:text-5xl">
           {title}
         </h1>
         {description && (
-          <p className="mt-6 text-muted leading-relaxed">{description}</p>
+          <p className="mt-6 text-text leading-relaxed">{description}</p>
         )}
         <div className="mt-12">{children}</div>
       </div>

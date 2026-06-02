@@ -137,7 +137,7 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
       <div className="admin-card flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between print:border-0">
         <div>
           <p className="label-caps text-muted">Order</p>
-          <h2 className="font-serif text-3xl font-light text-green">
+          <h2 className="font-serif text-3xl font-medium text-green">
             {order.orderNumber}
           </h2>
           <p className="mt-1 text-sm text-muted">{formatDateTime(order.createdAt)}</p>

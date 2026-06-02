@@ -104,7 +104,7 @@ export default function OrderConfirmationPage() {
     <section className="pt-32 pb-24 px-6 min-h-screen bg-cream">
       <div className="max-w-3xl mx-auto">
         <p className="label-caps text-terra mb-3">Order confirmed</p>
-        <h1 className="font-serif text-4xl font-light text-green mb-4">
+        <h1 className="font-serif text-4xl font-medium text-green mb-4">
           Thank you, {order.firstName}!
         </h1>
         <p className="text-muted mb-10">

@@ -19,7 +19,7 @@ export default function RootErrorBoundary({
     <section className="flex min-h-[70vh] items-center justify-center px-6 py-24">
       <div className="max-w-lg text-center">
         <p className="label-caps mb-4 text-terra">Application Error</p>
-        <h1 className="mb-4 font-serif text-3xl font-light text-green">
+        <h1 className="mb-4 font-serif text-3xl font-medium text-green">
           Something went wrong
         </h1>
         <p className="mb-2 text-sm text-muted">

@@ -64,7 +64,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         className={cn(
-          "relative inline-flex items-center justify-center overflow-hidden font-sans font-normal disabled:cursor-not-allowed disabled:opacity-50",
+          "relative inline-flex items-center justify-center overflow-hidden font-sans font-medium disabled:cursor-not-allowed disabled:opacity-50",
           variant === "primary" && "cta-shimmer",
           variants[variant],
           sizes[size],

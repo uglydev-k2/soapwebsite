@@ -27,7 +27,7 @@ export default function JournalArticlePage({ params }: { params: { slug: string 
           ]}
         />
         <span className="label-caps text-terra">{post.category}</span>
-        <h1 className="mt-4 font-serif text-4xl font-light text-green md:text-5xl">
+        <h1 className="mt-4 font-serif text-4xl font-medium text-green md:text-5xl">
           {post.title}
         </h1>
         <p className="mt-4 text-sm text-muted">

@@ -145,7 +145,7 @@ export default function Navbar({
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="label-caps text-muted transition-colors duration-250 hover:text-green"
+                  className="label-caps text-green/80 transition-colors duration-250 hover:text-green"
                 >
                   {link.label}
                 </Link>
@@ -253,7 +253,7 @@ export default function Navbar({
             <li key={link.href}>
               <Link
                 href={link.href}
-                className="block border-b border-cream/5 py-4 font-serif text-2xl font-light text-cream transition-colors hover:text-gold"
+                className="block border-b border-cream/5 py-4 font-serif text-2xl font-medium text-cream transition-colors hover:text-gold"
                 onClick={() => setMobileOpen(false)}
               >
                 {link.label}

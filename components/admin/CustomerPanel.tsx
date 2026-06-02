@@ -164,7 +164,7 @@ export function CustomerPanel({
             <p className="label-caps text-muted">Customer</p>
             <h2
               id="customer-panel-title"
-              className="font-serif text-2xl font-light text-green"
+              className="font-serif text-2xl font-medium text-green"
             >
               {customer.firstName} {customer.lastName}
             </h2>
