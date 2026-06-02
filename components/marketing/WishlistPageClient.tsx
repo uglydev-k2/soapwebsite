@@ -16,7 +16,7 @@ export function WishlistPageClient() {
   if (items.length === 0) {
     return (
       <div className="border border-green/10 bg-white py-16 text-center">
-        <p className="font-serif text-2xl text-green">Your wishlist is empty</p>
+        <p className="subheading text-2xl">Your wishlist is empty</p>
         <p className="mt-3 text-sm text-muted">
           Save products you love while browsing collections.
         </p>

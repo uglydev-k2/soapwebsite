@@ -253,7 +253,7 @@ export default function Navbar({
             <li key={link.href}>
               <Link
                 href={link.href}
-                className="block border-b border-cream/5 py-4 font-serif text-2xl font-medium text-cream transition-colors hover:text-gold"
+                className="block border-b border-cream/5 py-4 font-serif text-2xl font-semibold text-cream transition-colors hover:text-gold"
                 onClick={() => setMobileOpen(false)}
               >
                 {link.label}

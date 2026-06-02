@@ -46,7 +46,7 @@ export function ContactForm() {
   if (submitted) {
     return (
       <div className="border border-green/10 bg-white p-8 text-center">
-        <p className="font-serif text-2xl text-green">Message sent</p>
+        <p className="subheading text-2xl">Message sent</p>
         <p className="mt-3 text-sm text-muted">
           Thank you — we will reply within 1–2 business days.
         </p>

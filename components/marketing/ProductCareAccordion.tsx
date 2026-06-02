@@ -53,7 +53,7 @@ export function ProductCareAccordion({ category }: { category: Category }) {
         onClick={() => setOpen(!open)}
         aria-expanded={open}
       >
-        <span className="font-serif text-lg text-green">{care.title}</span>
+        <span className="subheading text-lg">{care.title}</span>
         <ChevronDown
           size={18}
           className={cn("text-muted transition-transform", open && "rotate-180")}

@@ -115,7 +115,7 @@ export function ProductForm({ product, className }: ProductFormProps) {
     >
       <div className="space-y-6">
         <div className="admin-card space-y-4">
-          <h2 className="font-serif text-xl font-medium text-green">Details</h2>
+          <h2 className="font-serif text-xl font-semibold text-green">Details</h2>
           <Input
             label="Product Name"
             {...register("name")}
@@ -150,7 +150,7 @@ export function ProductForm({ product, className }: ProductFormProps) {
         </div>
 
         <div className="admin-card space-y-4">
-          <h2 className="font-serif text-xl font-medium text-green">Pricing & Inventory</h2>
+          <h2 className="font-serif text-xl font-semibold text-green">Pricing & Inventory</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <Input
               label="Price ($)"
@@ -194,7 +194,7 @@ export function ProductForm({ product, className }: ProductFormProps) {
         </div>
 
         <div className="admin-card space-y-4">
-          <h2 className="font-serif text-xl font-medium text-green">Attributes</h2>
+          <h2 className="font-serif text-xl font-semibold text-green">Attributes</h2>
           <Input
             label="Fragrance"
             {...register("fragrance")}
@@ -213,7 +213,7 @@ export function ProductForm({ product, className }: ProductFormProps) {
 
       <div className="space-y-6">
         <div className="admin-card space-y-4">
-          <h2 className="font-serif text-xl font-medium text-green">Images</h2>
+          <h2 className="font-serif text-xl font-semibold text-green">Images</h2>
           {images.length > 0 && (
             <div className="grid grid-cols-2 gap-2">
               {images.map((url, i) => (
@@ -263,7 +263,7 @@ export function ProductForm({ product, className }: ProductFormProps) {
         </div>
 
         <div className="admin-card space-y-4">
-          <h2 className="font-serif text-xl font-medium text-green">Visibility</h2>
+          <h2 className="font-serif text-xl font-semibold text-green">Visibility</h2>
           <label className="flex cursor-pointer items-center gap-3">
             <input
               type="checkbox"

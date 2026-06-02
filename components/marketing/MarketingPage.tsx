@@ -28,7 +28,7 @@ export function MarketingPage({
         )}
       >
         <p className="label-caps text-terra">{eyebrow}</p>
-        <h1 className="mt-4 font-serif text-3xl font-medium tracking-wide text-green sm:text-4xl md:text-5xl">
+        <h1 className="mt-4 font-serif text-3xl font-semibold tracking-wide text-green sm:text-4xl md:text-5xl">
           {title}
         </h1>
         {description && (

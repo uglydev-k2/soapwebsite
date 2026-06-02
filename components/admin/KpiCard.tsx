@@ -29,7 +29,7 @@ export function KpiCard({
   return (
     <div className={cn("admin-card flex flex-col", className)}>
       <p className="label-caps mb-3 text-muted">{label}</p>
-      <p className="font-serif text-4xl font-medium text-green">{value}</p>
+      <p className="font-serif text-4xl font-semibold text-green">{value}</p>
       {change && (
         <span
           className={cn(

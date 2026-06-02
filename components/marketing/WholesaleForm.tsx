@@ -29,7 +29,7 @@ export function WholesaleForm() {
 
   if (submitted) {
     return (
-      <p className="border border-green/10 bg-white p-8 text-center font-serif text-xl text-green">
+      <p className="subheading border border-green/10 bg-white p-8 text-center text-xl">
         Thank you — our team will review your inquiry shortly.
       </p>
     );

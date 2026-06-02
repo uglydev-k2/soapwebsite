@@ -28,7 +28,7 @@ export default function CartPage() {
   return (
     <section className="marketing-header-offset min-h-screen px-4 pb-24 sm:px-6">
       <div className="max-w-4xl mx-auto">
-        <h1 className="font-serif text-4xl font-medium text-green mb-12">Your Cart</h1>
+        <h1 className="font-serif text-4xl font-semibold text-green mb-12">Your Cart</h1>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 space-y-6">
             {items.map((item) => (

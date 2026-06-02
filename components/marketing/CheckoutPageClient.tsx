@@ -128,7 +128,7 @@ export default function CheckoutPageClient() {
         >
           ← Back to cart
         </Link>
-        <h1 className="font-serif text-4xl font-medium text-green mb-12">Checkout</h1>
+        <h1 className="font-serif text-4xl font-semibold text-green mb-12">Checkout</h1>
 
         <form
           onSubmit={handleSubmit(onSubmit)}

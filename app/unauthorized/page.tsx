@@ -10,7 +10,7 @@ export default function UnauthorizedPage() {
     <section className="flex min-h-screen items-center justify-center bg-cream px-6">
       <div className="max-w-md text-center">
         <p className="label-caps mb-4 text-terra">Access Denied</p>
-        <h1 className="mb-4 font-serif text-4xl font-medium text-green">
+        <h1 className="mb-4 font-serif text-4xl font-semibold text-green">
           Unauthorized
         </h1>
         <p className="mb-8 text-sm text-muted leading-relaxed">

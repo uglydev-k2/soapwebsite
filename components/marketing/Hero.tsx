@@ -48,7 +48,7 @@ export default function Hero() {
             </span>
           </motion.div>
 
-          <h1 className="font-serif text-[2.35rem] font-medium leading-[1.1] text-green sm:text-5xl lg:text-6xl xl:text-7xl">
+          <h1 className="font-serif text-[2.35rem] font-semibold leading-[1.1] text-green sm:text-5xl lg:text-6xl xl:text-7xl">
             {headlineWords.map((word, index) => (
               <motion.span
                 key={word.text}
@@ -158,7 +158,7 @@ export default function Hero() {
             transition={{ duration: 0.55, delay: 0.45, ease: EASE_OUT }}
           >
             <span className="label-caps text-gold">The Collection</span>
-            <h3 className="mt-2 font-serif text-xl text-green">
+            <h3 className="subheading mt-2 text-xl">
               Botanical Bath & Body
             </h3>
             <p className="mt-1 text-sm text-muted">

@@ -24,7 +24,7 @@ export function FAQAccordion({ items }: { items: readonly FAQItem[] }) {
               onClick={() => setOpenIndex(open ? null : index)}
               aria-expanded={open}
             >
-              <span className="font-serif text-lg text-green">{item.question}</span>
+              <span className="subheading text-lg">{item.question}</span>
               <ChevronDown
                 size={18}
                 className={cn(
