@@ -8,7 +8,13 @@ import ProductGallery from "@/components/marketing/ProductGallery";
 import ProductReviews from "@/components/marketing/ProductReviews";
 import { TrackRecentlyViewed } from "@/components/marketing/TrackRecentlyViewed";
 import { RecentlyViewedStrip } from "@/components/marketing/RecentlyViewedStrip";
-import Link from "next/link";
+import { CompleteYourRitual } from "@/components/marketing/CompleteYourRitual";
+import { Breadcrumbs } from "@/components/marketing/Breadcrumbs";
+import { ShareProductButton } from "@/components/marketing/ShareProductButton";
+import { StockNotifyForm } from "@/components/marketing/StockNotifyForm";
+import { ProductCareAccordion } from "@/components/marketing/ProductCareAccordion";
+import { WishlistButton } from "@/components/marketing/WishlistButton";
+import type { Category } from "@prisma/client";
 
 export async function generateMetadata({
   params,
@@ -39,12 +45,13 @@ export default async function ProductDetailPage({
         image={product.images[0]}
       />
       <div className="max-w-6xl mx-auto">
-        <Link
-          href="/collections"
-          className="label-caps text-muted hover:text-green transition-colors mb-8 inline-block"
-        >
-          ← Back to Collections
-        </Link>
+        <Breadcrumbs
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Collections", href: "/collections" },
+            { label: product.name },
+          ]}
+        />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           <ProductGallery
             name={product.name}
@@ -81,12 +88,33 @@ export default async function ProductDetailPage({
                 <p className="text-sm text-muted leading-relaxed">{product.ingredients}</p>
               </div>
             )}
-            <p className="label-caps text-muted mb-6">
-              {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
-            </p>
-            <ProductBundleSelector product={product} disabled={product.stock === 0} />
+            <div className="mb-6 flex flex-wrap items-center gap-4">
+              <p className="label-caps text-muted">
+                {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
+              </p>
+              <ShareProductButton name={product.name} />
+              <WishlistButton
+                item={{
+                  productId: product.id,
+                  name: product.name,
+                  slug: product.slug,
+                  price: product.price,
+                  image: product.images[0],
+                }}
+              />
+            </div>
+            {product.stock === 0 ? (
+              <div className="mb-8 border border-green/10 bg-white p-6">
+                <p className="label-caps text-muted mb-3">Back in stock alert</p>
+                <StockNotifyForm productSlug={product.slug} productName={product.name} />
+              </div>
+            ) : (
+              <ProductBundleSelector product={product} disabled={false} />
+            )}
+            <ProductCareAccordion category={product.category as Category} />
           </div>
         </div>
+        <CompleteYourRitual category={product.category as Category} excludeSlug={product.slug} />
         <ProductReviews slug={product.slug} />
         <RecentlyViewedStrip excludeSlug={product.slug} />
       </div>

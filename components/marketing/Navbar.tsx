@@ -15,9 +15,9 @@ import type { NavbarAuthUser } from "@/lib/navbar-auth";
 
 const navLinks = [
   { label: "Collections", href: "/collections" },
-  { label: "Our Ritual", href: "#ritual" },
-  { label: "Scents", href: "#scents" },
-  { label: "About", href: "#about" },
+  { label: "Journal", href: "/journal" },
+  { label: "Scents", href: "/scents" },
+  { label: "About", href: "/about" },
 ];
 
 function Logo({ dark = false }: { dark?: boolean }) {

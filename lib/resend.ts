@@ -93,6 +93,52 @@ export async function sendContactEmail(data: {
   });
 }
 
+export async function sendStockNotifyRequest(data: {
+  email: string;
+  productName: string;
+  productSlug: string;
+}) {
+  const resend = getResend();
+  const to = process.env.STORE_CONTACT_EMAIL || process.env.RESEND_FROM_EMAIL || "hello@msvee.co";
+  if (!resend) {
+    console.info("[msvee:stock-notify]", data);
+    return;
+  }
+  await resend.emails.send({
+    from: process.env.RESEND_FROM_EMAIL || "hello@msvee.co",
+    to,
+    subject: `[Back in stock] ${data.productName}`,
+    html: `<p><strong>${data.email}</strong> wants to know when <strong>${data.productName}</strong> (${data.productSlug}) is back in stock.</p>`,
+  });
+}
+
+export async function sendWholesaleInquiry(data: {
+  businessName: string;
+  contactName: string;
+  email: string;
+  website?: string;
+  message: string;
+}) {
+  const resend = getResend();
+  const to = process.env.STORE_CONTACT_EMAIL || process.env.RESEND_FROM_EMAIL || "hello@msvee.co";
+  if (!resend) {
+    console.info("[msvee:wholesale]", data);
+    return;
+  }
+  await resend.emails.send({
+    from: process.env.RESEND_FROM_EMAIL || "hello@msvee.co",
+    to,
+    replyTo: data.email,
+    subject: `[Wholesale] ${data.businessName}`,
+    html: `
+      <p><strong>Business:</strong> ${data.businessName}</p>
+      <p><strong>Contact:</strong> ${data.contactName} &lt;${data.email}&gt;</p>
+      ${data.website ? `<p><strong>Website:</strong> ${data.website}</p>` : ""}
+      <p style="white-space: pre-wrap;">${data.message}</p>
+    `,
+  });
+}
+
 export async function sendAdminInvite(email: string, name: string) {
   const resend = getResend();
   if (!resend) return;

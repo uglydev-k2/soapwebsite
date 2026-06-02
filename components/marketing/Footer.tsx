@@ -12,8 +12,13 @@ const shopLinks = [
 
 const companyLinks = [
   { label: "Our Story", href: "/about" },
+  { label: "Journal", href: "/journal" },
   { label: "Gift Guide", href: "/gift-guide" },
+  { label: "Ritual Builder", href: "/ritual-builder" },
   { label: "Scent Guide", href: "/scents" },
+  { label: "Ingredients", href: "/ingredients" },
+  { label: "Sustainability", href: "/sustainability" },
+  { label: "Wholesale", href: "/wholesale" },
   { label: "Wishlist", href: "/wishlist" },
   { label: "Contact", href: "/contact" },
 ];

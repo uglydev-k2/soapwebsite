@@ -52,6 +52,20 @@ export const contactSchema = z.object({
   message: z.string().min(10, "Please include a bit more detail"),
 });
 
+export const stockNotifySchema = z.object({
+  email: z.string().email("Please enter a valid email"),
+  productSlug: z.string().min(1),
+  productName: z.string().min(1),
+});
+
+export const wholesaleSchema = z.object({
+  businessName: z.string().min(1, "Business name is required"),
+  contactName: z.string().min(1, "Contact name is required"),
+  email: z.string().email("Please enter a valid email"),
+  website: z.string().optional(),
+  message: z.string().min(20, "Tell us about your business and needs"),
+});
+
 export const loginSchema = z.object({
   email: z.string().email("Please enter a valid email"),
   password: z.string().min(1, "Password is required"),

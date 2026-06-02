@@ -4,6 +4,8 @@ import QuickStatsBar from "@/components/marketing/QuickStatsBar";
 import ValuesSection from "@/components/marketing/ValuesSection";
 import CategorySection from "@/components/marketing/CategorySection";
 import ScentFinder from "@/components/marketing/ScentFinder";
+import TrustPressSection from "@/components/marketing/TrustPressSection";
+import JournalPreviewSection from "@/components/marketing/JournalPreviewSection";
 import RitualSection from "@/components/marketing/RitualSection";
 import SkinConcernSection from "@/components/marketing/SkinConcernSection";
 import SubscriptionSection from "@/components/marketing/SubscriptionSection";
@@ -19,11 +21,13 @@ export default function HomePage() {
       <QuickStatsBar />
       <ValuesSection />
       <CategorySection />
+      <TrustPressSection />
       <ScentFinder />
       <SkinConcernSection />
       <RitualSection />
       <SubscriptionSection />
       <FragranceMap />
+      <JournalPreviewSection />
       <TestimonialsCarousel />
       <Newsletter />
     </>

@@ -140,6 +140,15 @@ export async function getActiveProducts(
   return applyFallbackFilters(STATIC_PRODUCTS as Product[], options);
 }
 
+export async function getRelatedProducts(
+  category: Category,
+  excludeSlug: string,
+  limit = 3
+): Promise<Product[]> {
+  const products = await getActiveProducts({ category, sort: "featured" });
+  return products.filter((p) => p.slug !== excludeSlug).slice(0, limit);
+}
+
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   const product = await safeDbQuery(
     "getProductBySlug",

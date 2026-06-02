@@ -14,6 +14,7 @@ import {
 import type { Category } from "@prisma/client";
 import { PRODUCT_CATEGORIES } from "@/lib/categories";
 import { RecentlyViewedSection } from "@/components/marketing/RecentlyViewedSection";
+import { Breadcrumbs } from "@/components/marketing/Breadcrumbs";
 
 export const metadata = {
   title: "Collections — MsVee Soaps",
@@ -90,6 +91,12 @@ export default function CollectionsPage({
   return (
     <section className="min-h-screen bg-cream px-6 pb-24 pt-32">
       <div className="mx-auto max-w-6xl">
+        <Breadcrumbs
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Collections" },
+          ]}
+        />
         <AnimatedSectionHeader
           eyebrow="Shop All"
           title="Our Collections"
