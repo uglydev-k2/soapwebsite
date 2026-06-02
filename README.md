@@ -86,11 +86,13 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 
 ## Deploy (Vercel)
 
+**Live URLs:** [soapwebsite.vercel.app](https://soapwebsite.vercel.app) · [mzveesoaps.vercel.app](https://mzveesoaps.vercel.app) · [msvee-soap.vercel.app](https://msvee-soap.vercel.app)
+
 1. Connect repo to Vercel (https://github.com/uglydev-k2/soapwebsite)
 2. Add a **PostgreSQL** database (Vercel Postgres, Neon, or Supabase) and set **`DATABASE_URL`**
 3. Add required env vars from `.env.example`:
    - `AUTH_SECRET` or `NEXTAUTH_SECRET` (same value: `openssl rand -base64 32`)
-   - `NEXTAUTH_URL` = your production URL (e.g. `https://your-app.vercel.app`)
+   - `NEXTAUTH_URL` = your production URL (e.g. `https://soapwebsite.vercel.app`)
 4. Redeploy — the build runs `prisma db push` to create tables
 5. Seed once locally or via CLI: `DATABASE_URL="..." npm run db:seed`
 6. Configure Stripe webhook: `https://your-domain.com/api/stripe/webhook`
