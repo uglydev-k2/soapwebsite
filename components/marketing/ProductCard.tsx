@@ -55,7 +55,7 @@ export default function ProductCard({
     <>
       <motion.article
         className={cn(
-          "group relative flex flex-col overflow-hidden border border-green/10 bg-white",
+          "group relative flex h-full min-w-0 flex-col overflow-hidden border border-green/10 bg-white",
           className
         )}
         style={{ borderRadius: "2px" }}
@@ -75,7 +75,7 @@ export default function ProductCard({
               alt={product.name}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-110"
-              sizes="(max-width: 768px) 100vw, 25vw"
+              sizes="(max-width: 1024px) 50vw, 25vw"
             />
           ) : (
             <div
@@ -84,13 +84,13 @@ export default function ProductCard({
                 gradient
               )}
             >
-              <span className="font-serif text-2xl text-green/30">
+              <span className="font-serif text-xl text-green/30 sm:text-2xl">
                 {product.name.split(" ")[0]}
               </span>
             </div>
           )}
 
-          <div className="absolute inset-0 flex flex-col items-center justify-end gap-2 bg-green-3/0 p-4 transition-all duration-300 group-hover:bg-green-3/40">
+          <div className="absolute inset-0 hidden flex-col items-center justify-end gap-2 bg-green-3/0 p-4 transition-all duration-300 group-hover:bg-green-3/40 sm:flex">
             <button
               type="button"
               onClick={(e) => {
@@ -120,7 +120,7 @@ export default function ProductCard({
             </button>
           </div>
 
-          <div className="absolute left-3 top-3 flex flex-col gap-2">
+          <div className="absolute left-2 top-2 flex flex-col gap-1.5 sm:left-3 sm:top-3 sm:gap-2">
             {product.featured && (
               <Badge status="Featured" className="bg-terra text-white" />
             )}
@@ -133,7 +133,7 @@ export default function ProductCard({
           </div>
         </Link>
 
-        <div className="flex flex-1 flex-col p-5">
+        <div className="flex flex-1 flex-col p-3 sm:p-5">
           <motion.span
             className="label-caps text-muted"
             initial={reduced ? false : { opacity: 0 }}
@@ -143,7 +143,7 @@ export default function ProductCard({
             {categoryLabels[product.category as Category] ?? product.category}
           </motion.span>
           <motion.h3
-            className="mt-1 font-serif text-lg text-green"
+            className="mt-1 font-serif text-base text-green sm:text-lg"
             initial={reduced ? false : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: reduced ? 0 : 0.28 + index * 0.06 }}
@@ -156,17 +156,17 @@ export default function ProductCard({
             </Link>
           </motion.h3>
           {product.fragrance && (
-            <p className="mt-1 text-sm text-muted">{product.fragrance}</p>
+            <p className="mt-1 text-xs text-muted sm:text-sm">{product.fragrance}</p>
           )}
 
-          <div className="mt-auto flex items-center justify-between pt-4">
+          <div className="mt-auto flex items-center justify-between pt-3 sm:pt-4">
             <motion.div
               className="flex items-baseline gap-2"
               initial={reduced ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4, delay: reduced ? 0 : 0.35 + index * 0.06 }}
             >
-              <span className="font-serif text-lg text-terra">
+              <span className="font-serif text-base text-terra sm:text-lg">
                 {formatPrice(product.price)}
               </span>
               {hasDiscount && product.comparePrice != null && (

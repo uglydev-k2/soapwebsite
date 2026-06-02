@@ -54,9 +54,12 @@ export default async function ProductGrid({
           )}
         </div>
 
-        <StaggerContainer className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4" stagger={0.06}>
+        <StaggerContainer
+          className="mt-12 grid [grid-template-columns:repeat(2,minmax(0,1fr))] gap-3 sm:gap-6 lg:[grid-template-columns:repeat(4,minmax(0,1fr))]"
+          stagger={0.06}
+        >
           {items.map((product, index) => (
-            <StaggerItem key={product.id}>
+            <StaggerItem key={product.id} className="h-full min-w-0">
               <ProductCard product={product} index={index} />
             </StaggerItem>
           ))}

@@ -4,6 +4,8 @@ import { getProductBySlug } from "@/lib/products";
 import { notFound } from "next/navigation";
 import { formatPrice, getCategoryLabel } from "@/lib/utils";
 import AddToCartButton from "@/components/marketing/AddToCartButton";
+import ProductGallery from "@/components/marketing/ProductGallery";
+import ProductReviews from "@/components/marketing/ProductReviews";
 import Link from "next/link";
 
 export async function generateMetadata({
@@ -35,21 +37,11 @@ export default async function ProductDetailPage({
           ← Back to Collections
         </Link>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-          <div
-            className="aspect-square card-border flex items-center justify-center"
-            style={{ background: gradient }}
-          >
-            {product.images[0] ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={product.images[0]}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="font-serif text-6xl text-white/30">{product.name[0]}</span>
-            )}
-          </div>
+          <ProductGallery
+            name={product.name}
+            images={product.images}
+            fallbackGradient={gradient}
+          />
           <div>
             <p className="label-caps text-terra mb-2">
               {getCategoryLabel(product.category)}
@@ -86,6 +78,7 @@ export default async function ProductDetailPage({
             <AddToCartButton product={product} disabled={product.stock === 0} />
           </div>
         </div>
+        <ProductReviews slug={product.slug} />
       </div>
     </section>
   );

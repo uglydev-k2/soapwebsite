@@ -1,7 +1,15 @@
 import { prisma } from "@/lib/prisma";
-import type { Product } from "@prisma/client";
+import type { Category, Prisma, Product } from "@prisma/client";
 import { safeDbQuery } from "@/lib/db";
 import { STATIC_FEATURED, STATIC_PRODUCTS } from "@/lib/catalog";
+
+type ProductSort = "featured" | "newest" | "price-asc" | "price-desc" | "name";
+
+interface ActiveProductOptions {
+  category?: Category;
+  scent?: string;
+  sort?: ProductSort;
+}
 
 export async function getFeaturedProducts(limit = 4): Promise<Product[]> {
   const products = await safeDbQuery(
@@ -19,17 +27,94 @@ export async function getFeaturedProducts(limit = 4): Promise<Product[]> {
     : (STATIC_FEATURED.slice(0, limit) as Product[]);
 }
 
-export async function getActiveProducts(): Promise<Product[]> {
+function getOrderBy(sort: ProductSort): Prisma.ProductOrderByWithRelationInput[] {
+  switch (sort) {
+    case "newest":
+      return [{ createdAt: "desc" }];
+    case "price-asc":
+      return [{ price: "asc" }, { name: "asc" }];
+    case "price-desc":
+      return [{ price: "desc" }, { name: "asc" }];
+    case "name":
+      return [{ name: "asc" }];
+    case "featured":
+    default:
+      return [{ featured: "desc" }, { name: "asc" }];
+  }
+}
+
+function applyFallbackFilters(
+  products: Product[],
+  { category, scent, sort = "featured" }: ActiveProductOptions
+): Product[] {
+  let filtered = products.filter((p) => p.active);
+
+  if (category) {
+    filtered = filtered.filter((p) => p.category === category);
+  }
+
+  if (scent) {
+    const query = scent.toLowerCase().trim();
+    if (query) {
+      filtered = filtered.filter((p) =>
+        `${p.name} ${p.fragrance ?? ""}`.toLowerCase().includes(query)
+      );
+    }
+  }
+
+  const sorted = [...filtered];
+  switch (sort) {
+    case "newest":
+      sorted.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+      break;
+    case "price-asc":
+      sorted.sort((a, b) => a.price - b.price || a.name.localeCompare(b.name));
+      break;
+    case "price-desc":
+      sorted.sort((a, b) => b.price - a.price || a.name.localeCompare(b.name));
+      break;
+    case "name":
+      sorted.sort((a, b) => a.name.localeCompare(b.name));
+      break;
+    case "featured":
+    default:
+      sorted.sort(
+        (a, b) =>
+          Number(b.featured) - Number(a.featured) || a.name.localeCompare(b.name)
+      );
+      break;
+  }
+
+  return sorted;
+}
+
+export async function getActiveProducts(
+  options: ActiveProductOptions = {}
+): Promise<Product[]> {
+  const { category, scent, sort = "featured" } = options;
   const products = await safeDbQuery(
     "getActiveProducts",
     () =>
       prisma.product.findMany({
-        where: { active: true },
-        orderBy: { name: "asc" },
+        where: {
+          active: true,
+          ...(category ? { category } : {}),
+          ...(scent
+            ? {
+                OR: [
+                  { name: { contains: scent, mode: "insensitive" } },
+                  { fragrance: { contains: scent, mode: "insensitive" } },
+                ],
+              }
+            : {}),
+        },
+        orderBy: getOrderBy(sort),
       }),
     [] as Product[]
   );
-  return products.length > 0 ? products : (STATIC_PRODUCTS as Product[]);
+
+  if (products.length > 0) return products;
+  return applyFallbackFilters(STATIC_PRODUCTS as Product[], options);
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
