@@ -38,7 +38,7 @@ const steps = [
 export default function RitualSection() {
   return (
     <section
-      className="relative overflow-hidden bg-green py-20 lg:py-28"
+      className="relative overflow-hidden bg-white py-20 lg:py-28"
       id="ritual"
     >
       <div className="ritual-rings pointer-events-none absolute inset-0" />
@@ -48,7 +48,7 @@ export default function RitualSection() {
           <ScrollReveal>
             <AnimatedSectionHeader
               align="left"
-              theme="dark"
+              theme="light"
               eyebrow="The MsVee Ritual"
               title={
                 <>
@@ -66,7 +66,7 @@ export default function RitualSection() {
                   <dt className="font-serif text-3xl text-gold lg:text-4xl">
                     <CountUpStat value={stat.value} />
                   </dt>
-                  <dd className="mt-1 label-caps text-cream/60">{stat.label}</dd>
+                  <dd className="mt-1 label-caps text-muted">{stat.label}</dd>
                 </div>
               ))}
             </dl>
@@ -77,16 +77,16 @@ export default function RitualSection() {
               <StaggerItem key={step.number}>
                 <article
                   className={cn(
-                    "group border border-gold/15 bg-green-3/30 p-8",
-                    "transition-all duration-300 hover:border-gold/30 hover:bg-green-3/50"
+                    "group border border-green/15 bg-white p-8",
+                    "transition-all duration-300 hover:border-terra/35 hover:bg-cream"
                   )}
                   style={{ borderRadius: "2px" }}
                 >
-                  <span className="label-caps text-gold">{step.number}</span>
-                  <h3 className="mt-3 font-serif text-2xl text-cream transition-colors duration-250 group-hover:text-gold">
+                  <span className="label-caps text-terra">{step.number}</span>
+                  <h3 className="mt-3 font-serif text-2xl text-green transition-colors duration-250 group-hover:text-terra">
                     {step.title}
                   </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-cream/60">
+                  <p className="mt-3 text-sm leading-relaxed text-muted">
                     {step.description}
                   </p>
                 </article>
