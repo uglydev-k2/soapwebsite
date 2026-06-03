@@ -1,11 +1,13 @@
 import { cn } from "@/lib/utils";
+import { Sparkline } from "@/components/admin/Sparkline";
 
 interface KpiCardProps {
   label: string;
   value: string | number;
   change?: string;
   changeType?: "positive" | "negative" | "neutral" | "warning";
-  progress?: number;
+  sparkline?: number[];
+  href?: string;
   className?: string;
 }
 
@@ -14,7 +16,8 @@ export function KpiCard({
   value,
   change,
   changeType = "positive",
-  progress = 0,
+  sparkline,
+  href,
   className,
 }: KpiCardProps) {
   const changeColors = {
@@ -24,12 +27,15 @@ export function KpiCard({
     warning: "bg-amber-100 text-amber-800",
   };
 
-  const clampedProgress = Math.min(100, Math.max(0, progress));
-
-  return (
-    <div className={cn("admin-card flex flex-col", className)}>
-      <p className="label-caps mb-3 text-muted">{label}</p>
-      <p className="font-serif text-4xl font-semibold text-green">{value}</p>
+  const content = (
+    <>
+      <div className="flex items-start justify-between gap-3">
+        <p className="label-caps text-muted">{label}</p>
+        {sparkline && sparkline.length > 1 && (
+          <Sparkline data={sparkline} className="opacity-80" />
+        )}
+      </div>
+      <p className="mt-3 font-serif text-4xl font-semibold text-green">{value}</p>
       {change && (
         <span
           className={cn(
@@ -40,12 +46,24 @@ export function KpiCard({
           {change}
         </span>
       )}
-      <div className="mt-4 h-1 w-full overflow-hidden bg-cream-2">
-        <div
-          className="h-full bg-terra transition-all duration-500"
-          style={{ width: `${clampedProgress}%` }}
-        />
-      </div>
-    </div>
+    </>
+  );
+
+  if (href) {
+    return (
+      <a
+        href={href}
+        className={cn(
+          "admin-card admin-card-interactive flex flex-col transition-shadow hover:shadow-md",
+          className
+        )}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <div className={cn("admin-card flex flex-col", className)}>{content}</div>
   );
 }

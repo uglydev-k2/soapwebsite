@@ -32,6 +32,8 @@ const EMPTY = {
   categoryBreakdown: [] as { category: string; count: number; percentage: number }[],
   recentActivity: [] as Awaited<ReturnType<typeof getRecentActivity>>,
   pendingCount: 0,
+  orderSparkline: [] as number[],
+  revenueSparkline: [] as number[],
 };
 
 export async function getDashboardData() {
@@ -64,6 +66,7 @@ async function fetchDashboardData() {
     activeStatusCount,
     bannedStatusCount,
     recentActivity,
+    orderSparkline,
   ] = await Promise.all([
     prisma.order.aggregate({
       where: { status: { notIn: ["CANCELLED", "REFUNDED"] } },
@@ -82,7 +85,15 @@ async function fetchDashboardData() {
     prisma.product.count({ where: { stock: { lt: 10 }, active: true } }),
     prisma.customer.count(),
     prisma.customer.count({
-      where: { status: "ACTIVE", createdAt: { gte: thirtyDaysAgo } },
+      where: {
+        OR: [
+          { lastActiveAt: { gte: thirtyDaysAgo } },
+          {
+            lastActiveAt: null,
+            createdAt: { gte: thirtyDaysAgo },
+          },
+        ],
+      },
     }),
     prisma.customer.count({ where: { createdAt: { gte: todayStart } } }),
     prisma.order.findMany({
@@ -100,6 +111,7 @@ async function fetchDashboardData() {
     prisma.customer.count({ where: { status: "ACTIVE" } }),
     prisma.customer.count({ where: { status: "BANNED" } }),
     getRecentActivity(10),
+    getOrderSparkline(),
   ]);
 
   const monthRevenue = await prisma.order.aggregate({
@@ -149,7 +161,25 @@ async function fetchDashboardData() {
     })),
     recentActivity,
     pendingCount,
+    orderSparkline,
+    revenueSparkline: revenueByMonth.slice(-6).map((m) => m.revenue),
   };
+}
+
+async function getOrderSparkline() {
+  const months = [];
+  for (let i = 5; i >= 0; i--) {
+    const start = new Date();
+    start.setMonth(start.getMonth() - i, 1);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(start);
+    end.setMonth(end.getMonth() + 1);
+    const count = await prisma.order.count({
+      where: { createdAt: { gte: start, lt: end } },
+    });
+    months.push(count);
+  }
+  return months;
 }
 
 async function getCustomerGrowth() {

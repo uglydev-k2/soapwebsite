@@ -1,56 +1,84 @@
 export const dynamic = "force-dynamic";
 
+import Link from "next/link";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { KpiCard } from "@/components/admin/KpiCard";
 import { CategoryDonut } from "@/components/admin/CategoryDonut";
 import { OrdersTable } from "@/components/admin/OrdersTable";
 import { ActivityFeed } from "@/components/admin/ActivityFeed";
+import { DashboardQuickActions } from "@/components/admin/DashboardQuickActions";
+import { OpsCenter } from "@/components/admin/OpsCenter";
+import { SystemHealthPanel } from "@/components/admin/SystemHealthPanel";
 import {
   CustomerGrowthChart,
   RevenueBarChart,
 } from "@/components/admin/GrowthCharts";
 import { getDashboardData } from "@/lib/dashboard";
+import { getAdminOverview } from "@/lib/admin-overview";
 import { formatPrice } from "@/lib/utils";
-import Link from "next/link";
 
 export default async function AdminDashboardPage() {
-  const data = await getDashboardData();
+  const [data, overview] = await Promise.all([
+    getDashboardData(),
+    getAdminOverview(),
+  ]);
+
+  const customerSparkline = data.customerGrowth.slice(-6).map((m) => m.count);
+  const revenueSparkline = data.revenueSparkline;
 
   return (
-    <AdminShell title="Dashboard" breadcrumbs={[{ label: "Overview" }]}>
-      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <KpiCard
-          label="Total Customers"
-          value={String(data.kpis.totalCustomers)}
-          change={`+${data.kpis.newSignupsToday} today`}
-          changeType="positive"
-          progress={65}
-        />
-        <KpiCard
-          label="Active (30 days)"
-          value={String(data.kpis.activeCustomers)}
-          change="Engaged shoppers"
-          changeType="positive"
-          progress={55}
-        />
+    <AdminShell title="Command Center" breadcrumbs={[{ label: "Overview" }]}>
+      <DashboardQuickActions />
+
+      <div className="mb-6 mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <KpiCard
           label="Total Revenue"
           value={formatPrice(data.kpis.totalRevenue)}
-          change={`+${data.kpis.revenueChange}% this month`}
+          change={`${data.kpis.revenueChange >= 0 ? "+" : ""}${data.kpis.revenueChange}% vs last month`}
           changeType={data.kpis.revenueChange >= 0 ? "positive" : "negative"}
-          progress={Math.min(Math.abs(data.kpis.revenueChange), 100)}
+          sparkline={revenueSparkline}
+          href="/admin/billing"
         />
         <KpiCard
-          label="MRR"
-          value={formatPrice(data.kpis.mrr)}
-          change={`${data.kpis.totalOrders} total orders`}
+          label="Orders This Week"
+          value={String(data.kpis.ordersChange)}
+          change={`${data.kpis.totalOrders} lifetime orders`}
           changeType="neutral"
-          progress={70}
+          sparkline={data.orderSparkline}
+          href="/admin/orders"
+        />
+        <KpiCard
+          label="Customers"
+          value={String(data.kpis.totalCustomers)}
+          change={`+${data.kpis.newSignupsToday} today`}
+          changeType="positive"
+          sparkline={customerSparkline}
+          href="/admin/customers"
+        />
+        <KpiCard
+          label="Monthly Revenue"
+          value={formatPrice(data.kpis.mrr)}
+          change={`${data.kpis.totalProducts} active SKUs`}
+          changeType="neutral"
+          sparkline={revenueSparkline}
+          href="/admin/analytics"
         />
       </div>
 
+      <div className="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <div className="xl:col-span-2">
+          <OpsCenter
+            alerts={overview.alerts}
+            pendingOrders={overview.pendingOrders}
+            lowStockCount={overview.lowStockCount}
+            flaggedProducts={overview.flaggedProducts}
+          />
+        </div>
+        <SystemHealthPanel services={overview.services} compact />
+      </div>
+
       {data.kpis.lowStockCount > 0 && (
-        <div className="mb-6 flex items-center justify-between border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <div className="mb-6 flex flex-col gap-3 border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 sm:flex-row sm:items-center sm:justify-between">
           <span>
             {data.kpis.lowStockCount} product
             {data.kpis.lowStockCount > 1 ? "s are" : " is"} running low on stock
@@ -67,7 +95,7 @@ export default async function AdminDashboardPage() {
           <CustomerGrowthChart data={data.customerGrowth} />
         </div>
         <div className="admin-card p-6">
-          <h2 className="label-caps mb-4 text-muted">By Category</h2>
+          <h2 className="label-caps mb-4 text-muted">Catalog by Category</h2>
           <CategoryDonut data={data.categoryBreakdown} />
         </div>
       </div>
@@ -78,7 +106,12 @@ export default async function AdminDashboardPage() {
           <RevenueBarChart data={data.revenueByMonth} />
         </div>
         <div className="admin-card p-6">
-          <h2 className="label-caps mb-4 text-muted">Recent Activity</h2>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="label-caps text-muted">Recent Activity</h2>
+            <Link href="/admin/logs" className="text-xs text-terra hover:text-green">
+              All logs →
+            </Link>
+          </div>
           <ActivityFeed items={data.recentActivity} />
         </div>
       </div>

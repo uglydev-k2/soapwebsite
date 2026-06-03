@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { Bell, ChevronRight, Menu, Plus } from "lucide-react";
+import { ChevronRight, Menu, Plus, Search } from "lucide-react";
 import { cn, formatDateTime } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
+import { AdminNotificationsPanel } from "@/components/admin/AdminNotificationsPanel";
 
 export interface BreadcrumbItem {
   label: string;
@@ -16,6 +17,7 @@ interface TopbarProps {
   breadcrumbs?: BreadcrumbItem[];
   showNewProduct?: boolean;
   onMenuToggle?: () => void;
+  onSearchOpen?: () => void;
   className?: string;
 }
 
@@ -34,6 +36,7 @@ export function Topbar({
   breadcrumbs = [],
   showNewProduct = true,
   onMenuToggle,
+  onSearchOpen,
   className,
 }: TopbarProps) {
   const { data: session } = useSession();
@@ -42,7 +45,7 @@ export function Topbar({
   return (
     <header
       className={cn(
-        "flex flex-col gap-4 border-b border-green/10 bg-white px-6 py-5 lg:flex-row lg:items-center lg:justify-between",
+        "sticky top-0 z-20 flex flex-col gap-4 border-b border-green/10 bg-white/95 px-4 py-4 backdrop-blur-sm sm:px-6 sm:py-5 lg:flex-row lg:items-center lg:justify-between",
         className
       )}
     >
@@ -58,48 +61,61 @@ export function Topbar({
           </button>
         )}
         <div>
-        <nav className="mb-1 flex flex-wrap items-center gap-1 text-xs text-muted">
-          <Link href="/admin" className="transition-colors hover:text-green">
-            Admin
-          </Link>
-          {breadcrumbs.map((crumb, i) => (
-            <span key={`${crumb.label}-${i}`} className="flex items-center gap-1">
-              <ChevronRight size={12} className="text-green/30" />
-              {crumb.href ? (
-                <Link
-                  href={crumb.href}
-                  className="transition-colors hover:text-green"
-                >
-                  {crumb.label}
-                </Link>
-              ) : (
-                <span className="text-green">{crumb.label}</span>
-              )}
-            </span>
-          ))}
-        </nav>
-        <h1 className="font-serif text-2xl font-semibold text-green">{title}</h1>
-        <p className="mt-0.5 text-xs text-muted">{today}</p>
+          <nav className="mb-1 flex flex-wrap items-center gap-1 text-xs text-muted">
+            <Link href="/admin" className="transition-colors hover:text-green">
+              Admin
+            </Link>
+            {breadcrumbs.map((crumb, i) => (
+              <span key={`${crumb.label}-${i}`} className="flex items-center gap-1">
+                <ChevronRight size={12} className="text-green/30" />
+                {crumb.href ? (
+                  <Link
+                    href={crumb.href}
+                    className="transition-colors hover:text-green"
+                  >
+                    {crumb.label}
+                  </Link>
+                ) : (
+                  <span className="text-green">{crumb.label}</span>
+                )}
+              </span>
+            ))}
+          </nav>
+          <h1 className="font-serif text-2xl font-semibold text-green">{title}</h1>
+          <p className="mt-0.5 text-xs text-muted">{today}</p>
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
+        <button
+          type="button"
+          onClick={onSearchOpen}
+          className="hidden items-center gap-2 border border-green/15 bg-cream/50 px-3 py-2 text-xs text-muted transition-colors hover:border-green/30 hover:text-green sm:flex"
+        >
+          <Search size={14} />
+          <span>Search</span>
+          <kbd className="ml-2 border border-green/15 bg-white px-1.5 py-0.5 text-[10px]">
+            ⌘K
+          </kbd>
+        </button>
+        <button
+          type="button"
+          onClick={onSearchOpen}
+          className="p-2 text-muted transition-colors hover:bg-cream hover:text-green sm:hidden"
+          aria-label="Search"
+        >
+          <Search size={18} />
+        </button>
         {showNewProduct && (
           <Link href="/admin/products/new">
             <Button size="sm" className="gap-1.5">
               <Plus size={14} />
-              New Product
+              <span className="hidden sm:inline">New Product</span>
+              <span className="sm:hidden">New</span>
             </Button>
           </Link>
         )}
-        <button
-          type="button"
-          className="relative p-2 text-muted transition-colors hover:bg-cream hover:text-green"
-          aria-label="Notifications"
-        >
-          <Bell size={18} strokeWidth={1.5} />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 bg-terra" />
-        </button>
+        <AdminNotificationsPanel />
         <div
           className="flex h-9 w-9 items-center justify-center bg-terra text-xs font-medium text-white"
           title={session?.user?.name ?? "Admin"}

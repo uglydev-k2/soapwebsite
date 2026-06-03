@@ -4,17 +4,34 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
-import { LogOut, X } from "lucide-react";
+import {
+  Activity,
+  BarChart3,
+  Bell,
+  CreditCard,
+  ExternalLink,
+  FileText,
+  LayoutDashboard,
+  LogOut,
+  Package,
+  ScrollText,
+  Settings,
+  Shield,
+  ShoppingCart,
+  Users,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { hasPermission, type Permission } from "@/lib/rbac";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import type { ApiResponse, AdminSession } from "@/types";
+import type { LucideIcon } from "lucide-react";
 
 interface NavItem {
   label: string;
   href: string;
-  icon: string;
+  icon: LucideIcon;
   badge?: number;
   permission?: Permission;
 }
@@ -26,34 +43,35 @@ interface NavSection {
 
 const navSections: NavSection[] = [
   {
-    title: "OVERVIEW",
+    title: "Overview",
     items: [
-      { label: "Dashboard", href: "/admin", icon: "📊", permission: "dashboard:read" },
-      { label: "Analytics", href: "/admin/analytics", icon: "📈", permission: "analytics:read" },
+      { label: "Dashboard", href: "/admin", icon: LayoutDashboard, permission: "dashboard:read" },
+      { label: "Analytics", href: "/admin/analytics", icon: BarChart3, permission: "analytics:read" },
+      { label: "System", href: "/admin/system", icon: Activity, permission: "dashboard:read" },
     ],
   },
   {
-    title: "CATALOG",
+    title: "Catalog",
     items: [
-      { label: "Products", href: "/admin/products", icon: "📦", permission: "products:read" },
-      { label: "Content", href: "/admin/content", icon: "📝", permission: "content:read" },
+      { label: "Products", href: "/admin/products", icon: Package, permission: "products:read" },
+      { label: "Content", href: "/admin/content", icon: FileText, permission: "content:read" },
     ],
   },
   {
-    title: "COMMERCE",
+    title: "Commerce",
     items: [
-      { label: "Orders", href: "/admin/orders", icon: "🛒", permission: "orders:read" },
-      { label: "Customers", href: "/admin/customers", icon: "👥", permission: "customers:read" },
-      { label: "Billing", href: "/admin/billing", icon: "💳", permission: "billing:read" },
+      { label: "Orders", href: "/admin/orders", icon: ShoppingCart, permission: "orders:read" },
+      { label: "Customers", href: "/admin/customers", icon: Users, permission: "customers:read" },
+      { label: "Billing", href: "/admin/billing", icon: CreditCard, permission: "billing:read" },
     ],
   },
   {
-    title: "SYSTEM",
+    title: "System",
     items: [
-      { label: "Admin Users", href: "/admin/users", icon: "🔐", permission: "users:read" },
-      { label: "Notifications", href: "/admin/notifications", icon: "🔔", permission: "notifications:write" },
-      { label: "Audit Logs", href: "/admin/logs", icon: "🪵", permission: "logs:read" },
-      { label: "Settings", href: "/admin/settings", icon: "⚙️", permission: "settings:read" },
+      { label: "Admin Users", href: "/admin/users", icon: Shield, permission: "users:read" },
+      { label: "Notifications", href: "/admin/notifications", icon: Bell, permission: "notifications:write" },
+      { label: "Audit Logs", href: "/admin/logs", icon: ScrollText, permission: "logs:read" },
+      { label: "Settings", href: "/admin/settings", icon: Settings, permission: "settings:read" },
     ],
   },
 ];
@@ -113,10 +131,10 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
     let cancelled = false;
     async function fetchPending() {
       try {
-        const res = await fetch("/api/orders?status=PENDING&limit=1");
-        const json = (await res.json()) as ApiResponse<unknown[]>;
-        if (!cancelled && res.ok) {
-          setPendingOrdersCount(json.meta?.total ?? 0);
+        const res = await fetch("/api/admin/overview");
+        const json = (await res.json()) as ApiResponse<{ pendingOrders: number }>;
+        if (!cancelled && res.ok && json.data) {
+          setPendingOrdersCount(json.data.pendingOrders);
         }
       } catch {
         /* ignore */
@@ -150,7 +168,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
     .filter((section) => section.items.length > 0);
 
   const sidebarContent = (
-    <aside className="flex h-full w-[240px] shrink-0 flex-col bg-green-3 text-cream">
+    <aside className="admin-sidebar flex h-full w-[260px] shrink-0 flex-col">
       <div className="border-b border-white/10 px-5 py-6">
         <Link href="/admin" className="block" onClick={onClose}>
           <p className="font-serif text-2xl leading-none text-cream">
@@ -158,7 +176,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
             <span className="text-cream">Vee</span>
           </p>
           <p className="label-caps mt-1 text-[0.65rem] tracking-[0.22em] text-cream/50">
-            Admin Panel
+            Command Center
           </p>
         </Link>
       </div>
@@ -172,6 +190,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
             <ul className="space-y-0.5">
               {section.items.map((item) => {
                 const active = isActive(item.href);
+                const Icon = item.icon;
                 return (
                   <li key={item.href}>
                     <Link
@@ -180,14 +199,12 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                       className={cn(
                         "flex items-center gap-3 px-3 py-2.5 text-sm transition-colors",
                         active
-                          ? "border-l-2 border-gold bg-white/5 pl-[10px] text-cream"
+                          ? "border-l-2 border-gold bg-white/8 pl-[10px] text-cream"
                           : "border-l-2 border-transparent text-cream/70 hover:bg-white/5 hover:text-cream"
                       )}
                     >
-                      <span className="text-base leading-none" aria-hidden>
-                        {item.icon}
-                      </span>
-                      <span className="flex-1 font-sans font-normal tracking-wide">
+                      <Icon size={16} strokeWidth={1.5} className="shrink-0 opacity-80" />
+                      <span className="flex-1 font-sans tracking-wide">
                         {item.label}
                       </span>
                       {item.badge !== undefined && item.badge > 0 && (
@@ -205,6 +222,15 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
       </nav>
 
       <div className="border-t border-white/10 p-4">
+        <Link
+          href="/"
+          target="_blank"
+          onClick={onClose}
+          className="mb-3 flex items-center gap-2 px-2 py-2 text-xs text-cream/60 transition-colors hover:text-gold"
+        >
+          <ExternalLink size={14} />
+          View storefront
+        </Link>
         <div className="mb-3 flex items-center gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center bg-terra font-sans text-xs font-medium text-white">
             {getInitials(displayName)}

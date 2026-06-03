@@ -134,6 +134,7 @@ export function isSupabaseProfileAdmin(
 /** Route → minimum permission */
 export const ROUTE_PERMISSIONS: Record<string, Permission> = {
   "/admin": "dashboard:read",
+  "/admin/system": "dashboard:read",
   "/admin/analytics": "analytics:read",
   "/admin/products": "products:read",
   "/admin/orders": "orders:read",

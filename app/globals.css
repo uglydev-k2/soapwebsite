@@ -170,6 +170,20 @@ html {
     @apply bg-white border p-6;
     border-color: rgba(44, 74, 62, 0.1);
     border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(26, 46, 38, 0.04);
+  }
+
+  .admin-card-interactive {
+    @apply cursor-pointer;
+  }
+
+  .admin-sidebar {
+    background: linear-gradient(180deg, var(--green-3) 0%, #152620 100%);
+    color: var(--cream);
+  }
+
+  .admin-shell {
+    background: linear-gradient(180deg, #f4f1eb 0%, #ece7de 100%);
   }
 
   .admin-input {

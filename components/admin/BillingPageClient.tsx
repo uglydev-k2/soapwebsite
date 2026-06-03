@@ -101,28 +101,28 @@ export default function BillingPageClient() {
     <div>
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <KpiCard
-          label="MRR"
+          label="Monthly Revenue"
           value={formatPrice(data.metrics.mrr)}
+          change="Current calendar month"
           changeType="positive"
-          progress={75}
         />
         <KpiCard
-          label="ARR"
+          label="Annual Run Rate"
           value={formatPrice(data.metrics.arr)}
+          change="Projected from monthly"
           changeType="positive"
-          progress={80}
         />
         <KpiCard
-          label="Churn Rate"
+          label="Refund Rate"
           value={`${data.metrics.churnRate}%`}
+          change="Cancelled / paid orders"
           changeType={data.metrics.churnRate > 10 ? "warning" : "positive"}
-          progress={data.metrics.churnRate}
         />
         <KpiCard
-          label="Avg LTV"
+          label="Avg Order Value"
           value={formatPrice(data.metrics.ltv)}
+          change="Per completed order"
           changeType="neutral"
-          progress={60}
         />
       </div>
 

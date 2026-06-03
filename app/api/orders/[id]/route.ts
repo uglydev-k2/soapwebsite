@@ -60,3 +60,48 @@ export async function PATCH(
 
   return jsonResponse(order);
 }
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const { session, error } = await requireAdmin("orders:write");
+  if (error) return error;
+
+  const body = await request.json().catch(() => ({}));
+  if (body.action !== "send-tracking") {
+    return errorResponse("Invalid action", 400);
+  }
+
+  const order = await prisma.order.findUnique({
+    where: { id: params.id },
+    include: { customer: true },
+  });
+
+  if (!order) return errorResponse("Order not found", 404);
+  if (!order.customer.email) {
+    return errorResponse("Customer has no email address", 400);
+  }
+
+  const trackingInfo =
+    typeof body.trackingInfo === "string" ? body.trackingInfo : undefined;
+
+  await sendTrackingEmail(
+    order.customer.email,
+    order.orderNumber,
+    trackingInfo
+  );
+
+  await logAdminAction({
+    adminId: session!.user!.id,
+    adminEmail: session!.user!.email ?? "",
+    adminRole: (session!.user as { role?: string }).role ?? "",
+    action: "NOTIFY",
+    entity: "Order",
+    entityId: params.id,
+    metadata: { orderNumber: order.orderNumber, trackingInfo },
+    ipAddress: getClientIp(request),
+  });
+
+  return jsonResponse({ success: true });
+}

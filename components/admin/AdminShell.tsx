@@ -4,6 +4,10 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Sidebar } from "@/components/admin/Sidebar";
 import { Topbar, type BreadcrumbItem } from "@/components/admin/Topbar";
+import {
+  CommandPalette,
+  useCommandPalette,
+} from "@/components/admin/CommandPalette";
 
 interface AdminShellProps {
   children: React.ReactNode;
@@ -21,24 +25,28 @@ export function AdminShell({
   className,
 }: AdminShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { open, openPalette, closePalette } = useCommandPalette();
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="admin-shell min-h-screen bg-[#f4f1eb]">
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
 
-      <div className="flex min-h-screen flex-col lg:pl-[240px]">
+      <div className="flex min-h-screen flex-col lg:pl-[260px]">
         <Topbar
           title={title}
           breadcrumbs={breadcrumbs}
           showNewProduct={showNewProduct}
           onMenuToggle={() => setSidebarOpen(true)}
+          onSearchOpen={openPalette}
         />
 
-        <main className={cn("flex-1 p-6", className)}>{children}</main>
+        <main className={cn("flex-1 p-4 sm:p-6", className)}>{children}</main>
       </div>
+
+      <CommandPalette open={open} onClose={closePalette} />
     </div>
   );
 }
