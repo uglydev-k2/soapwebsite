@@ -158,3 +158,25 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
   if (product) return product;
   return (STATIC_PRODUCTS.find((p) => p.slug === slug) as Product) ?? null;
 }
+
+export async function getProductsBySlugs(slugs: string[]): Promise<Product[]> {
+  const results: Product[] = [];
+  for (const slug of slugs) {
+    const product = await getProductBySlug(slug);
+    if (product) results.push(product);
+  }
+  return results;
+}
+
+export async function getProductsByIngredientKeywords(
+  keywords: readonly string[],
+  limit = 3
+): Promise<Product[]> {
+  const products = await getActiveProducts({ sort: "featured" });
+  const matched = products.filter((product) => {
+    const haystack =
+      `${product.name} ${product.description} ${product.fragrance ?? ""} ${product.ingredients ?? ""}`.toLowerCase();
+    return keywords.some((keyword) => haystack.includes(keyword.toLowerCase()));
+  });
+  return matched.slice(0, limit);
+}

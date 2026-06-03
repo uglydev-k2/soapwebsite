@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getJournalPost, JOURNAL_POSTS } from "@/lib/content/journal";
 import { Breadcrumbs } from "@/components/marketing/Breadcrumbs";
+import { ShopThisRitual } from "@/components/marketing/ShopThisRitual";
 
 export function generateStaticParams() {
   return JOURNAL_POSTS.map((p) => ({ slug: p.slug }));
@@ -43,6 +44,9 @@ export default function JournalArticlePage({ params }: { params: { slug: string 
             <p key={paragraph.slice(0, 40)}>{paragraph}</p>
           ))}
         </div>
+        {post.shopSlugs && post.shopSlugs.length > 0 && (
+          <ShopThisRitual productSlugs={post.shopSlugs} />
+        )}
         <Link
           href="/journal"
           className="mt-12 inline-block label-caps text-green hover:text-terra"

@@ -3,6 +3,7 @@ import Marquee from "@/components/marketing/Marquee";
 import QuickStatsBar from "@/components/marketing/QuickStatsBar";
 import ValuesSection from "@/components/marketing/ValuesSection";
 import CategorySection from "@/components/marketing/CategorySection";
+import ProductGrid from "@/components/marketing/ProductGrid";
 import ScentFinder from "@/components/marketing/ScentFinder";
 import TrustPressSection from "@/components/marketing/TrustPressSection";
 import JournalPreviewSection from "@/components/marketing/JournalPreviewSection";
@@ -21,6 +22,11 @@ export default function HomePage() {
       <QuickStatsBar />
       <ValuesSection />
       <CategorySection />
+      <ProductGrid
+        title="Start Your Ritual"
+        subtitle="Bestsellers"
+        limit={4}
+      />
       <TrustPressSection />
       <ScentFinder />
       <SkinConcernSection />

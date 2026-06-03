@@ -12,7 +12,7 @@ export type CheckoutSettings = {
 
 const DEFAULT_CHECKOUT_SETTINGS: CheckoutSettings = {
   flatShippingRate: 8,
-  freeShippingThreshold: 75,
+  freeShippingThreshold: 60,
   featureCheckout: true,
   taxRate: TAX_RATE,
 };

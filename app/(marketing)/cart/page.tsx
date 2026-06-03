@@ -2,6 +2,8 @@
 
 import { useCartStore } from "@/store/cartStore";
 import { formatPrice } from "@/lib/utils";
+import { calculateCartTotals } from "@/lib/shipping";
+import { FreeShippingProgress } from "@/components/marketing/FreeShippingProgress";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import { Minus, Plus, Trash2 } from "lucide-react";
@@ -9,9 +11,8 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 export default function CartPage() {
   const { items, updateQuantity, removeItem, subtotal } = useCartStore();
 
-  const shipping = subtotal() >= 75 ? 0 : 8;
-  const tax = Math.round(subtotal() * 0.08 * 100) / 100;
-  const total = Math.round((subtotal() + shipping + tax) * 100) / 100;
+  const sub = subtotal();
+  const { shipping, tax, total } = calculateCartTotals(sub);
 
   if (items.length === 0) {
     return (
@@ -94,10 +95,13 @@ export default function CartPage() {
           </div>
           <div className="card-border p-6 bg-white h-fit">
             <h2 className="label-caps text-muted mb-6">Order Summary</h2>
+            <div className="mb-6">
+              <FreeShippingProgress subtotal={sub} />
+            </div>
             <div className="space-y-2 text-sm mb-6">
               <div className="flex justify-between">
                 <span className="text-muted">Subtotal</span>
-                <span>{formatPrice(subtotal())}</span>
+                <span>{formatPrice(sub)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted">Shipping</span>

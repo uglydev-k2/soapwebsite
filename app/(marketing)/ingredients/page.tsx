@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MarketingPage } from "@/components/marketing/MarketingPage";
+import { IngredientProductLinks } from "@/components/marketing/IngredientProductLinks";
 import { INGREDIENT_GLOSSARY } from "@/lib/content/ingredients";
 
 export const metadata = { title: "Ingredients — MsVee Soaps" };
@@ -16,12 +17,15 @@ export default function IngredientsPage() {
         {INGREDIENT_GLOSSARY.map((item) => (
           <li
             key={item.name}
-            className="border border-green/10 bg-white p-6"
+            className="flex flex-col border border-green/10 bg-white p-6"
             style={{ borderRadius: "2px" }}
           >
             <p className="label-caps text-terra">{item.benefit}</p>
-            <h2 className="mt-2 font-serif text-xl text-green">{item.name}</h2>
-            <p className="mt-3 text-sm leading-relaxed text-muted">{item.description}</p>
+            <h2 className="subheading mt-2 text-xl">{item.name}</h2>
+            <p className="mt-3 flex-1 text-sm leading-relaxed text-muted">
+              {item.description}
+            </p>
+            <IngredientProductLinks ingredient={item} />
           </li>
         ))}
       </ul>
