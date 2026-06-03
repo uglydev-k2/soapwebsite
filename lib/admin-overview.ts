@@ -5,6 +5,7 @@ import {
   isDatabaseConfigured,
   OPTIONAL_ENV,
 } from "@/lib/env";
+import { isPushConfigured } from "@/lib/push-notifications";
 
 export type AdminAlert = {
   id: string;
@@ -111,6 +112,7 @@ function buildServiceHealth(missingRequired: string[]): ServiceHealth[] {
     process.env.UPLOADTHING_SECRET?.trim() &&
       process.env.UPLOADTHING_APP_ID?.trim()
   );
+  const pushOk = isPushConfigured();
 
   const optionalMissing = OPTIONAL_ENV.filter(
     (key) => !process.env[key]?.trim()
@@ -152,6 +154,14 @@ function buildServiceHealth(missingRequired: string[]): ServiceHealth[] {
       detail: uploadOk
         ? "UploadThing configured"
         : "Product image uploads unavailable",
+    },
+    {
+      id: "push",
+      label: "Browser Push (VAPID)",
+      status: pushOk ? "ok" : "degraded",
+      detail: pushOk
+        ? "Background push notifications ready"
+        : "VAPID keys not set — foreground alerts only",
     },
     {
       id: "optional",

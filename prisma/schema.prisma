@@ -135,6 +135,19 @@ model Announcement {
   createdAt DateTime  @default(now())
 }
 
+model AdminPushSubscription {
+  id         String   @id @default(cuid())
+  adminEmail String
+  endpoint   String   @unique
+  p256dh     String
+  auth       String
+  userAgent  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([adminEmail])
+}
+
 enum Category {
   SOAP
   BODY_WASH

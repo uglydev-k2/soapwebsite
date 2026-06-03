@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useToastStore } from "@/store/toastStore";
+import { showForegroundNotification } from "@/components/admin/PushNotificationToggle";
 import type { ApiResponse } from "@/types";
 
 type LiveData = {
@@ -9,6 +10,7 @@ type LiveData = {
   newOrdersSince: number;
   lowStockCount: number;
   latestOrder?: {
+    id?: string;
     orderNumber: string;
     createdAt: string;
   } | null;
@@ -40,10 +42,14 @@ export function useAdminLiveUpdates(enabled = true) {
 
         if (initializedRef.current) {
           if (newOrdersSince > 0) {
-            addToast(
-              `${newOrdersSince} new order${newOrdersSince > 1 ? "s" : ""} received`,
-              "info"
-            );
+            const message = `${newOrdersSince} new order${newOrdersSince > 1 ? "s" : ""} received`;
+            addToast(message, "info");
+            showForegroundNotification("New order received", {
+              body: latestOrder
+                ? `${latestOrder.orderNumber}${latestOrder.id ? "" : ""}`
+                : message,
+              tag: latestOrder?.orderNumber ?? "new-order",
+            });
           } else if (
             pendingRef.current !== null &&
             pendingOrders > pendingRef.current

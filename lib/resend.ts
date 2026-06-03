@@ -155,3 +155,71 @@ export async function sendAdminInvite(email: string, name: string) {
     `,
   });
 }
+
+export async function sendAdminNewOrderAlert(data: {
+  recipients: string[];
+  orderNumber: string;
+  total: number;
+  customerEmail: string;
+  customerName: string;
+  itemCount: number;
+  orderUrl: string;
+}) {
+  const resend = getResend();
+  if (!resend || data.recipients.length === 0) {
+    console.info("[msvee:new-order-alert]", data);
+    return;
+  }
+
+  const siteUrl = process.env.NEXTAUTH_URL ?? "";
+  const href = data.orderUrl.startsWith("http")
+    ? data.orderUrl
+    : `${siteUrl}${data.orderUrl}`;
+
+  await resend.emails.send({
+    from: process.env.RESEND_FROM_EMAIL || "hello@msvee.co",
+    to: data.recipients,
+    subject: `[New Order] ${data.orderNumber} — $${data.total.toFixed(2)}`,
+    html: `
+      <div style="font-family: Georgia, serif; color: #1C1C1C; max-width: 560px; margin: 0 auto;">
+        <h1 style="color: #2C4A3E; font-weight: 500;">New Order Received</h1>
+        <p><strong>${data.orderNumber}</strong> just came in.</p>
+        <ul style="color: #3a3530; line-height: 1.7;">
+          <li>Customer: ${data.customerName} (${data.customerEmail})</li>
+          <li>Items: ${data.itemCount}</li>
+          <li>Total: <strong>$${data.total.toFixed(2)}</strong></li>
+        </ul>
+        <p><a href="${href}" style="color: #963f1a;">Open order in admin →</a></p>
+      </div>
+    `,
+  });
+}
+
+export async function sendAdminLowStockAlert(data: {
+  recipients: string[];
+  products: { name: string; stock: number; slug: string }[];
+}) {
+  const resend = getResend();
+  if (!resend || data.recipients.length === 0) {
+    console.info("[msvee:low-stock-alert]", data);
+    return;
+  }
+
+  const siteUrl = process.env.NEXTAUTH_URL ?? "";
+  const list = data.products
+    .map((p) => `<li>${p.name} — ${p.stock} left</li>`)
+    .join("");
+
+  await resend.emails.send({
+    from: process.env.RESEND_FROM_EMAIL || "hello@msvee.co",
+    to: data.recipients,
+    subject: `[Low Stock] ${data.products.length} product${data.products.length > 1 ? "s" : ""} need attention`,
+    html: `
+      <div style="font-family: Georgia, serif; color: #1C1C1C; max-width: 560px;">
+        <h1 style="color: #2C4A3E; font-weight: 500;">Low Stock Alert</h1>
+        <ul style="line-height: 1.7;">${list}</ul>
+        <p><a href="${siteUrl}/admin/inventory" style="color: #963f1a;">Review inventory →</a></p>
+      </div>
+    `,
+  });
+}

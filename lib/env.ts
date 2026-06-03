@@ -52,6 +52,10 @@ export const OPTIONAL_ENV = [
   "UPLOADTHING_APP_ID",
   "RESEND_API_KEY",
   "RESEND_FROM_EMAIL",
+  "VAPID_PUBLIC_KEY",
+  "VAPID_PRIVATE_KEY",
+  "VAPID_SUBJECT",
+  "NEXT_PUBLIC_VAPID_PUBLIC_KEY",
 ] as const;
 
 export function getMissingProductionEnv(): string[] {

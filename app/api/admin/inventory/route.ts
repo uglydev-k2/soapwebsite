@@ -12,6 +12,7 @@ import {
   getLowStockProducts,
   LOW_STOCK_THRESHOLD,
 } from "@/lib/admin-inventory";
+import { notifyAdminsOfLowStock } from "@/lib/order-notifications";
 
 export const dynamic = "force-dynamic";
 
@@ -48,12 +49,34 @@ export async function PATCH(request: NextRequest) {
   }
 
   const results = [];
+  const newlyLowStock: { name: string; stock: number; slug: string }[] = [];
+
   for (const update of parsed.data.updates) {
+    const before = await prisma.product.findUnique({
+      where: { id: update.id },
+      select: { stock: true },
+    });
     const product = await prisma.product.update({
       where: { id: update.id },
       data: { stock: update.stock },
     });
     results.push(product);
+
+    if (
+      before &&
+      before.stock > LOW_STOCK_THRESHOLD &&
+      product.stock <= LOW_STOCK_THRESHOLD
+    ) {
+      newlyLowStock.push({
+        name: product.name,
+        stock: product.stock,
+        slug: product.slug,
+      });
+    }
+  }
+
+  if (newlyLowStock.length > 0) {
+    await notifyAdminsOfLowStock(newlyLowStock);
   }
 
   await logAdminAction({

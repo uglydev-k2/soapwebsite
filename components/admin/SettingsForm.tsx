@@ -16,6 +16,7 @@ import { formatListField } from "@/lib/list-field";
 import { useToastStore } from "@/store/toastStore";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { PushNotificationToggle } from "@/components/admin/PushNotificationToggle";
 
 interface AdminUserRow {
   id: string;
@@ -179,6 +180,7 @@ export function SettingsForm({
 
   return (
     <div className={cn("grid gap-8 lg:grid-cols-2", className)}>
+      <PushNotificationToggle className="lg:col-span-2" />
       <form
         onSubmit={handleStoreSubmit(saveStore)}
         className="admin-card space-y-4 lg:col-span-2"

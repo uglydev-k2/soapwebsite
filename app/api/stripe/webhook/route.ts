@@ -3,6 +3,8 @@ import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { generateOrderNumber } from "@/lib/utils";
 import { sendOrderConfirmation } from "@/lib/resend";
+import { notifyAdminsOfNewOrder, notifyAdminsOfLowStock } from "@/lib/order-notifications";
+import { LOW_STOCK_THRESHOLD } from "@/lib/admin-inventory";
 import { saveOrderToSupabase } from "@/lib/supabase/orders";
 import type { ShippingAddress, ValidatedCartItem } from "@/lib/checkout";
 import { isDatabaseConfigured } from "@/lib/env";
@@ -116,6 +118,9 @@ export async function POST(request: NextRequest) {
       items: cartItems,
     });
 
+    let createdOrderId: string | undefined;
+    const newlyLowStock: { name: string; stock: number; slug: string }[] = [];
+
     if (isDatabaseConfigured()) {
       const customer = await prisma.customer.upsert({
         where: { email },
@@ -134,14 +139,25 @@ export async function POST(request: NextRequest) {
             quantity: item.quantity,
             price: item.price,
           });
-          await prisma.product.update({
+          const previousStock = product.stock;
+          const updated = await prisma.product.update({
             where: { id: product.id },
             data: { stock: { decrement: item.quantity } },
           });
+          if (
+            previousStock > LOW_STOCK_THRESHOLD &&
+            updated.stock <= LOW_STOCK_THRESHOLD
+          ) {
+            newlyLowStock.push({
+              name: updated.name,
+              stock: updated.stock,
+              slug: updated.slug,
+            });
+          }
         }
       }
 
-      await prisma.order.create({
+      const created = await prisma.order.create({
         data: {
           orderNumber,
           status: "PROCESSING",
@@ -155,9 +171,23 @@ export async function POST(request: NextRequest) {
           items: { create: orderItems },
         },
       });
+      createdOrderId = created.id;
     }
 
     await sendOrderConfirmation(email, orderNumber, total);
+
+    await notifyAdminsOfNewOrder({
+      orderId: createdOrderId,
+      orderNumber,
+      total,
+      customerEmail: email,
+      customerName: `${firstName} ${lastName}`.trim() || email,
+      itemCount: cartItems.reduce((sum, item) => sum + item.quantity, 0),
+    });
+
+    if (newlyLowStock.length > 0) {
+      await notifyAdminsOfLowStock(newlyLowStock);
+    }
   }
 
   return NextResponse.json({ received: true });
