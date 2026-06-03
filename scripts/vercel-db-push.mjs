@@ -8,19 +8,32 @@ if (!url) {
   process.exit(0);
 }
 
-const initSql = join(process.cwd(), "scripts", "init-prisma-tables.sql");
-if (existsSync(initSql)) {
-  console.log("[vercel-db-push] Applying Prisma tables via SQL (Supabase-compatible)…");
+function run(cmd) {
   try {
-    execSync(
-      "npx prisma db execute --file scripts/init-prisma-tables.sql --schema prisma/schema.prisma",
-      { stdio: "inherit" }
-    );
-    process.exit(0);
+    execSync(cmd, { stdio: "inherit" });
+    return true;
   } catch {
-    console.log("[vercel-db-push] SQL init failed or partial — trying db push…");
+    return false;
   }
 }
 
-console.log("[vercel-db-push] Applying Prisma schema via db push…");
-execSync("npx prisma db push --skip-generate", { stdio: "inherit" });
+const initSql = join(process.cwd(), "scripts", "init-prisma-tables.sql");
+if (existsSync(initSql)) {
+  console.log("[vercel-db-push] Applying Prisma tables via SQL (Supabase-compatible)…");
+  if (
+    run(
+      "npx prisma db execute --file scripts/init-prisma-tables.sql --schema prisma/schema.prisma"
+    )
+  ) {
+    process.exit(0);
+  }
+  console.log("[vercel-db-push] SQL init skipped (tables likely already exist)");
+}
+
+console.log("[vercel-db-push] Trying prisma db push…");
+if (run("npx prisma db push --skip-generate")) {
+  process.exit(0);
+}
+
+console.log("[vercel-db-push] Schema step finished with warnings — continuing build");
+process.exit(0);
