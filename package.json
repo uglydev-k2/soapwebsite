@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
-    "vercel-build": "prisma generate && next build",
+    "vercel-build": "prisma generate && node scripts/vercel-db-push.mjs && next build",
+    "db:setup": "bash scripts/db-setup.sh",
     "start": "next start",
     "lint": "next lint",
     "db:push": "prisma db push",

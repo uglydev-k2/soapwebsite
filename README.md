@@ -89,12 +89,13 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 **Live URLs:** [soapwebsite.vercel.app](https://soapwebsite.vercel.app) · [mzveesoaps.vercel.app](https://mzveesoaps.vercel.app) · [msvee-soap.vercel.app](https://msvee-soap.vercel.app)
 
 1. Connect repo to Vercel (https://github.com/uglydev-k2/soapwebsite)
-2. Add a **PostgreSQL** database (Vercel Postgres, Neon, or Supabase) and set **`DATABASE_URL`**
+2. **Supabase:** Project → **Connect** → copy **Transaction pooler** URL → `DATABASE_URL`, and **Direct** URL → `DIRECT_URL`
 3. Add required env vars from `.env.example`:
    - `AUTH_SECRET` or `NEXTAUTH_SECRET` (same value: `openssl rand -base64 32`)
-   - `NEXTAUTH_URL` = your production URL (e.g. `https://soapwebsite.vercel.app`)
-4. Redeploy — the build runs `prisma db push` to create tables
-5. Seed once locally or via CLI: `DATABASE_URL="..." npm run db:seed`
+   - `NEXTAUTH_URL` = your production URL (e.g. `https://mzveesoaps.vercel.app`)
+   - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+4. Redeploy — Vercel build auto-runs `prisma db push` when `DATABASE_URL` is set
+5. Seed once locally: fill `.env.local`, then `npm run db:setup`
 6. Configure Stripe webhook: `https://your-domain.com/api/stripe/webhook`
 
 If you see **Application error** on the homepage, `DATABASE_URL` is usually missing or the DB is unreachable. Check Vercel → Project → Settings → Environment Variables.
