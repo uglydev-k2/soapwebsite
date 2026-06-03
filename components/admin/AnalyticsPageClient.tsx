@@ -5,11 +5,19 @@ import {
   AnalyticsCharts,
   type AnalyticsData,
 } from "@/components/admin/AnalyticsCharts";
+import { ProductSkuTable } from "@/components/admin/ProductSkuTable";
+import type { ProductSkuMetric } from "@/lib/admin-analytics";
 import { Skeleton } from "@/components/ui/Skeleton";
+
+type AnalyticsPayload = AnalyticsData & {
+  productSkus?: ProductSkuMetric[];
+  totalRevenue?: number;
+  totalOrders?: number;
+};
 
 export default function AnalyticsPageClient() {
   const [range, setRange] = useState("30d");
-  const [data, setData] = useState<AnalyticsData | null>(null);
+  const [data, setData] = useState<AnalyticsPayload | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -49,7 +57,37 @@ export default function AnalyticsPageClient() {
           </button>
         ))}
       </div>
-      {data && <AnalyticsCharts data={data} />}
+      {data && (
+        <>
+          {(data.totalRevenue != null || data.totalOrders != null) && (
+            <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {data.totalRevenue != null && (
+                <div className="admin-card p-4">
+                  <p className="label-caps text-muted">Period Revenue</p>
+                  <p className="mt-2 font-serif text-3xl font-semibold text-green">
+                    {data.totalRevenue.toLocaleString("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    })}
+                  </p>
+                </div>
+              )}
+              {data.totalOrders != null && (
+                <div className="admin-card p-4">
+                  <p className="label-caps text-muted">Period Orders</p>
+                  <p className="mt-2 font-serif text-3xl font-semibold text-green">
+                    {data.totalOrders}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+          <AnalyticsCharts data={data} />
+          {data.productSkus && data.productSkus.length > 0 && (
+            <ProductSkuTable skus={data.productSkus} className="mt-6" />
+          )}
+        </>
+      )}
     </div>
   );
 }

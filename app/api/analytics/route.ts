@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin, jsonResponse } from "@/lib/api-helpers";
 import { withApiHandler } from "@/lib/api-handler";
 import { isDatabaseConfigured } from "@/lib/env";
+import { getProductSkuMetrics } from "@/lib/admin-analytics";
 
 export const GET = withApiHandler("analytics", async (request: NextRequest) => {
   const { error } = await requireAdmin();
@@ -18,6 +19,7 @@ export const GET = withApiHandler("analytics", async (request: NextRequest) => {
       monthlyRevenue: [],
       totalRevenue: 0,
       totalOrders: 0,
+      productSkus: [],
     });
   }
 
@@ -106,6 +108,7 @@ export const GET = withApiHandler("analytics", async (request: NextRequest) => {
   }));
 
   const monthlyRevenue = await getMonthlyRevenue();
+  const productSkus = await getProductSkuMetrics(since);
 
   return jsonResponse({
     revenueOverTime,
@@ -116,6 +119,7 @@ export const GET = withApiHandler("analytics", async (request: NextRequest) => {
     monthlyRevenue,
     totalRevenue: totalOrderRevenue,
     totalOrders: orders.length,
+    productSkus,
   });
 });
 

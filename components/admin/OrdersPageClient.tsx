@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { useToastStore } from "@/store/toastStore";
 import { cn } from "@/lib/utils";
+import { Download } from "lucide-react";
 import type { Order, Customer, OrderItem } from "@prisma/client";
 
 type OrderWithRelations = Order & {
@@ -50,6 +51,12 @@ export default function OrdersPageClient({
     router.refresh();
   };
 
+  const exportCsv = () => {
+    const query = new URLSearchParams(params.toString());
+    window.open(`/api/admin/export/orders?${query.toString()}`, "_blank");
+    addToast("Exporting orders CSV");
+  };
+
   return (
     <div>
       <div className="flex flex-wrap gap-2 mb-6 border-b border-green/10 pb-4">
@@ -69,7 +76,7 @@ export default function OrdersPageClient({
         ))}
       </div>
 
-      <div className="flex gap-4 mb-4">
+      <div className="mb-4 flex flex-wrap items-center gap-4">
         <Input
           placeholder="Search order # or email..."
           variant="admin"
@@ -82,6 +89,10 @@ export default function OrdersPageClient({
             router.push(`/admin/orders?${p.toString()}`);
           }}
         />
+        <Button size="sm" variant="ghost" onClick={exportCsv} className="gap-2">
+          <Download size={14} />
+          Export CSV
+        </Button>
         {selected.length > 0 && (
           <div className="flex flex-wrap gap-2">
             <Button size="sm" variant="ghost" onClick={() => bulkUpdate("PROCESSING")}>

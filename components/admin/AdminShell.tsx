@@ -9,6 +9,7 @@ import {
   useCommandPalette,
 } from "@/components/admin/CommandPalette";
 import { AdminSetupBanner } from "@/components/admin/AdminSetupBanner";
+import { useAdminLiveUpdates } from "@/components/admin/useAdminLiveUpdates";
 
 interface AdminShellProps {
   children: React.ReactNode;
@@ -27,6 +28,7 @@ export function AdminShell({
 }: AdminShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { open, openPalette, closePalette } = useCommandPalette();
+  useAdminLiveUpdates(true);
 
   return (
     <div className="admin-shell min-h-screen bg-[#f4f1eb]">

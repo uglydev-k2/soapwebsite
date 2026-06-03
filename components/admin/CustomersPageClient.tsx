@@ -97,24 +97,11 @@ export default function CustomersPageClient({
   };
 
   const exportCsv = () => {
-    const rows = filtered.filter((c) =>
-      selected.length ? selected.includes(c.id) : true
-    );
-    const header = "Name,Email,Status,Orders,Spent,Joined,Last Active\n";
-    const body = rows
-      .map(
-        (c) =>
-          `"${c.firstName} ${c.lastName}","${c.email}","${c.status ?? "ACTIVE"}",${c.ordersCount},${c.totalSpent},"${formatDate(c.createdAt)}","${c.lastActiveAt ? formatDate(c.lastActiveAt) : ""}"`
-      )
-      .join("\n");
-    const blob = new Blob([header + body], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `customers-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    addToast("CSV exported");
+    const query = new URLSearchParams();
+    if (search) query.set("search", search);
+    if (statusFilter) query.set("status", statusFilter);
+    window.open(`/api/admin/export/customers?${query.toString()}`, "_blank");
+    addToast("Exporting customers CSV");
   };
 
   return (

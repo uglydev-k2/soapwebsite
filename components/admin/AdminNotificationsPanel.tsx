@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Bell, CheckCircle2, AlertTriangle, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -34,28 +34,38 @@ export function AdminNotificationsPanel({
 }: AdminNotificationsPanelProps) {
   const [open, setOpen] = useState(false);
   const [data, setData] = useState<OverviewData | null>(null);
+  const [livePending, setLivePending] = useState<number | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      try {
-        const res = await fetch("/api/admin/overview");
-        const json = (await res.json()) as ApiResponse<OverviewData>;
-        if (!cancelled && res.ok && json.data) {
-          setData(json.data);
-        }
-      } catch {
-        /* ignore */
+  const load = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/overview");
+      const json = (await res.json()) as ApiResponse<OverviewData>;
+      if (res.ok && json.data) {
+        setData(json.data);
       }
+    } catch {
+      /* ignore */
     }
+  }, []);
+
+  useEffect(() => {
     load();
     const interval = setInterval(load, 60_000);
-    return () => {
-      cancelled = true;
-      clearInterval(interval);
+    return () => clearInterval(interval);
+  }, [load]);
+
+  useEffect(() => {
+    const onLive = (event: Event) => {
+      const detail = (event as CustomEvent<{ pendingOrders: number }>).detail;
+      if (detail?.pendingOrders != null) {
+        setLivePending(detail.pendingOrders);
+      }
+      load();
     };
-  }, []);
+    window.addEventListener("admin-live-update", onLive);
+    return () => window.removeEventListener("admin-live-update", onLive);
+  }, [load]);
 
   useEffect(() => {
     if (!open) return;
@@ -69,6 +79,7 @@ export function AdminNotificationsPanel({
   }, [open]);
 
   const alertCount = data?.alerts.length ?? 0;
+  const pendingDisplay = livePending ?? data?.pendingOrders;
 
   return (
     <div className={cn("relative", className)} ref={panelRef}>
@@ -90,7 +101,13 @@ export function AdminNotificationsPanel({
       {open && (
         <div className="absolute right-0 top-full z-50 mt-2 w-80 border border-green/10 bg-white shadow-xl">
           <div className="border-b border-green/10 px-4 py-3">
-            <p className="label-caps text-muted">Operations Alerts</p>
+            <p className="label-caps text-muted">Live Operations</p>
+            {pendingDisplay != null && (
+              <p className="mt-1 text-xs text-muted">
+                {pendingDisplay} pending order{pendingDisplay === 1 ? "" : "s"}{" "}
+                · updates every 20s
+              </p>
+            )}
           </div>
           <div className="max-h-80 overflow-y-auto p-2">
             {!data ? (
@@ -137,13 +154,20 @@ export function AdminNotificationsPanel({
               </ul>
             )}
           </div>
-          <div className="border-t border-green/10 px-4 py-2">
+          <div className="flex items-center justify-between border-t border-green/10 px-4 py-2">
             <Link
-              href="/admin/system"
+              href="/admin/orders?status=PENDING"
               onClick={() => setOpen(false)}
               className="text-xs text-terra hover:text-green"
             >
-              System health →
+              Pending orders →
+            </Link>
+            <Link
+              href="/admin/system"
+              onClick={() => setOpen(false)}
+              className="text-xs text-muted hover:text-green"
+            >
+              System health
             </Link>
           </div>
         </div>
