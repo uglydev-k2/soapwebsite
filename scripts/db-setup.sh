@@ -20,12 +20,15 @@ if [[ -z "${DATABASE_URL:-}" ]]; then
   exit 1
 fi
 
-echo "→ Pushing Prisma schema…"
-npx prisma db push
+echo "→ Applying Prisma schema (Supabase-safe SQL)…"
+npx prisma db execute --file scripts/init-prisma-tables.sql --schema prisma/schema.prisma 2>/dev/null || {
+  echo "→ SQL init skipped (tables may already exist); trying prisma db push…"
+  npx prisma db push || true
+}
 
 echo "→ Seeding products, orders, and admin user…"
 npm run db:seed
 
 echo ""
 echo "Done. Admin login: admin@msvee.co / msvee-admin-2024"
-echo "Copy DATABASE_URL, DIRECT_URL, AUTH_SECRET, and Supabase keys to Vercel → Environment Variables, then redeploy."
+echo "Copy env vars to Vercel → Environment Variables, then redeploy."

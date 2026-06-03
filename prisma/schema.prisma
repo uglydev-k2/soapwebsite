@@ -1,31 +1,35 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
+  schemas   = ["public"]
 }
 
 model Product {
-  id               String             @id @default(cuid())
+  id               String           @id @default(cuid())
   name             String
-  slug             String             @unique
+  slug             String           @unique
   description      String
   price            Float
   comparePrice     Float?
   category         Category
-  stock            Int                @default(0)
+  stock            Int              @default(0)
   images           String[]
   ingredients      String?
   fragrance        String?
-  featured         Boolean            @default(false)
-  active           Boolean            @default(true)
-  moderationStatus ModerationStatus   @default(APPROVED)
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
+  featured         Boolean          @default(false)
+  active           Boolean          @default(true)
+  moderationStatus ModerationStatus @default(APPROVED)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
   orderItems       OrderItem[]
+
+  @@schema("public")
 }
 
 model Order {
@@ -43,6 +47,8 @@ model Order {
   notes       String?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+
+  @@schema("public")
 }
 
 model OrderItem {
@@ -53,6 +59,8 @@ model OrderItem {
   productId String
   quantity  Int
   price     Float
+
+  @@schema("public")
 }
 
 model Customer {
@@ -67,6 +75,8 @@ model Customer {
   lastActiveAt DateTime?
   orders       Order[]
   createdAt    DateTime       @default(now())
+
+  @@schema("public")
 }
 
 model AdminUser {
@@ -78,6 +88,8 @@ model AdminUser {
   active      Boolean   @default(true)
   lastLoginAt DateTime?
   createdAt   DateTime  @default(now())
+
+  @@schema("public")
 }
 
 model StoreSettings {
@@ -99,6 +111,8 @@ model StoreSettings {
   bannedKeywords        String[] @default([])
   allowedEmailDomains   String[] @default([])
   updatedAt             DateTime @updatedAt
+
+  @@schema("public")
 }
 
 model NewsletterSubscriber {
@@ -106,6 +120,8 @@ model NewsletterSubscriber {
   email     String   @unique
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
+
+  @@schema("public")
 }
 
 model AuditLog {
@@ -123,6 +139,7 @@ model AuditLog {
   @@index([adminId])
   @@index([entity])
   @@index([createdAt])
+  @@schema("public")
 }
 
 model Announcement {
@@ -134,6 +151,8 @@ model Announcement {
   sentAt    DateTime?
   createdBy String
   createdAt DateTime  @default(now())
+
+  @@schema("public")
 }
 
 model AdminPushSubscription {
@@ -147,6 +166,7 @@ model AdminPushSubscription {
   updatedAt  DateTime @updatedAt
 
   @@index([adminEmail])
+  @@schema("public")
 }
 
 enum Category {
@@ -156,6 +176,8 @@ enum Category {
   SCRUB
   AROMATHERAPY
   GIFT_SET
+
+  @@schema("public")
 }
 
 enum OrderStatus {
@@ -165,6 +187,8 @@ enum OrderStatus {
   DELIVERED
   CANCELLED
   REFUNDED
+
+  @@schema("public")
 }
 
 enum Role {
@@ -172,12 +196,16 @@ enum Role {
   ADMIN
   MODERATOR
   EDITOR
+
+  @@schema("public")
 }
 
 enum CustomerStatus {
   ACTIVE
   BANNED
   INACTIVE
+
+  @@schema("public")
 }
 
 enum ModerationStatus {
@@ -185,4 +213,6 @@ enum ModerationStatus {
   APPROVED
   REJECTED
   FLAGGED
+
+  @@schema("public")
 }
