@@ -8,6 +8,7 @@ import {
   Activity,
   BarChart3,
   Bell,
+  Boxes,
   CreditCard,
   ExternalLink,
   FileText,
@@ -54,6 +55,7 @@ const navSections: NavSection[] = [
     title: "Catalog",
     items: [
       { label: "Products", href: "/admin/products", icon: Package, permission: "products:read" },
+      { label: "Inventory", href: "/admin/inventory", icon: Boxes, permission: "products:read" },
       { label: "Content", href: "/admin/content", icon: FileText, permission: "content:read" },
     ],
   },

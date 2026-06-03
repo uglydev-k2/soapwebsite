@@ -116,6 +116,8 @@ export const storeSettingsSchema = z.object({
   maintenanceMode: z.boolean().optional().default(false),
   featureCheckout: z.boolean().optional().default(true),
   featureNewsletter: z.boolean().optional().default(true),
+  bannedKeywords: z.string().optional().default(""),
+  allowedEmailDomains: z.string().optional().default(""),
 });
 
 export const adminInviteSchema = z.object({

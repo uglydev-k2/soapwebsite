@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, jsonResponse, errorResponse } from "@/lib/api-helpers";
 import { storeSettingsSchema } from "@/lib/validations";
+import { parseListField } from "@/lib/list-field";
 import { logAdminAction } from "@/lib/audit";
 import { getClientIp } from "@/lib/rate-limit";
 import bcrypt from "bcryptjs";
@@ -37,10 +38,20 @@ export async function PUT(request: NextRequest) {
     if (!parsed.success) {
       return errorResponse(parsed.error.errors[0]?.message || "Invalid data");
     }
+    const { bannedKeywords, allowedEmailDomains, ...rest } = parsed.data;
     const settings = await prisma.storeSettings.upsert({
       where: { id: "default" },
-      create: { id: "default", ...parsed.data },
-      update: parsed.data,
+      create: {
+        id: "default",
+        ...rest,
+        bannedKeywords: parseListField(bannedKeywords),
+        allowedEmailDomains: parseListField(allowedEmailDomains),
+      },
+      update: {
+        ...rest,
+        bannedKeywords: parseListField(bannedKeywords),
+        allowedEmailDomains: parseListField(allowedEmailDomains),
+      },
     });
     await logAdminAction({
       ...adminMeta,

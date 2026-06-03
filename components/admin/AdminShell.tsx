@@ -8,6 +8,7 @@ import {
   CommandPalette,
   useCommandPalette,
 } from "@/components/admin/CommandPalette";
+import { AdminSetupBanner } from "@/components/admin/AdminSetupBanner";
 
 interface AdminShellProps {
   children: React.ReactNode;
@@ -43,7 +44,10 @@ export function AdminShell({
           onSearchOpen={openPalette}
         />
 
-        <main className={cn("flex-1 p-4 sm:p-6", className)}>{children}</main>
+        <main className={cn("flex-1 p-4 sm:p-6", className)}>
+          <AdminSetupBanner />
+          {children}
+        </main>
       </div>
 
       <CommandPalette open={open} onClose={closePalette} />

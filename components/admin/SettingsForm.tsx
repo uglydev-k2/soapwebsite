@@ -12,6 +12,7 @@ import {
   type StoreSettingsData,
 } from "@/lib/validations";
 import { cn } from "@/lib/utils";
+import { formatListField } from "@/lib/list-field";
 import { useToastStore } from "@/store/toastStore";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -59,6 +60,8 @@ export function SettingsForm({
           maintenanceMode: settings.maintenanceMode,
           featureCheckout: settings.featureCheckout,
           featureNewsletter: settings.featureNewsletter,
+          bannedKeywords: formatListField(settings.bannedKeywords),
+          allowedEmailDomains: formatListField(settings.allowedEmailDomains),
         }
       : undefined,
   });
@@ -266,6 +269,37 @@ export function SettingsForm({
               <span className="text-sm text-text">{label}</span>
             </label>
           ))}
+        </fieldset>
+        <fieldset className="space-y-3 border-t border-green/10 pt-4">
+          <legend className="label-caps text-muted">Moderation & Access</legend>
+          <div>
+            <label className="label-caps mb-2 block text-muted">
+              Banned keywords
+            </label>
+            <textarea
+              {...registerStore("bannedKeywords")}
+              rows={2}
+              placeholder="spam, counterfeit, ..."
+              className="admin-input w-full resize-y text-sm"
+            />
+            <p className="mt-1 text-xs text-muted">
+              Comma-separated words flagged during product moderation.
+            </p>
+          </div>
+          <div>
+            <label className="label-caps mb-2 block text-muted">
+              Allowed admin email domains
+            </label>
+            <textarea
+              {...registerStore("allowedEmailDomains")}
+              rows={2}
+              placeholder="msvee.co, yourcompany.com"
+              className="admin-input w-full resize-y text-sm"
+            />
+            <p className="mt-1 text-xs text-muted">
+              Leave empty to allow any domain for admin invites.
+            </p>
+          </div>
         </fieldset>
         <Button type="submit" disabled={savingStore}>
           {savingStore ? "Saving…" : "Save Store Settings"}

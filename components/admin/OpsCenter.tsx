@@ -25,7 +25,7 @@ export function OpsCenter({
     {
       label: "Low Stock",
       value: lowStockCount,
-      href: "/admin/products",
+      href: "/admin/inventory",
       urgent: lowStockCount > 0,
     },
     {

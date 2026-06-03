@@ -83,7 +83,10 @@ export default function OrdersPageClient({
           }}
         />
         {selected.length > 0 && (
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" variant="ghost" onClick={() => bulkUpdate("PROCESSING")}>
+              Mark Processing
+            </Button>
             <Button size="sm" variant="ghost" onClick={() => bulkUpdate("SHIPPED")}>
               Mark Shipped
             </Button>

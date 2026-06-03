@@ -15,12 +15,15 @@ import {
 } from "@/components/admin/GrowthCharts";
 import { getDashboardData } from "@/lib/dashboard";
 import { getAdminOverview } from "@/lib/admin-overview";
+import { getPendingFulfillmentOrders } from "@/lib/admin-inventory";
+import { FulfillmentQueue } from "@/components/admin/FulfillmentQueue";
 import { formatPrice } from "@/lib/utils";
 
 export default async function AdminDashboardPage() {
-  const [data, overview] = await Promise.all([
+  const [data, overview, fulfillmentOrders] = await Promise.all([
     getDashboardData(),
     getAdminOverview(),
+    getPendingFulfillmentOrders(6),
   ]);
 
   const customerSparkline = data.customerGrowth.slice(-6).map((m) => m.count);
@@ -67,13 +70,17 @@ export default async function AdminDashboardPage() {
 
       <div className="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
         <div className="xl:col-span-2">
-          <OpsCenter
-            alerts={overview.alerts}
-            pendingOrders={overview.pendingOrders}
-            lowStockCount={overview.lowStockCount}
-            flaggedProducts={overview.flaggedProducts}
-          />
+          <FulfillmentQueue orders={fulfillmentOrders} />
         </div>
+        <OpsCenter
+          alerts={overview.alerts}
+          pendingOrders={overview.pendingOrders}
+          lowStockCount={overview.lowStockCount}
+          flaggedProducts={overview.flaggedProducts}
+        />
+      </div>
+
+      <div className="mb-6">
         <SystemHealthPanel services={overview.services} compact />
       </div>
 
@@ -83,7 +90,7 @@ export default async function AdminDashboardPage() {
             {data.kpis.lowStockCount} product
             {data.kpis.lowStockCount > 1 ? "s are" : " is"} running low on stock
           </span>
-          <Link href="/admin/products" className="label-caps underline">
+          <Link href="/admin/inventory" className="label-caps underline">
             Review Inventory →
           </Link>
         </div>

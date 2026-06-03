@@ -9,6 +9,8 @@ import { loginSchema } from "@/lib/validations";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { z } from "zod";
+import Link from "next/link";
+import { Shield } from "lucide-react";
 
 type LoginForm = z.infer<typeof loginSchema>;
 
@@ -44,22 +46,28 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-cream flex items-center justify-center px-6">
+    <div className="admin-shell flex min-h-screen items-center justify-center px-4 py-12">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(168,138,74,0.08),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(31,52,44,0.06),transparent_35%)]" />
+
       <div
-        className={`w-full max-w-md bg-white p-8 card-border ${shake ? "animate-shake" : ""}`}
+        className={`relative w-full max-w-md border border-green/10 bg-white p-8 shadow-xl ${shake ? "animate-shake" : ""}`}
       >
-        <div className="text-center mb-8">
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center bg-green-3 text-gold">
+            <Shield size={22} />
+          </div>
           <h1 className="font-serif text-3xl text-green">
             <span className="italic text-terra">Ms</span>
             <span>Vee</span>
-            <span className="text-green text-2xl"> Soaps</span>
           </h1>
-          <p className="label-caps text-muted mt-2">Admin Panel</p>
+          <p className="label-caps mt-2 text-muted">Admin Command Center</p>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <Input
             label="Email"
             type="email"
+            autoComplete="username"
             variant="admin"
             error={errors.email?.message}
             {...register("email")}
@@ -67,15 +75,26 @@ export default function AdminLoginPage() {
           <Input
             label="Password"
             type="password"
+            autoComplete="current-password"
             variant="admin"
             error={errors.password?.message}
             {...register("password")}
           />
-          {error && <p className="text-terra text-sm">{error}</p>}
+          {error && (
+            <p className="border border-terra/20 bg-terra/5 px-3 py-2 text-sm text-terra">
+              {error}
+            </p>
+          )}
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? "Signing in…" : "Sign in to dashboard"}
           </Button>
         </form>
+
+        <p className="mt-6 text-center text-xs text-muted">
+          <Link href="/" className="text-green hover:text-terra">
+            ← Back to storefront
+          </Link>
+        </p>
       </div>
     </div>
   );
