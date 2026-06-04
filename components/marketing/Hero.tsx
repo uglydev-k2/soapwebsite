@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import {
@@ -11,6 +10,8 @@ import {
 } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { EASE_OUT, fadeUp, staggerContainer } from "@/lib/motion";
+
+const HERO_IMAGE = "/images/hero-soaps.jpg";
 
 const headlineWords = [
   { text: "Where", accent: false },
@@ -78,7 +79,10 @@ export default function Hero() {
             indulgence.
           </motion.p>
 
-          <motion.div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4" variants={fadeUp}>
+          <motion.div
+            className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4"
+            variants={fadeUp}
+          >
             <Link
               href="/collections"
               className="cta-shimmer inline-flex min-h-[3rem] w-full items-center justify-center gap-2 bg-terra px-8 py-3.5 text-sm label-caps text-white transition-colors duration-250 hover:bg-terra-2 sm:w-auto"
@@ -99,25 +103,24 @@ export default function Hero() {
 
         <div className="relative">
           <motion.div
-            className="relative aspect-[4/5] overflow-hidden bg-green-3 lg:aspect-square"
+            className="relative aspect-[4/5] overflow-hidden bg-stone-200 lg:aspect-square"
             style={{ y: panelY, scale: panelScale }}
           >
-            <Image
-              src="/images/hero-collection-soaps.jpg"
-              alt="Handcrafted soap bars in pink, layered botanical, and natural tones on a steel work surface"
-              fill
-              priority
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover object-center"
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={HERO_IMAGE}
+              alt="Handcrafted soap bars in pink, marbled botanical, and natural tones"
+              className="absolute inset-0 h-full w-full object-cover object-center"
+              fetchPriority="high"
+              decoding="async"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
           </motion.div>
 
           <motion.div
             className={cn(
-              "relative mt-4 w-full border border-green/10 bg-white p-5 shadow-lg",
-              "lg:absolute lg:-bottom-8 lg:-left-8 lg:mt-0 lg:w-72",
-              !reduced && "lg:animate-float-gentle"
+              "relative z-10 -mt-6 w-full border border-green/10 bg-white p-5 shadow-lg",
+              "sm:mt-4 lg:absolute lg:-bottom-8 lg:-left-8 lg:mt-0 lg:w-72"
             )}
             style={{ borderRadius: "2px" }}
             initial={reduced ? false : { opacity: 0, y: 24 }}
@@ -125,17 +128,17 @@ export default function Hero() {
             transition={{ duration: 0.55, delay: 0.45, ease: EASE_OUT }}
           >
             <span className="label-caps text-gold">The Collection</span>
-            <h3 className="subheading mt-2 text-xl">
-              Botanical Bath & Body
-            </h3>
+            <h3 className="subheading mt-2 text-xl">Botanical Bath & Body</h3>
             <p className="mt-1 text-sm text-muted">
               Soaps, washes, lotions, and ritual sets — crafted in small batches.
             </p>
             <Link
               href="/collections"
-              className="mt-4 inline-block label-caps text-green transition-colors duration-250 hover:text-terra"
+              className="mt-4 flex min-h-[3rem] w-full items-center justify-center bg-terra px-6 py-3 text-sm label-caps text-white transition-colors duration-250 hover:bg-terra-2 lg:inline-flex lg:min-h-0 lg:w-auto lg:bg-transparent lg:px-0 lg:py-0 lg:text-green lg:hover:text-terra"
+              style={{ borderRadius: 0 }}
             >
-              Shop all →
+              <span className="lg:hidden">Shop now</span>
+              <span className="hidden lg:inline">Shop all →</span>
             </Link>
           </motion.div>
         </div>
