@@ -7,6 +7,7 @@
     "build": "prisma generate && next build",
     "vercel-build": "prisma generate && node scripts/vercel-db-push.mjs && next build",
     "db:setup": "bash scripts/db-setup.sh",
+    "admin:create": "tsx scripts/create-admin.ts",
     "env:vercel-checklist": "node scripts/print-vercel-env-checklist.mjs",
     "env:push-vercel": "node scripts/push-vercel-env-api.mjs",
     "start": "next start",

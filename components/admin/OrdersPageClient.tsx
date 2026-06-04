@@ -59,13 +59,13 @@ export default function OrdersPageClient({
 
   return (
     <div>
-      <div className="flex flex-wrap gap-2 mb-6 border-b border-green/10 pb-4">
+      <div className="admin-tabs-scroll mb-6 border-b border-green/10 pb-2">
         {tabs.map((tab) => (
           <button
             key={tab}
             onClick={() => setStatus(tab)}
             className={cn(
-              "label-caps px-3 py-2 transition-colors",
+              "label-caps shrink-0 px-3 py-2.5 transition-colors",
               initialStatus === tab
                 ? "text-terra border-b-2 border-terra"
                 : "text-muted hover:text-green"
@@ -76,11 +76,11 @@ export default function OrdersPageClient({
         ))}
       </div>
 
-      <div className="mb-4 flex flex-wrap items-center gap-4">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
         <Input
           placeholder="Search order # or email..."
           variant="admin"
-          className="max-w-sm"
+          className="w-full sm:max-w-sm"
           defaultValue={params.get("search") || ""}
           onChange={(e) => {
             const p = new URLSearchParams(params.toString());

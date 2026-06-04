@@ -39,8 +39,42 @@ export function CustomersTable({
   }
 
   return (
-    <div className={cn("overflow-x-auto", className)}>
-      <table className="w-full text-left text-sm">
+    <div className={className}>
+      <ul className="divide-y divide-green/10 md:hidden">
+        {customers.map((customer) => (
+          <li key={customer.id}>
+            <button
+              type="button"
+              onClick={() => onView?.(customer)}
+              className="admin-mobile-card w-full text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-terra/15 font-sans text-xs font-medium text-terra">
+                  {getInitials(customer.firstName, customer.lastName)}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-green">
+                    {customer.firstName} {customer.lastName}
+                  </p>
+                  <p className="truncate text-xs text-muted">{customer.email}</p>
+                </div>
+              </div>
+              <div className="mt-3 flex justify-between text-xs text-muted">
+                <span>{customer.ordersCount} orders</span>
+                <span className="font-medium text-green">
+                  {formatPrice(customer.totalSpent)}
+                </span>
+              </div>
+              <p className="mt-1 text-[11px] text-muted">
+                Joined {formatDate(customer.createdAt)}
+              </p>
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <div className={cn("hidden overflow-x-auto md:block")}>
+      <table className="w-full min-w-[560px] text-left text-sm">
         <thead>
           <tr className="border-b border-green/10">
             <th className="label-caps px-4 py-3 text-muted">Customer</th>
@@ -95,6 +129,7 @@ export function CustomersTable({
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

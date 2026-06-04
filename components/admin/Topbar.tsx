@@ -45,7 +45,7 @@ export function Topbar({
   return (
     <header
       className={cn(
-        "sticky top-0 z-20 flex flex-col gap-4 border-b border-green/10 bg-white/95 px-4 py-4 backdrop-blur-sm sm:px-6 sm:py-5 lg:flex-row lg:items-center lg:justify-between",
+        "sticky top-0 z-20 flex flex-col gap-3 border-b border-green/10 bg-white/95 px-4 py-3 backdrop-blur-sm supports-[padding:max(0px)]:pt-[max(0.75rem,env(safe-area-inset-top))] sm:gap-4 sm:px-6 sm:py-5 lg:flex-row lg:items-center lg:justify-between",
         className
       )}
     >
@@ -54,14 +54,14 @@ export function Topbar({
           <button
             type="button"
             onClick={onMenuToggle}
-            className="mt-1 shrink-0 p-2 text-green transition-colors hover:bg-cream lg:hidden"
+            className="admin-touch-target -ml-1 mt-0.5 shrink-0 text-green transition-colors hover:bg-cream lg:hidden"
             aria-label="Open menu"
           >
             <Menu size={22} strokeWidth={1.5} />
           </button>
         )}
-        <div>
-          <nav className="mb-1 flex flex-wrap items-center gap-1 text-xs text-muted">
+        <div className="min-w-0 flex-1">
+          <nav className="mb-1 flex flex-wrap items-center gap-1 text-[11px] text-muted sm:text-xs">
             <Link href="/admin" className="transition-colors hover:text-green">
               Admin
             </Link>
@@ -81,12 +81,16 @@ export function Topbar({
               </span>
             ))}
           </nav>
-          <h1 className="font-serif text-2xl font-semibold text-green">{title}</h1>
-          <p className="mt-0.5 text-xs text-muted">{today}</p>
+          <h1 className="truncate font-serif text-xl font-semibold text-green sm:text-2xl">
+            {title}
+          </h1>
+          <p className="mt-0.5 hidden text-xs text-muted sm:block">
+            {today}
+          </p>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex w-full items-center justify-end gap-1 sm:w-auto sm:gap-3">
         <button
           type="button"
           onClick={onSearchOpen}
@@ -101,7 +105,7 @@ export function Topbar({
         <button
           type="button"
           onClick={onSearchOpen}
-          className="p-2 text-muted transition-colors hover:bg-cream hover:text-green sm:hidden"
+          className="admin-touch-target text-muted transition-colors hover:bg-cream hover:text-green sm:hidden"
           aria-label="Search"
         >
           <Search size={18} />

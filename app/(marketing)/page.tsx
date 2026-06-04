@@ -24,7 +24,7 @@ export default function HomePage() {
       <CategorySection />
       <ProductGrid
         title="Start Your Ritual"
-        subtitle="Bestsellers"
+        subtitle="Signature bar soaps"
         limit={4}
       />
       <TrustPressSection />

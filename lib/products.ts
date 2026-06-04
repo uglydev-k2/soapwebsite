@@ -1,7 +1,28 @@
 import { prisma } from "@/lib/prisma";
 import type { Category, Prisma, Product } from "@prisma/client";
 import { safeDbQuery } from "@/lib/db";
-import { STATIC_FEATURED, STATIC_PRODUCTS } from "@/lib/catalog";
+import {
+  FEATURED_PRODUCT_SLUGS,
+  STATIC_FEATURED,
+  STATIC_PRODUCTS,
+} from "@/lib/catalog";
+
+function orderFeaturedProducts<T extends { id: string; slug: string; featured: boolean }>(
+  products: T[],
+  limit: number
+): T[] {
+  const ordered = FEATURED_PRODUCT_SLUGS.map((slug) =>
+    products.find((p) => p.slug === slug)
+  ).filter((p): p is T => p != null);
+
+  if (ordered.length >= limit) {
+    return ordered.slice(0, limit);
+  }
+
+  const used = new Set(ordered.map((p) => p.id));
+  const rest = products.filter((p) => p.featured && !used.has(p.id));
+  return [...ordered, ...rest].slice(0, limit);
+}
 
 type ProductSort = "featured" | "newest" | "price-asc" | "price-desc" | "name";
 
@@ -18,14 +39,13 @@ export async function getFeaturedProducts(limit = 4): Promise<Product[]> {
     () =>
       prisma.product.findMany({
         where: { featured: true, active: true },
-        take: limit,
         orderBy: { createdAt: "desc" },
       }),
     [] as Product[]
   );
   return products.length > 0
-    ? products
-    : (STATIC_FEATURED.slice(0, limit) as Product[]);
+    ? orderFeaturedProducts(products, limit)
+    : (orderFeaturedProducts(STATIC_FEATURED, limit) as Product[]);
 }
 
 function getOrderBy(sort: ProductSort): Prisma.ProductOrderByWithRelationInput[] {

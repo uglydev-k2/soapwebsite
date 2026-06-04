@@ -47,7 +47,7 @@ export function SystemHealthPanel({
         {services.map((service) => (
           <li
             key={service.id}
-            className="flex items-center justify-between border border-green/10 bg-white px-3 py-2.5"
+            className="flex flex-col gap-1 border border-green/10 bg-white px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between"
           >
             <div className="flex items-center gap-2">
               <span
@@ -55,7 +55,7 @@ export function SystemHealthPanel({
               />
               <span className="text-sm text-green">{service.label}</span>
             </div>
-            <span className="max-w-[55%] truncate text-right text-xs text-muted">
+            <span className="text-xs text-muted sm:max-w-[55%] sm:truncate sm:text-right">
               {service.detail}
             </span>
           </li>

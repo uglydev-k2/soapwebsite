@@ -58,12 +58,12 @@ export function DashboardQuickActions() {
   return (
     <div className="admin-card p-4">
       <p className="label-caps mb-3 text-muted">Quick Actions</p>
-      <div className="flex flex-wrap gap-2">
+      <div className="admin-actions-scroll">
         {actions.map((action) => (
           <Link
             key={action.href + action.label}
             href={action.href}
-            className="inline-flex items-center gap-2 border border-green/10 bg-white px-3 py-2 text-xs text-green transition-all hover:border-green/25 hover:shadow-sm"
+            className="inline-flex items-center gap-2 border border-green/10 bg-white px-3 py-2.5 text-xs text-green transition-all hover:border-green/25 hover:shadow-sm"
           >
             <span
               className={`flex h-6 w-6 items-center justify-center ${action.accent}`}

@@ -42,12 +42,12 @@ export default function AnalyticsPageClient() {
 
   return (
     <div>
-      <div className="flex gap-2 mb-6">
+      <div className="admin-tabs-scroll mb-6">
         {["7d", "30d", "90d"].map((r) => (
           <button
             key={r}
             onClick={() => setRange(r)}
-            className={`label-caps px-4 py-2 border transition-colors ${
+            className={`label-caps shrink-0 px-4 py-2.5 border transition-colors ${
               range === r
                 ? "border-terra text-terra bg-terra/5"
                 : "border-green/20 text-muted hover:border-green"

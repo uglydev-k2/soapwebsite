@@ -56,7 +56,8 @@ export function AnalyticsCharts({ data, className }: AnalyticsChartsProps) {
     <div className={cn("grid gap-6", className)}>
       <div className="admin-card">
         <h3 className="label-caps mb-4 text-muted">Revenue Over Time</h3>
-        <ResponsiveContainer width="100%" height={280}>
+        <div className="h-[220px] w-full sm:h-[280px]">
+        <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data.revenueOverTime} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="revenueFill" x1="0" y1="0" x2="0" y2="1">
@@ -90,12 +91,14 @@ export function AnalyticsCharts({ data, className }: AnalyticsChartsProps) {
             />
           </AreaChart>
         </ResponsiveContainer>
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="admin-card">
           <h3 className="label-caps mb-4 text-muted">Orders by Status</h3>
-          <ResponsiveContainer width="100%" height={240}>
+          <div className="h-[200px] w-full sm:h-[240px]">
+        <ResponsiveContainer width="100%" height="100%">
             <BarChart data={statusData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(44,74,62,0.08)" vertical={false} />
               <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "#6b5e52", fontSize: 11 }} />
@@ -105,10 +108,12 @@ export function AnalyticsCharts({ data, className }: AnalyticsChartsProps) {
             </BarChart>
           </ResponsiveContainer>
         </div>
+        </div>
 
         <div className="admin-card">
           <h3 className="label-caps mb-4 text-muted">New Customers</h3>
-          <ResponsiveContainer width="100%" height={240}>
+          <div className="h-[200px] w-full sm:h-[240px]">
+        <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data.customerAcquisition} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(44,74,62,0.08)" vertical={false} />
               <XAxis dataKey="week" axisLine={false} tickLine={false} tick={{ fill: "#6b5e52", fontSize: 11 }} />
@@ -124,12 +129,14 @@ export function AnalyticsCharts({ data, className }: AnalyticsChartsProps) {
             </LineChart>
           </ResponsiveContainer>
         </div>
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="admin-card">
           <h3 className="label-caps mb-4 text-muted">Top Products by Revenue</h3>
-          <ResponsiveContainer width="100%" height={280}>
+          <div className="h-[220px] w-full sm:h-[280px]">
+        <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={data.topProducts}
               layout="vertical"
@@ -153,10 +160,12 @@ export function AnalyticsCharts({ data, className }: AnalyticsChartsProps) {
             </BarChart>
           </ResponsiveContainer>
         </div>
+        </div>
 
         <div className="admin-card">
           <h3 className="label-caps mb-4 text-muted">Catalog by Category</h3>
-          <ResponsiveContainer width="100%" height={280}>
+          <div className="h-[220px] w-full sm:h-[280px]">
+        <ResponsiveContainer width="100%" height="100%">
             <BarChart data={categoryData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(44,74,62,0.08)" vertical={false} />
               <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "#6b5e52", fontSize: 10 }} />
@@ -176,6 +185,7 @@ export function AnalyticsCharts({ data, className }: AnalyticsChartsProps) {
               <Legend iconType="square" iconSize={8} wrapperStyle={{ fontSize: 11, color: "#6b5e52" }} />
             </BarChart>
           </ResponsiveContainer>
+        </div>
         </div>
       </div>
     </div>

@@ -5,6 +5,8 @@ export type ProductCategoryConfig = {
   slug: string;
   label: string;
   description: string;
+  /** Optional tile image (falls back to gradient) */
+  image?: string;
 };
 
 export const PRODUCT_CATEGORIES: ProductCategoryConfig[] = [
@@ -13,6 +15,7 @@ export const PRODUCT_CATEGORIES: ProductCategoryConfig[] = [
     slug: "bar-soap",
     label: "Bar Soaps",
     description: "Hand-poured botanical bars for a rich, creamy lather.",
+    image: "/images/products/blush-rose-bar.jpg",
   },
   {
     value: "BODY_WASH",
@@ -43,6 +46,7 @@ export const PRODUCT_CATEGORIES: ProductCategoryConfig[] = [
     slug: "gift-sets",
     label: "Gift Sets",
     description: "Curated rituals wrapped for gifting moments.",
+    image: "/images/hero-soaps.jpg",
   },
 ];
 

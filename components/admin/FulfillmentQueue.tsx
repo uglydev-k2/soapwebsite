@@ -47,7 +47,7 @@ export function FulfillmentQueue({ orders }: FulfillmentQueueProps) {
   };
 
   return (
-    <div className="admin-card p-6">
+    <div className="admin-card">
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <PackageCheck size={18} className="text-terra" />
@@ -98,11 +98,12 @@ export function FulfillmentQueue({ orders }: FulfillmentQueueProps) {
                   </p>
                 </div>
 
-                <div className="flex shrink-0 flex-wrap gap-2">
+                <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
                   {isPending ? (
                     <Button
                       size="sm"
                       variant="ghost"
+                      className="w-full sm:w-auto"
                       disabled={updatingId === order.id}
                       onClick={() => updateStatus(order.id, "PROCESSING")}
                     >
@@ -111,13 +112,14 @@ export function FulfillmentQueue({ orders }: FulfillmentQueueProps) {
                   ) : null}
                   <Button
                     size="sm"
+                    className="w-full sm:w-auto"
                     disabled={updatingId === order.id}
                     onClick={() => updateStatus(order.id, "SHIPPED")}
                   >
                     Mark Shipped
                   </Button>
-                  <Link href={`/admin/orders/${order.id}`}>
-                    <Button size="sm" variant="ghost" className="gap-1">
+                  <Link href={`/admin/orders/${order.id}`} className="w-full sm:w-auto">
+                    <Button size="sm" variant="ghost" className="w-full gap-1 sm:w-auto">
                       Open
                       <ArrowRight size={14} />
                     </Button>

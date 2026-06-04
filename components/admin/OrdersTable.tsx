@@ -39,8 +39,55 @@ export function OrdersTable({
   }
 
   return (
-    <div className={cn("overflow-x-auto", className)}>
-      <table className="w-full text-left text-sm">
+    <div className={className}>
+      <ul className="divide-y divide-green/10 md:hidden">
+        {orders.map((order) => {
+          const itemCount = order.items.reduce((s, i) => s + i.quantity, 0);
+          return (
+            <li key={order.id} className="admin-mobile-card">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <Link
+                    href={`/admin/orders/${order.id}`}
+                    className="font-serif text-lg text-green hover:text-terra"
+                  >
+                    {order.orderNumber}
+                  </Link>
+                  <p className="mt-1 text-sm text-text">
+                    {order.customer.firstName} {order.customer.lastName}
+                  </p>
+                  <p className="truncate text-xs text-muted">{order.customer.email}</p>
+                </div>
+                <Badge
+                  variant="status"
+                  className={cn(
+                    "shrink-0 capitalize",
+                    statusColors[order.status] ?? statusColors.PENDING
+                  )}
+                >
+                  {order.status.toLowerCase()}
+                </Badge>
+              </div>
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
+                <span>{formatDate(order.createdAt)}</span>
+                <span>
+                  {itemCount} {itemCount === 1 ? "item" : "items"} ·{" "}
+                  <span className="font-medium text-green">{formatPrice(order.total)}</span>
+                </span>
+              </div>
+              <Link
+                href={`/admin/orders/${order.id}`}
+                className="mt-3 inline-flex text-xs font-medium text-terra underline-offset-2 hover:underline"
+              >
+                View order →
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+
+      <div className="hidden overflow-x-auto md:block">
+      <table className="w-full min-w-[640px] text-left text-sm">
         <thead>
           <tr className="border-b border-green/10">
             {selectable && (
@@ -114,6 +161,7 @@ export function OrdersTable({
           })}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

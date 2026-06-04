@@ -86,7 +86,7 @@ export function AdminNotificationsPanel({
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="relative p-2 text-muted transition-colors hover:bg-cream hover:text-green"
+        className="admin-touch-target relative text-muted transition-colors hover:bg-cream hover:text-green"
         aria-label="Notifications"
         aria-expanded={open}
       >
@@ -99,7 +99,7 @@ export function AdminNotificationsPanel({
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-80 border border-green/10 bg-white shadow-xl">
+        <div className="fixed inset-x-3 top-[calc(4.5rem+env(safe-area-inset-top,0px))] z-50 max-h-[min(70dvh,420px)] overflow-hidden border border-green/10 bg-white shadow-xl sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-80 sm:max-h-none">
           <div className="border-b border-green/10 px-4 py-3">
             <p className="label-caps text-muted">Live Operations</p>
             {pendingDisplay != null && (

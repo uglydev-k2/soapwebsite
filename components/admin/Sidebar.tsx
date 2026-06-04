@@ -170,7 +170,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
     .filter((section) => section.items.length > 0);
 
   const sidebarContent = (
-    <aside className="admin-sidebar flex h-full w-[260px] shrink-0 flex-col">
+    <aside className="admin-sidebar flex h-full w-[min(280px,88vw)] max-w-[280px] shrink-0 flex-col sm:w-[260px]">
       <div className="border-b border-white/10 px-5 py-6">
         <Link href="/admin" className="block" onClick={onClose}>
           <p className="font-serif text-2xl leading-none text-cream">
@@ -284,7 +284,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
 
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 lg:hidden",
+          "fixed inset-y-0 left-0 z-50 w-[min(280px,88vw)] transform transition-transform duration-300 ease-out lg:hidden",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >

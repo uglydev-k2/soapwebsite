@@ -26,7 +26,8 @@ export function CustomerGrowthChart({
   data: { month: string; count: number }[];
 }) {
   return (
-    <ResponsiveContainer width="100%" height={280}>
+    <div className="h-[220px] w-full sm:h-[280px]">
+    <ResponsiveContainer width="100%" height="100%">
       <LineChart data={data}>
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(44,74,62,0.08)" />
         <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#6B5E52" }} />
@@ -41,6 +42,7 @@ export function CustomerGrowthChart({
         />
       </LineChart>
     </ResponsiveContainer>
+    </div>
   );
 }
 
@@ -50,7 +52,8 @@ export function RevenueBarChart({
   data: { month: string; revenue: number }[];
 }) {
   return (
-    <ResponsiveContainer width="100%" height={280}>
+    <div className="h-[220px] w-full sm:h-[280px]">
+    <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data}>
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(44,74,62,0.08)" />
         <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#6B5E52" }} />
@@ -65,5 +68,6 @@ export function RevenueBarChart({
         <Bar dataKey="revenue" fill="#B5552A" radius={[0, 0, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
+    </div>
   );
 }

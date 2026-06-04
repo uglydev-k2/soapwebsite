@@ -144,25 +144,25 @@ export function DashboardView({
       {permissions.viewCharts && (
         <>
           <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <div className="admin-card p-6 lg:col-span-2">
+            <div className="admin-card lg:col-span-2">
               <h2 className="label-caps mb-4 text-muted">
                 Customer Growth (12 mo)
               </h2>
               <CustomerGrowthChart data={data.customerGrowth} />
             </div>
-            <div className="admin-card p-6">
+            <div className="admin-card">
               <h2 className="label-caps mb-4 text-muted">Catalog by Category</h2>
               <CategoryDonut data={data.categoryBreakdown} />
             </div>
           </div>
 
           <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <div className="admin-card p-6 lg:col-span-2">
+            <div className="admin-card lg:col-span-2">
               <h2 className="label-caps mb-4 text-muted">Revenue by Month</h2>
               <RevenueBarChart data={data.revenueByMonth} />
             </div>
             {permissions.viewActivity && (
-              <div className="admin-card p-6">
+              <div className="admin-card">
                 <div className="mb-4 flex items-center justify-between">
                   <h2 className="label-caps text-muted">Recent Activity</h2>
                   <Link
@@ -186,7 +186,7 @@ export function DashboardView({
       )}
 
       {permissions.viewRecentOrders && (
-        <div className="admin-card p-6">
+        <div className="admin-card">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="label-caps text-muted">Recent Orders</h2>
             <Link

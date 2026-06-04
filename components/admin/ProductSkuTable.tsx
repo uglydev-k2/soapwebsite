@@ -47,7 +47,7 @@ export function ProductSkuTable({ skus, className }: ProductSkuTableProps) {
 
   return (
     <div className={cn("admin-card overflow-hidden", className)}>
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-green/10 px-6 py-4">
+      <div className="flex flex-col gap-3 border-b border-green/10 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div>
           <h3 className="label-caps text-muted">Product Performance by SKU</h3>
           <p className="mt-1 text-xs text-muted">
@@ -63,7 +63,40 @@ export function ProductSkuTable({ skus, className }: ProductSkuTableProps) {
         </button>
       </div>
 
-      <div className="overflow-x-auto">
+      <ul className="divide-y divide-green/10 md:hidden">
+        {skus.map((sku) => (
+          <li key={sku.productId} className="admin-mobile-card mx-0 border-0 border-b">
+            <Link
+              href={`/admin/products/${sku.productId}`}
+              className="font-serif text-base text-green hover:text-terra"
+            >
+              {sku.name}
+            </Link>
+            <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+              <div>
+                <span className="text-muted">Revenue</span>
+                <p className="font-medium text-green">{formatPrice(sku.revenue)}</p>
+              </div>
+              <div>
+                <span className="text-muted">Units sold</span>
+                <p className="font-medium text-green">{sku.unitsSold}</p>
+              </div>
+              <div>
+                <span className="text-muted">Stock</span>
+                <p className={cn("font-medium", sku.stock <= 10 ? "text-terra" : "text-green")}>
+                  {sku.stock}
+                </p>
+              </div>
+              <div>
+                <span className="text-muted">Orders</span>
+                <p className="font-medium text-green">{sku.orderCount}</p>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <div className="hidden overflow-x-auto md:block">
         <table className="w-full min-w-[720px] text-sm">
           <thead>
             <tr className="border-b border-green/10 bg-cream/40 text-left">

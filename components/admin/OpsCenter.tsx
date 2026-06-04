@@ -37,7 +37,7 @@ export function OpsCenter({
   ];
 
   return (
-    <div className="admin-card p-6">
+    <div className="admin-card">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="label-caps text-muted">Operations Center</h2>
         <Link href="/admin/orders" className="text-xs text-terra hover:text-green">
@@ -45,7 +45,7 @@ export function OpsCenter({
         </Link>
       </div>
 
-      <div className="mb-6 grid grid-cols-3 gap-3">
+      <div className="mb-6 grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
         {tiles.map((tile) => (
           <Link
             key={tile.label}
@@ -78,10 +78,12 @@ export function OpsCenter({
             <li key={alert.id}>
               <Link
                 href={alert.href}
-                className="flex items-center justify-between border border-green/10 bg-cream/50 px-4 py-3 text-sm transition-colors hover:bg-cream"
+                className="flex flex-col gap-1 border border-green/10 bg-cream/50 px-4 py-3 text-sm transition-colors hover:bg-cream sm:flex-row sm:items-center sm:justify-between"
               >
-                <span className="text-green">{alert.title}</span>
-                <span className="text-xs text-muted">{alert.description}</span>
+                <span className="font-medium text-green">{alert.title}</span>
+                <span className="text-xs text-muted sm:max-w-[50%] sm:text-right">
+                  {alert.description}
+                </span>
               </Link>
             </li>
           ))}

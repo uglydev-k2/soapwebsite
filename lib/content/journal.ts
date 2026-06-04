@@ -24,7 +24,7 @@ export const JOURNAL_POSTS: JournalPost[] = [
       "Layer texture intentionally: cleanse with a botanical wash or bar, pat dry without rubbing, then lock in moisture while skin is still dewy. This sequence takes under ten minutes but changes how the whole day feels.",
       "Keep your products visible. When your soap and lotion live within reach, consistency becomes effortless. Rotate scents seasonally so the ritual stays fresh without losing its structure.",
     ],
-    shopSlugs: ["citrus-bloom-bar-soap", "forest-cedar-body-wash", "warm-amber-body-lotion"],
+    shopSlugs: ["botanical-swirl-bar", "forest-cedar-body-wash", "warm-amber-body-lotion"],
   },
   {
     slug: "reading-ingredient-labels",
@@ -39,7 +39,7 @@ export const JOURNAL_POSTS: JournalPost[] = [
       "We avoid parabens, sulfates, and synthetic dyes. Instead we use plant-derived cleansers, nourishing oils, and essential-oil-based scent profiles composed like fine fragrance.",
       "Fragrance can appear as essential oils, natural isolates, or 'parfum.' We list key notes on every product page so you know whether you're reaching for calm lavender or grounding cedar.",
     ],
-    shopSlugs: ["warm-amber-body-lotion", "rosehip-renewal-bar-soap", "lavender-oat-sugar-scrub"],
+    shopSlugs: ["oat-honey-comfort-bar", "blush-rose-artisan-bar", "lavender-oat-sugar-scrub"],
   },
   {
     slug: "gift-rituals-that-feel-luxury",
@@ -54,7 +54,7 @@ export const JOURNAL_POSTS: JournalPost[] = [
       "Wrap with texture — kraft paper, dried botanicals, a handwritten note about why you chose this scent for them. The ritual begins before they open the box.",
       "For hosts and teachers, single hero products in seasonal scents feel personal without overwhelming. Add a sample vial so they can discover your favorite note.",
     ],
-    shopSlugs: ["full-ritual-gift-set", "citrus-bloom-bar-soap", "cedarwood-calm-roll-on"],
+    shopSlugs: ["full-ritual-gift-set", "blush-rose-artisan-bar", "cedarwood-calm-roll-on"],
   },
   {
     slug: "evening-wind-down",

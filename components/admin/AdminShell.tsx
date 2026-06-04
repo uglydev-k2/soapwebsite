@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Sidebar } from "@/components/admin/Sidebar";
 import { Topbar, type BreadcrumbItem } from "@/components/admin/Topbar";
@@ -30,6 +30,15 @@ export function AdminShell({
   const { open, openPalette, closePalette } = useCommandPalette();
   useAdminLiveUpdates(true);
 
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [sidebarOpen]);
+
   return (
     <div className="admin-shell min-h-screen bg-[#f4f1eb]">
       <Sidebar
@@ -46,7 +55,13 @@ export function AdminShell({
           onSearchOpen={openPalette}
         />
 
-        <main className={cn("flex-1 p-4 sm:p-6", className)}>
+        <main
+          className={cn(
+            "flex-1 p-4 pb-8 sm:p-6 sm:pb-10",
+            "max-w-full overflow-x-hidden",
+            className
+          )}
+        >
           <AdminSetupBanner />
           {children}
         </main>

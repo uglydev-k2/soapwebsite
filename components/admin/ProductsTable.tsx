@@ -94,8 +94,82 @@ export function ProductsTable({
   }
 
   return (
-    <div className={cn("overflow-x-auto", className)}>
-      <table className="w-full text-left text-sm">
+    <div className={className}>
+      <ul className="divide-y divide-green/10 md:hidden">
+        {sorted.map((product) => (
+          <li key={product.id} className="admin-mobile-card">
+            <div className="flex gap-3">
+              <div
+                className={cn(
+                  "relative h-14 w-14 shrink-0 overflow-hidden bg-gradient-to-br",
+                  getCategoryGradient(product.category)
+                )}
+              >
+                {product.images[0] ? (
+                  <Image
+                    src={product.images[0]}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                    sizes="56px"
+                  />
+                ) : (
+                  <span className="flex h-full items-center justify-center text-lg opacity-40">
+                    🧴
+                  </span>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-serif text-base text-green">{product.name}</p>
+                <p className="truncate text-xs text-muted">{product.slug}</p>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <Badge variant="default">
+                    {categoryLabels[product.category as Category]}
+                  </Badge>
+                  <span className="font-medium text-green">{formatPrice(product.price)}</span>
+                  <span
+                    className={cn(
+                      "text-sm font-medium",
+                      product.stock < 5
+                        ? "text-red-600"
+                        : product.stock <= 20
+                          ? "text-amber-700"
+                          : "text-green"
+                    )}
+                  >
+                    {product.stock} in stock
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="mt-3 flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                type="button"
+                className="flex-1"
+                onClick={() => onEdit?.(product)}
+              >
+                <Pencil size={14} className="mr-1" />
+                Edit
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                type="button"
+                className="flex-1 text-terra hover:border-terra"
+                onClick={() => onDelete?.(product)}
+              >
+                <Trash2 size={14} className="mr-1" />
+                Delete
+              </Button>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <div className={cn("hidden overflow-x-auto md:block")}>
+      <table className="w-full min-w-[720px] text-left text-sm">
         <thead>
           <tr className="border-b border-green/10">
             <th className="label-caps px-4 py-3 text-muted">Image</th>
@@ -208,6 +282,7 @@ export function ProductsTable({
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

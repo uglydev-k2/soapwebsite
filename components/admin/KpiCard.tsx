@@ -35,7 +35,9 @@ export function KpiCard({
           <Sparkline data={sparkline} className="opacity-80" />
         )}
       </div>
-      <p className="mt-3 font-serif text-4xl font-semibold text-green">{value}</p>
+      <p className="mt-3 font-serif text-3xl font-semibold text-green sm:text-4xl">
+        {value}
+      </p>
       {change && (
         <span
           className={cn(

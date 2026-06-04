@@ -38,6 +38,15 @@ export default function CategorySection() {
                   <InteractiveMedia
                     className={`aspect-[4/3] bg-gradient-to-br ${getCategoryGradient(category.value)}`}
                   >
+                    {category.image ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={category.image}
+                        alt=""
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                      />
+                    ) : null}
                     <span className="sr-only">{category.label}</span>
                   </InteractiveMedia>
                   <div className="p-5 sm:p-6">
