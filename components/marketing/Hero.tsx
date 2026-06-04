@@ -110,7 +110,7 @@ export default function Hero() {
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover object-center"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-green-3/40 via-transparent to-black/5" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
           </motion.div>
 
           <motion.div
