@@ -25,6 +25,14 @@ export function ProductForm({ product, className }: ProductFormProps) {
   const addToast = useToastStore((s) => s.addToast);
   const [saving, setSaving] = useState(false);
   const [slugManual, setSlugManual] = useState(!!product);
+  const [uploadConfigured, setUploadConfigured] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/upload-status")
+      .then((r) => r.json())
+      .then((json) => setUploadConfigured(json.data?.configured === true))
+      .catch(() => setUploadConfigured(false));
+  }, []);
 
   const {
     register,
@@ -237,26 +245,64 @@ export function ProductForm({ product, className }: ProductFormProps) {
               ))}
             </div>
           )}
-          <UploadButton
-            endpoint="productImage"
-            onClientUploadComplete={(res) => {
-              const urls = res.map((f) => f.url);
-              setValue("images", [...images, ...urls]);
-              addToast("Image uploaded");
-            }}
-            onUploadError={(error) => {
-              addToast(error.message, "error");
-            }}
-            appearance={{
-              button:
-                "w-full border border-green/20 bg-cream px-4 py-2 text-sm text-green transition-colors hover:border-green ut-ready:bg-cream",
-              allowedContent: "text-xs text-muted",
-            }}
-            content={{
-              button: "Upload Image",
-              allowedContent: "Max 4MB, up to 6 images",
-            }}
-          />
+          {uploadConfigured === false && (
+            <p className="rounded border border-gold/30 bg-gold/5 px-3 py-2 text-xs text-muted">
+              Image uploads are not configured on this server. Add{" "}
+              <code className="text-green">UPLOADTHING_SECRET</code> and{" "}
+              <code className="text-green">UPLOADTHING_APP_ID</code> (or{" "}
+              <code className="text-green">UPLOADTHING_TOKEN</code>) in Vercel, then
+              redeploy. You can still paste image URLs manually below.
+            </p>
+          )}
+          {uploadConfigured !== false && (
+            <UploadButton
+              endpoint="productImage"
+              onClientUploadComplete={(res) => {
+                const urls = res.map((f) => f.url);
+                setValue("images", [...images, ...urls]);
+                addToast("Image uploaded");
+              }}
+              onUploadError={(error) => {
+                addToast(error.message, "error");
+              }}
+              appearance={{
+                button:
+                  "w-full border border-green/20 bg-cream px-4 py-2 text-sm text-green transition-colors hover:border-green ut-ready:bg-cream",
+                allowedContent: "text-xs text-muted",
+              }}
+              content={{
+                button: "Upload Image",
+                allowedContent: "Max 4MB, up to 5 images",
+              }}
+            />
+          )}
+          <div>
+            <label className="label-caps mb-2 block text-muted">Image URL</label>
+            <div className="flex gap-2">
+              <input
+                type="url"
+                placeholder="https://… or /images/products/…"
+                className="admin-input min-w-0 flex-1"
+                id="manual-image-url"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  const input = document.getElementById(
+                    "manual-image-url"
+                  ) as HTMLInputElement | null;
+                  const url = input?.value.trim();
+                  if (!url) return;
+                  setValue("images", [...images, url]);
+                  if (input) input.value = "";
+                  addToast("Image URL added");
+                }}
+              >
+                Add
+              </Button>
+            </div>
+          </div>
           {errors.images && (
             <p className="text-xs text-terra">{errors.images.message}</p>
           )}

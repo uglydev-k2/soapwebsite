@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Push required env vars from .env.local to Vercel via API.
+ * Push env vars from .env.local to Vercel via API.
  * Requires VERCEL_TOKEN (or reads local Vercel CLI auth.json).
  */
 import { readFileSync, existsSync } from "node:fs";
@@ -10,7 +10,7 @@ import { join } from "node:path";
 const TEAM_ID = process.env.VERCEL_TEAM_ID ?? "team_o5SfD9J7DXBQHEAbO5MMahF0";
 const PROJECT_ID = process.env.VERCEL_PROJECT_ID ?? "prj_JnVlKIC313nE3Swh54UVTPyoxRAF";
 
-const KEYS = [
+const REQUIRED_KEYS = [
   "DATABASE_URL",
   "DIRECT_URL",
   "AUTH_SECRET",
@@ -20,6 +20,24 @@ const KEYS = [
   "NEXT_PUBLIC_SUPABASE_ANON_KEY",
   "SUPABASE_SERVICE_ROLE_KEY",
 ];
+
+/** Pushed when present in .env.local */
+const OPTIONAL_KEYS = [
+  "UPLOADTHING_SECRET",
+  "UPLOADTHING_APP_ID",
+  "UPLOADTHING_TOKEN",
+  "STRIPE_SECRET_KEY",
+  "STRIPE_WEBHOOK_SECRET",
+  "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY",
+  "RESEND_API_KEY",
+  "RESEND_FROM_EMAIL",
+  "VAPID_PUBLIC_KEY",
+  "VAPID_PRIVATE_KEY",
+  "VAPID_SUBJECT",
+  "NEXT_PUBLIC_VAPID_PUBLIC_KEY",
+];
+
+const KEYS = [...REQUIRED_KEYS, ...OPTIONAL_KEYS];
 
 const TARGETS = ["production", "preview", "development"];
 
@@ -86,7 +104,8 @@ const { envs = [] } = await api(`/v9/projects/${PROJECT_ID}/env`);
 for (const key of KEYS) {
   const value = local[key];
   if (!value) {
-    console.log(`Skip ${key} (not in .env.local)`);
+    const optional = OPTIONAL_KEYS.includes(key);
+    console.log(`Skip ${key} (not in .env.local${optional ? ", optional" : ""})`);
     continue;
   }
 
@@ -107,6 +126,15 @@ for (const key of KEYS) {
   });
   console.log(`Added ${key} → ${TARGETS.join(", ")}`);
 }
+
+const uploadReady =
+  Boolean(local.UPLOADTHING_TOKEN) ||
+  (Boolean(local.UPLOADTHING_SECRET) && Boolean(local.UPLOADTHING_APP_ID));
+console.log(
+  uploadReady
+    ? "\nUploadThing: keys found in .env.local — product image uploads should work after deploy."
+    : "\nUploadThing: not in .env.local. Create an app at https://uploadthing.com and add UPLOADTHING_SECRET + UPLOADTHING_APP_ID (or UPLOADTHING_TOKEN), then re-run npm run env:push-vercel."
+);
 
 console.log("\nTriggering production redeploy…");
 const deploy = await api(`/v13/deployments`, {

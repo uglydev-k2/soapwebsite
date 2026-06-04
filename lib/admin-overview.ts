@@ -6,6 +6,7 @@ import {
   OPTIONAL_ENV,
 } from "@/lib/env";
 import { isPushConfigured } from "@/lib/push-notifications";
+import { isUploadThingConfigured } from "@/lib/uploadthing-env";
 
 export type AdminAlert = {
   id: string;
@@ -108,10 +109,7 @@ function buildServiceHealth(missingRequired: string[]): ServiceHealth[] {
   const dbOk = isDatabaseConfigured();
   const stripeOk = Boolean(process.env.STRIPE_SECRET_KEY?.trim());
   const resendOk = Boolean(process.env.RESEND_API_KEY?.trim());
-  const uploadOk = Boolean(
-    process.env.UPLOADTHING_SECRET?.trim() &&
-      process.env.UPLOADTHING_APP_ID?.trim()
-  );
+  const uploadOk = isUploadThingConfigured();
   const pushOk = isPushConfigured();
 
   const optionalMissing = OPTIONAL_ENV.filter(

@@ -30,12 +30,39 @@ const required = [
   "SUPABASE_SERVICE_ROLE_KEY",
 ];
 
-console.log("\nVercel Environment Variables checklist\n");
-for (const key of required) {
+const optional = [
+  "UPLOADTHING_SECRET",
+  "UPLOADTHING_APP_ID",
+  "UPLOADTHING_TOKEN",
+  "STRIPE_SECRET_KEY",
+  "STRIPE_WEBHOOK_SECRET",
+  "RESEND_API_KEY",
+];
+
+function status(key) {
   const v = vars[key] ?? "";
-  const status = v.length > 5 ? "✓ ready to paste" : "✗ missing in .env.local";
-  console.log(`  ${key}: ${status}`);
+  return v.length > 5 ? "✓ ready to paste" : "✗ missing in .env.local";
 }
-console.log("\n→ Vercel Dashboard → Project → Settings → Environment Variables");
-console.log("→ Add each value from .env.local (Production + Preview)");
+
+console.log("\nVercel Environment Variables checklist\n");
+console.log("Required:");
+for (const key of required) {
+  console.log(`  ${key}: ${status(key)}`);
+}
+console.log("\nOptional (enables extra features):");
+for (const key of optional) {
+  console.log(`  ${key}: ${status(key)}`);
+}
+
+const uploadReady =
+  (vars.UPLOADTHING_TOKEN?.length > 5) ||
+  (vars.UPLOADTHING_SECRET?.length > 5 && vars.UPLOADTHING_APP_ID?.length > 2);
+console.log(
+  uploadReady
+    ? "\nProduct image uploads: configured locally — run npm run env:push-vercel to sync."
+    : "\nProduct image uploads: add UploadThing keys from https://uploadthing.com/dashboard"
+);
+
+console.log("\n→ Or: npm run env:push-vercel");
+console.log("→ Vercel Dashboard → Project → Settings → Environment Variables");
 console.log("→ Deployments → Redeploy\n");
