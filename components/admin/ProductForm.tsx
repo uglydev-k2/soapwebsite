@@ -247,11 +247,18 @@ export function ProductForm({ product, className }: ProductFormProps) {
           )}
           {uploadConfigured === false && (
             <p className="rounded border border-gold/30 bg-gold/5 px-3 py-2 text-xs text-muted">
-              Image uploads are not configured on this server. Add{" "}
-              <code className="text-green">UPLOADTHING_SECRET</code> and{" "}
-              <code className="text-green">UPLOADTHING_APP_ID</code> (or{" "}
-              <code className="text-green">UPLOADTHING_TOKEN</code>) in Vercel, then
-              redeploy. You can still paste image URLs manually below.
+              Image uploads are not configured. Add{" "}
+              <code className="text-green">UPLOADTHING_TOKEN</code> from{" "}
+              <a
+                href="https://uploadthing.com/dashboard"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-terra underline"
+              >
+                uploadthing.com/dashboard
+              </a>{" "}
+              (API Keys → V7) to Vercel, then redeploy. You can still add image URLs
+              manually below.
             </p>
           )}
           {uploadConfigured !== false && (

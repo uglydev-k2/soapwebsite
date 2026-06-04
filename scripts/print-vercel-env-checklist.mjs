@@ -31,8 +31,6 @@ const required = [
 ];
 
 const optional = [
-  "UPLOADTHING_SECRET",
-  "UPLOADTHING_APP_ID",
   "UPLOADTHING_TOKEN",
   "STRIPE_SECRET_KEY",
   "STRIPE_WEBHOOK_SECRET",
@@ -54,9 +52,7 @@ for (const key of optional) {
   console.log(`  ${key}: ${status(key)}`);
 }
 
-const uploadReady =
-  (vars.UPLOADTHING_TOKEN?.length > 5) ||
-  (vars.UPLOADTHING_SECRET?.length > 5 && vars.UPLOADTHING_APP_ID?.length > 2);
+const uploadReady = vars.UPLOADTHING_TOKEN?.length > 20;
 console.log(
   uploadReady
     ? "\nProduct image uploads: configured locally — run npm run env:push-vercel to sync."

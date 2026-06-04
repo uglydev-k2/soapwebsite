@@ -127,13 +127,11 @@ for (const key of KEYS) {
   console.log(`Added ${key} → ${TARGETS.join(", ")}`);
 }
 
-const uploadReady =
-  Boolean(local.UPLOADTHING_TOKEN) ||
-  (Boolean(local.UPLOADTHING_SECRET) && Boolean(local.UPLOADTHING_APP_ID));
+const uploadReady = Boolean(local.UPLOADTHING_TOKEN?.trim());
 console.log(
   uploadReady
-    ? "\nUploadThing: keys found in .env.local — product image uploads should work after deploy."
-    : "\nUploadThing: not in .env.local. Create an app at https://uploadthing.com and add UPLOADTHING_SECRET + UPLOADTHING_APP_ID (or UPLOADTHING_TOKEN), then re-run npm run env:push-vercel."
+    ? "\nUploadThing: UPLOADTHING_TOKEN found — product image uploads should work after deploy."
+    : "\nUploadThing: add UPLOADTHING_TOKEN to .env.local (see npm run setup:uploadthing), then re-run npm run env:push-vercel."
 );
 
 console.log("\nTriggering production redeploy…");
