@@ -11,7 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 import { EASE_OUT, fadeUp, staggerContainer } from "@/lib/motion";
 
-const HERO_IMAGE = "/images/hero-soaps.jpg";
+const HERO_IMAGE = "/images/hero-soaps.jpg?v=2";
 
 const headlineWords = [
   { text: "Where", accent: false },
@@ -109,7 +109,7 @@ export default function Hero() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={HERO_IMAGE}
-              alt="Handcrafted soap bars in pink, marbled botanical, and natural tones"
+              alt="Luxury handcrafted soap bars styled on marble with botanical accents"
               className="absolute inset-0 h-full w-full object-cover object-center"
               fetchPriority="high"
               decoding="async"
