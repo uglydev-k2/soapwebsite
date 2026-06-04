@@ -13,6 +13,7 @@ import {
 } from "@/lib/checkout";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { isUsCountry } from "@/lib/shipping";
 
 export const POST = withApiHandler("checkout.create", async (request: NextRequest) => {
   if (!process.env.STRIPE_SECRET_KEY) {
@@ -34,6 +35,10 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
     parsed.data.items
   );
   if (cartError) return errorResponse(cartError);
+
+  if (!isUsCountry(parsed.data.country)) {
+    return errorResponse("We only ship to addresses within the United States");
+  }
 
   const subtotal = validatedItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -116,7 +121,7 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
     customer_email: parsed.data.email,
     line_items: lineItems,
     shipping_address_collection: {
-      allowed_countries: ["GH", "US", "GB", "NG", "CA"],
+      allowed_countries: ["US"],
     },
     success_url: `${siteUrl}/order/confirmation?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${siteUrl}/checkout?cancelled=true`,

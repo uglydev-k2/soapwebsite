@@ -12,7 +12,7 @@ export const FAQ_ITEMS = [
   {
     question: "Do you offer free shipping?",
     answer:
-      "Orders over $75 qualify for free standard shipping within the continental United States. A flat rate applies to smaller orders.",
+      "Orders over $60 qualify for free standard shipping within the continental United States. A flat $8 rate applies to smaller orders.",
   },
   {
     question: "Can I return or exchange a product?",
@@ -27,7 +27,7 @@ export const FAQ_ITEMS = [
   {
     question: "Do you ship internationally?",
     answer:
-      "We currently ship within the United States. International shipping is coming soon — join our newsletter to be notified.",
+      "No. We ship to United States addresses only, including Alaska, Hawaii, and U.S. territories where carriers deliver.",
   },
 ] as const;
 
@@ -38,7 +38,7 @@ export const SHIPPING_SECTIONS = [
   },
   {
     title: "Rates",
-    body: "Standard shipping is $8 flat rate. Orders over $75 ship free. Expedited options may be available at checkout when offered.",
+    body: "Standard shipping is $8 flat rate. Orders over $60 ship free within the continental United States.",
   },
   {
     title: "Returns",

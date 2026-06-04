@@ -144,9 +144,12 @@ export const checkoutFormSchema = z.object({
   line1: z.string().min(1, "Address is required"),
   line2: z.string().optional(),
   city: z.string().min(1, "City is required"),
-  state: z.string().min(1, "State / region is required"),
-  postalCode: z.string().min(1, "Postal code is required"),
-  country: z.string().min(2, "Country is required"),
+  state: z.string().min(2, "State is required"),
+  postalCode: z
+    .string()
+    .min(5, "ZIP code is required")
+    .max(10, "Enter a valid US ZIP code"),
+  country: z.literal("United States"),
 });
 
 export const checkoutSchema = checkoutFormSchema.extend({

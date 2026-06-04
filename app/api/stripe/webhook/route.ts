@@ -17,7 +17,7 @@ function parseShippingAddress(raw: string | undefined): ShippingAddress {
       city: "",
       state: "",
       postalCode: "",
-      country: "Ghana",
+      country: "United States",
     };
   }
   try {
@@ -28,7 +28,7 @@ function parseShippingAddress(raw: string | undefined): ShippingAddress {
       city: "",
       state: "",
       postalCode: "",
-      country: "Ghana",
+      country: "United States",
     };
   }
 }

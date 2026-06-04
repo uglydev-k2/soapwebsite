@@ -13,10 +13,12 @@ import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { formatPrice } from "@/lib/utils";
 import { AuthSpinner } from "@/components/auth/AuthSpinner";
-
-const TAX_RATE = 0.08;
-const FLAT_SHIPPING = 8;
-const FREE_SHIPPING_THRESHOLD = 75;
+import {
+  calculateCartTotals,
+  FREE_SHIPPING_THRESHOLD,
+  US_COUNTRY,
+  US_STATES,
+} from "@/lib/shipping";
 
 export default function CheckoutPageClient() {
   const router = useRouter();
@@ -41,17 +43,7 @@ export default function CheckoutPageClient() {
       .catch(() => {});
   }, []);
 
-  const totals = useMemo(() => {
-    const sub = subtotal();
-    const shipping = sub >= FREE_SHIPPING_THRESHOLD ? 0 : FLAT_SHIPPING;
-    const tax = Math.round(sub * TAX_RATE * 100) / 100;
-    return {
-      subtotal: sub,
-      shipping,
-      tax,
-      total: Math.round((sub + shipping + tax) * 100) / 100,
-    };
-  }, [subtotal]);
+  const totals = useMemo(() => calculateCartTotals(subtotal()), [subtotal]);
 
   const {
     register,
@@ -61,7 +53,8 @@ export default function CheckoutPageClient() {
   } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutFormSchema),
     defaultValues: {
-      country: "Ghana",
+      country: US_COUNTRY,
+      state: "",
     },
   });
 
@@ -171,7 +164,11 @@ export default function CheckoutPageClient() {
             </div>
 
             <div className="card-border bg-white p-6">
-              <h2 className="font-serif text-2xl text-green mb-6">Shipping Address</h2>
+              <h2 className="font-serif text-2xl text-green mb-2">Shipping Address</h2>
+              <p className="mb-6 text-sm text-muted">
+                United States only · Free shipping on orders {formatPrice(FREE_SHIPPING_THRESHOLD)}+
+              </p>
+              <input type="hidden" {...register("country")} />
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
                   <Input
@@ -195,36 +192,39 @@ export default function CheckoutPageClient() {
                   error={errors.city?.message}
                   {...register("city")}
                 />
+                <div>
+                  <Label htmlFor="state" className="mb-2 block">
+                    State
+                  </Label>
+                  <select
+                    id="state"
+                    className="admin-input w-full"
+                    defaultValue=""
+                    {...register("state")}
+                  >
+                    <option value="" disabled>
+                      Select state
+                    </option>
+                    {US_STATES.map((s) => (
+                      <option key={s.code} value={s.code}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.state && (
+                    <p className="mt-1 text-sm text-terra">{errors.state.message}</p>
+                  )}
+                </div>
                 <Input
-                  label="State / Region"
-                  variant="marketing"
-                  error={errors.state?.message}
-                  {...register("state")}
-                />
-                <Input
-                  label="Postal code"
+                  label="ZIP code"
                   variant="marketing"
                   error={errors.postalCode?.message}
                   {...register("postalCode")}
                 />
-                <div>
-                  <Label htmlFor="country" className="mb-2 block">
-                    Country
-                  </Label>
-                  <select
-                    id="country"
-                    className="admin-input w-full"
-                    {...register("country")}
-                  >
-                    <option value="Ghana">Ghana</option>
-                    <option value="Nigeria">Nigeria</option>
-                    <option value="United States">United States</option>
-                    <option value="United Kingdom">United Kingdom</option>
-                    <option value="Canada">Canada</option>
-                  </select>
-                  {errors.country && (
-                    <p className="mt-1 text-sm text-terra">{errors.country.message}</p>
-                  )}
+                <div className="sm:col-span-2">
+                  <p className="text-sm text-muted">
+                    Country: <span className="text-green">{US_COUNTRY}</span>
+                  </p>
                 </div>
               </div>
             </div>
@@ -267,7 +267,7 @@ export default function CheckoutPageClient() {
               {loading ? "Redirecting…" : "Pay with Stripe"}
             </Button>
             <p className="mt-3 text-xs text-muted text-center">
-              Secure payment via Stripe. Paystack support coming soon for Ghana.
+              Secure payment via Stripe. Orders ship to U.S. addresses only.
             </p>
           </div>
         </form>
