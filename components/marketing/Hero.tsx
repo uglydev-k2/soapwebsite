@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import {
@@ -9,7 +10,6 @@ import {
   useTransform,
 } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { BotanicalParticles } from "@/components/motion/BotanicalParticles";
 import { EASE_OUT, fadeUp, staggerContainer } from "@/lib/motion";
 
 const headlineWords = [
@@ -99,51 +99,18 @@ export default function Hero() {
 
         <div className="relative">
           <motion.div
-            className="relative aspect-[4/5] overflow-hidden bg-green lg:aspect-square"
+            className="relative aspect-[4/5] overflow-hidden bg-green-3 lg:aspect-square"
             style={{ y: panelY, scale: panelScale }}
           >
-            <BotanicalParticles />
-            <svg
-              viewBox="0 0 400 400"
-              className="absolute inset-0 h-full w-full"
-              aria-hidden
-            >
-              <path
-                d="M200 380 C200 380 80 280 80 180 C80 100 130 40 200 40 C270 40 320 100 320 180 C320 280 200 380 200 380Z"
-                fill="none"
-                stroke="rgba(201,169,110,0.35)"
-                strokeWidth="1"
-                className="animate-draw-stroke"
-                style={{ strokeDasharray: 800, strokeDashoffset: 800 }}
-              />
-              <path
-                d="M200 340 C200 340 120 260 120 180 C120 120 155 80 200 80 C245 80 280 120 280 180 C280 260 200 340 200 340Z"
-                fill="none"
-                stroke="rgba(201,169,110,0.22)"
-                strokeWidth="1"
-                className="animate-draw-stroke"
-                style={{
-                  strokeDasharray: 600,
-                  strokeDashoffset: 600,
-                  animationDelay: "0.4s",
-                }}
-              />
-              <path
-                d="M200 60 L200 320 M160 140 Q200 100 240 140 M150 200 Q200 160 250 200 M155 260 Q200 220 245 260"
-                fill="none"
-                stroke="rgba(247,243,237,0.28)"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                className="animate-draw-stroke"
-                style={{
-                  strokeDasharray: 500,
-                  strokeDashoffset: 500,
-                  animationDelay: "0.8s",
-                }}
-              />
-              <circle cx="200" cy="180" r="5" fill="rgba(201,169,110,0.55)" />
-            </svg>
-            <div className="absolute inset-0 bg-gradient-to-t from-green-3/50 via-transparent to-green-3/10" />
+            <Image
+              src="/images/hero-collection-soaps.jpg"
+              alt="Handcrafted soap bars in pink, layered botanical, and natural tones on a steel work surface"
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-green-3/40 via-transparent to-black/5" />
           </motion.div>
 
           <motion.div
