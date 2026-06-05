@@ -1,27 +1,33 @@
 "use client";
 
 import Image from "next/image";
-import { ImageIcon, X } from "lucide-react";
-import { UploadDropzone } from "@/lib/uploadthing";
+import { useCallback, useRef, useState } from "react";
+import { ImageIcon, Loader2, Upload, X } from "lucide-react";
+import {
+  MAX_PRODUCT_IMAGES,
+  uploadProductImage,
+} from "@/lib/supabase/product-images";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { useToastStore } from "@/store/toastStore";
 import { cn } from "@/lib/utils";
-
-export const MAX_PRODUCT_IMAGES = 4;
 
 interface ProductImageUploaderProps {
   images: string[];
   onChange: (images: string[]) => void;
-  uploadReady: boolean;
   className?: string;
 }
 
 export function ProductImageUploader({
   images,
   onChange,
-  uploadReady,
   className,
 }: ProductImageUploaderProps) {
   const addToast = useToastStore((s) => s.addToast);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const storageReady = isSupabaseConfigured();
   const atMax = images.length >= MAX_PRODUCT_IMAGES;
   const remaining = MAX_PRODUCT_IMAGES - images.length;
 
@@ -29,13 +35,56 @@ export function ProductImageUploader({
     onChange(images.filter((_, i) => i !== index));
   };
 
-  const appendUrls = (urls: string[]) => {
-    if (!urls.length) return;
-    const merged = [...images, ...urls].slice(0, MAX_PRODUCT_IMAGES);
-    onChange(merged);
-    addToast(
-      urls.length === 1 ? "Image uploaded" : `${urls.length} images uploaded`
-    );
+  const uploadFiles = useCallback(
+    async (fileList: FileList | File[]) => {
+      if (!storageReady) {
+        addToast("Supabase Storage is not configured", "error");
+        return;
+      }
+      if (atMax) {
+        addToast(`Maximum of ${MAX_PRODUCT_IMAGES} images reached`, "error");
+        return;
+      }
+
+      const files = Array.from(fileList).slice(0, remaining);
+      if (!files.length) return;
+
+      setUploading(true);
+      const uploaded: string[] = [];
+
+      try {
+        for (const file of files) {
+          try {
+            const publicUrl = await uploadProductImage(file);
+            uploaded.push(publicUrl);
+          } catch (err) {
+            const message =
+              err instanceof Error ? err.message : "Upload failed";
+            addToast(`${file.name}: ${message}`, "error");
+          }
+        }
+
+        if (uploaded.length) {
+          onChange([...images, ...uploaded].slice(0, MAX_PRODUCT_IMAGES));
+          addToast(
+            uploaded.length === 1
+              ? "Image uploaded"
+              : `${uploaded.length} images uploaded`
+          );
+        }
+      } finally {
+        setUploading(false);
+        if (inputRef.current) inputRef.current.value = "";
+      }
+    },
+    [addToast, atMax, images, onChange, remaining, storageReady]
+  );
+
+  const onDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(false);
+    if (uploading || atMax) return;
+    void uploadFiles(event.dataTransfer.files);
   };
 
   return (
@@ -69,51 +118,84 @@ export function ProductImageUploader({
 
       <p className="text-xs text-muted">
         {images.length} / {MAX_PRODUCT_IMAGES} images
-        {images.length > 0 ? " — saved when you create or update the product" : ""}
+        {images.length > 0
+          ? " — saved to the product when you submit the form"
+          : ""}
       </p>
 
-      {uploadReady && !atMax && (
-        <UploadDropzone
-          endpoint="productImage"
-          onBeforeUploadBegin={(files) => files.slice(0, remaining)}
-          onClientUploadComplete={(res) => {
-            appendUrls(res.map((f) => f.url));
-          }}
-          onUploadError={(error) => {
-            addToast(error.message, "error");
-          }}
-          appearance={{
-            container:
-              "border-2 border-dashed border-green/20 bg-cream/50 ut-uploading:bg-cream",
-            uploadIcon: "text-green/40",
-            label: "text-sm text-green font-medium",
-            allowedContent: "text-xs text-muted",
-            button:
-              "bg-terra text-white text-xs label-caps px-4 py-2 ut-ready:bg-terra ut-uploading:opacity-70",
-          }}
-          content={{
-            label: "Drag & drop product photos here",
-            allowedContent: `Up to ${remaining} more · 4MB max each · JPG, PNG, WebP`,
-            button: remaining > 1 ? "Choose files" : "Choose file",
-          }}
-        />
-      )}
-
-      {uploadReady && atMax && (
-        <p className="text-xs text-muted">
-          Maximum of {MAX_PRODUCT_IMAGES} images reached. Remove one to upload
-          another.
+      {!storageReady && (
+        <p className="rounded border border-gold/30 bg-gold/5 px-3 py-2 text-xs text-muted">
+          Set <code className="text-green">NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
+          <code className="text-green">NEXT_PUBLIC_SUPABASE_ANON_KEY</code>, and
+          create a public <code className="text-green">products</code> bucket in
+          Supabase Storage.
         </p>
       )}
 
-      {!uploadReady && (
-        <div className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-green/15 bg-cream/30 px-4 py-10 text-center">
-          <ImageIcon className="h-8 w-8 text-green/30" />
-          <p className="text-sm text-muted">
-            Drag-and-drop uploads unavailable until{" "}
-            <code className="text-green">UPLOADTHING_TOKEN</code> is set on the
-            server.
-          </p>
+      {storageReady && !atMax && (
+        <div
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              inputRef.current?.click();
+            }
+          }}
+          onDragEnter={(e) => {
+            e.preventDefault();
+            if (!uploading) setIsDragging(true);
+          }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            if (!uploading) setIsDragging(true);
+          }}
+          onDragLeave={(e) => {
+            e.preventDefault();
+            setIsDragging(false);
+          }}
+          onDrop={onDrop}
+          onClick={() => !uploading && inputRef.current?.click()}
+          className={cn(
+            "flex cursor-pointer flex-col items-center justify-center gap-3 border-2 border-dashed px-4 py-10 text-center transition-colors",
+            isDragging
+              ? "border-terra bg-terra/5"
+              : "border-green/20 bg-cream/50 hover:border-green/40",
+            uploading && "pointer-events-none opacity-70"
+          )}
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple={remaining > 1}
+            className="sr-only"
+            onChange={(e) => {
+              if (e.target.files?.length) void uploadFiles(e.target.files);
+            }}
+          />
+          {uploading ? (
+            <Loader2 className="h-8 w-8 animate-spin text-terra" />
+          ) : (
+            <Upload className="h-8 w-8 text-green/40" />
+          )}
+          <div>
+            <p className="text-sm font-medium text-green">
+              {uploading ? "Uploading…" : "Drag & drop product photos here"}
+            </p>
+            <p className="mt-1 text-xs text-muted">
+              or click to browse · JPG, PNG, WebP · up to {remaining} more · 5MB
+              each
+            </p>
+          </div>
+        </div>
+      )}
+
+      {storageReady && atMax && (
+        <div className="flex items-center gap-2 border border-green/10 bg-cream/30 px-4 py-3 text-xs text-muted">
+          <ImageIcon className="h-4 w-4 shrink-0 text-green/50" />
+          Maximum of {MAX_PRODUCT_IMAGES} images reached. Remove one to upload
+          another.
         </div>
       )}
     </div>

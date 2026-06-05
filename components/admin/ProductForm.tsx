@@ -23,19 +23,6 @@ export function ProductForm({ product, className }: ProductFormProps) {
   const addToast = useToastStore((s) => s.addToast);
   const [saving, setSaving] = useState(false);
   const [slugManual, setSlugManual] = useState(!!product);
-  const [uploadConfigured, setUploadConfigured] = useState<boolean | null>(null);
-  const [uploadTokenLength, setUploadTokenLength] = useState(0);
-
-  useEffect(() => {
-    fetch("/api/admin/upload-status", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((json) => {
-        setUploadConfigured(json.data?.configured === true);
-        setUploadTokenLength(json.data?.tokenLength ?? 0);
-      })
-      .catch(() => setUploadConfigured(false));
-  }, []);
-
   const {
     register,
     handleSubmit,
@@ -217,34 +204,9 @@ export function ProductForm({ product, className }: ProductFormProps) {
       <div className="space-y-6">
         <div className="admin-card space-y-4">
           <h2 className="font-serif text-xl font-semibold text-green">Images</h2>
-          {uploadConfigured === false && (
-            <p className="rounded border border-gold/30 bg-gold/5 px-3 py-2 text-xs text-muted">
-              {uploadTokenLength === 0 ? (
-                <>
-                  <code className="text-green">UPLOADTHING_TOKEN</code> is not on this
-                  server yet. Add it in Vercel → <strong>mzveesoaps</strong> →
-                  Environment Variables, then redeploy Production.
-                </>
-              ) : (
-                <>
-                  Upload token looks invalid — re-copy from UploadThing → API Keys →
-                  V7.
-                </>
-              )}{" "}
-              <a
-                href="https://uploadthing.com/dashboard"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-terra underline"
-              >
-                uploadthing.com/dashboard
-              </a>
-            </p>
-          )}
           <ProductImageUploader
             images={images}
             onChange={(next) => setValue("images", next, { shouldValidate: true })}
-            uploadReady={uploadConfigured === true}
           />
           {errors.images && (
             <p className="text-xs text-terra">{errors.images.message}</p>

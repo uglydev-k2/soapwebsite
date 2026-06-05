@@ -6,7 +6,7 @@ import {
   OPTIONAL_ENV,
 } from "@/lib/env";
 import { isPushConfigured } from "@/lib/push-notifications";
-import { isUploadThingConfigured } from "@/lib/uploadthing-env";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 export type AdminAlert = {
   id: string;
@@ -109,7 +109,7 @@ function buildServiceHealth(missingRequired: string[]): ServiceHealth[] {
   const dbOk = isDatabaseConfigured();
   const stripeOk = Boolean(process.env.STRIPE_SECRET_KEY?.trim());
   const resendOk = Boolean(process.env.RESEND_API_KEY?.trim());
-  const uploadOk = isUploadThingConfigured();
+  const uploadOk = isSupabaseConfigured();
   const pushOk = isPushConfigured();
 
   const optionalMissing = OPTIONAL_ENV.filter(
@@ -150,8 +150,8 @@ function buildServiceHealth(missingRequired: string[]): ServiceHealth[] {
       label: "Media Uploads",
       status: uploadOk ? "ok" : "degraded",
       detail: uploadOk
-        ? "UploadThing configured"
-        : "Product image uploads unavailable",
+        ? "Supabase Storage (products bucket)"
+        : "Supabase env vars not set",
     },
     {
       id: "push",
