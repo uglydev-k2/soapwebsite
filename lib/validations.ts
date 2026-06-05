@@ -15,7 +15,10 @@ export const productSchema = z.object({
     "GIFT_SET",
   ]),
   stock: z.coerce.number().int().min(0),
-  images: z.array(z.string()).default([]),
+  images: z
+    .array(z.union([z.string().url(), z.string().startsWith("/")]))
+    .max(4)
+    .default([]),
   ingredients: z.string().optional().nullable(),
   fragrance: z.string().optional().nullable(),
   featured: z.boolean().default(false),

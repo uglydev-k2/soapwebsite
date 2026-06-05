@@ -1,13 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { X } from "lucide-react";
 import type { Product } from "@prisma/client";
-import { UploadButton } from "@/lib/uploadthing";
+import { ProductImageUploader } from "@/components/admin/ProductImageUploader";
 import { productSchema, type ProductFormData } from "@/lib/validations";
 import { cn, slugify } from "@/lib/utils";
 import { PRODUCT_CATEGORIES } from "@/lib/categories";
@@ -111,13 +109,6 @@ export function ProductForm({ product, className }: ProductFormProps) {
     } finally {
       setSaving(false);
     }
-  };
-
-  const removeImage = (index: number) => {
-    setValue(
-      "images",
-      images.filter((_, i) => i !== index)
-    );
   };
 
   return (
@@ -226,43 +217,19 @@ export function ProductForm({ product, className }: ProductFormProps) {
       <div className="space-y-6">
         <div className="admin-card space-y-4">
           <h2 className="font-serif text-xl font-semibold text-green">Images</h2>
-          {images.length > 0 && (
-            <div className="grid grid-cols-2 gap-2">
-              {images.map((url, i) => (
-                <div key={url} className="group relative aspect-square bg-cream">
-                  <Image
-                    src={url}
-                    alt={`Product ${i + 1}`}
-                    fill
-                    className="object-cover"
-                    sizes="160px"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeImage(i)}
-                    className="absolute right-1 top-1 bg-white/90 p-1 text-muted opacity-0 transition-opacity group-hover:opacity-100 hover:text-terra"
-                    aria-label="Remove image"
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
           {uploadConfigured === false && (
             <p className="rounded border border-gold/30 bg-gold/5 px-3 py-2 text-xs text-muted">
-              Image uploads are not configured on this deployment.
               {uploadTokenLength === 0 ? (
                 <>
-                  {" "}
-                  <code className="text-green">UPLOADTHING_TOKEN</code> is missing on
-                  the server — add it in Vercel → <strong>mzveesoaps</strong> → Settings
-                  → Environment Variables (value only, starts with{" "}
-                  <code className="text-green">eyJ</code>), then{" "}
-                  <strong>Redeploy Production</strong> without build cache.
+                  <code className="text-green">UPLOADTHING_TOKEN</code> is not on this
+                  server yet. Add it in Vercel → <strong>mzveesoaps</strong> →
+                  Environment Variables, then redeploy Production.
                 </>
               ) : (
-                <> Token is present but invalid — re-copy from UploadThing API Keys → V7.</>
+                <>
+                  Upload token looks invalid — re-copy from UploadThing → API Keys →
+                  V7.
+                </>
               )}{" "}
               <a
                 href="https://uploadthing.com/dashboard"
@@ -272,58 +239,13 @@ export function ProductForm({ product, className }: ProductFormProps) {
               >
                 uploadthing.com/dashboard
               </a>
-              . You can still add image URLs manually below.
             </p>
           )}
-          {uploadConfigured !== false && (
-            <UploadButton
-              endpoint="productImage"
-              onClientUploadComplete={(res) => {
-                const urls = res.map((f) => f.url);
-                setValue("images", [...images, ...urls]);
-                addToast("Image uploaded");
-              }}
-              onUploadError={(error) => {
-                addToast(error.message, "error");
-              }}
-              appearance={{
-                button:
-                  "w-full border border-green/20 bg-cream px-4 py-2 text-sm text-green transition-colors hover:border-green ut-ready:bg-cream",
-                allowedContent: "text-xs text-muted",
-              }}
-              content={{
-                button: "Upload Image",
-                allowedContent: "Max 4MB, up to 5 images",
-              }}
-            />
-          )}
-          <div>
-            <label className="label-caps mb-2 block text-muted">Image URL</label>
-            <div className="flex gap-2">
-              <input
-                type="url"
-                placeholder="https://… or /images/products/…"
-                className="admin-input min-w-0 flex-1"
-                id="manual-image-url"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  const input = document.getElementById(
-                    "manual-image-url"
-                  ) as HTMLInputElement | null;
-                  const url = input?.value.trim();
-                  if (!url) return;
-                  setValue("images", [...images, url]);
-                  if (input) input.value = "";
-                  addToast("Image URL added");
-                }}
-              >
-                Add
-              </Button>
-            </div>
-          </div>
+          <ProductImageUploader
+            images={images}
+            onChange={(next) => setValue("images", next, { shouldValidate: true })}
+            uploadReady={uploadConfigured === true}
+          />
           {errors.images && (
             <p className="text-xs text-terra">{errors.images.message}</p>
           )}
