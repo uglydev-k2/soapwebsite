@@ -26,11 +26,15 @@ export function ProductForm({ product, className }: ProductFormProps) {
   const [saving, setSaving] = useState(false);
   const [slugManual, setSlugManual] = useState(!!product);
   const [uploadConfigured, setUploadConfigured] = useState<boolean | null>(null);
+  const [uploadTokenLength, setUploadTokenLength] = useState(0);
 
   useEffect(() => {
-    fetch("/api/admin/upload-status")
+    fetch("/api/admin/upload-status", { cache: "no-store" })
       .then((r) => r.json())
-      .then((json) => setUploadConfigured(json.data?.configured === true))
+      .then((json) => {
+        setUploadConfigured(json.data?.configured === true);
+        setUploadTokenLength(json.data?.tokenLength ?? 0);
+      })
       .catch(() => setUploadConfigured(false));
   }, []);
 
@@ -247,8 +251,19 @@ export function ProductForm({ product, className }: ProductFormProps) {
           )}
           {uploadConfigured === false && (
             <p className="rounded border border-gold/30 bg-gold/5 px-3 py-2 text-xs text-muted">
-              Image uploads are not configured. Add{" "}
-              <code className="text-green">UPLOADTHING_TOKEN</code> from{" "}
+              Image uploads are not configured on this deployment.
+              {uploadTokenLength === 0 ? (
+                <>
+                  {" "}
+                  <code className="text-green">UPLOADTHING_TOKEN</code> is missing on
+                  the server — add it in Vercel → <strong>mzveesoaps</strong> → Settings
+                  → Environment Variables (value only, starts with{" "}
+                  <code className="text-green">eyJ</code>), then{" "}
+                  <strong>Redeploy Production</strong> without build cache.
+                </>
+              ) : (
+                <> Token is present but invalid — re-copy from UploadThing API Keys → V7.</>
+              )}{" "}
               <a
                 href="https://uploadthing.com/dashboard"
                 target="_blank"
@@ -256,9 +271,8 @@ export function ProductForm({ product, className }: ProductFormProps) {
                 className="text-terra underline"
               >
                 uploadthing.com/dashboard
-              </a>{" "}
-              (API Keys → V7) to Vercel, then redeploy. You can still add image URLs
-              manually below.
+              </a>
+              . You can still add image URLs manually below.
             </p>
           )}
           {uploadConfigured !== false && (
