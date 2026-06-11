@@ -126,7 +126,7 @@ export default function BillingPageClient() {
         />
       </div>
 
-      <div className="admin-card p-6">
+      <div className="admin-card">
         <h2 className="label-caps mb-4 text-muted">All Orders / Subscriptions</h2>
         <DataTable
           data={data.subscriptions}
@@ -135,6 +135,7 @@ export default function BillingPageClient() {
             {
               key: "orderNumber",
               header: "Order #",
+              mobilePrimary: true,
               render: (s) => s.orderNumber,
             },
             {

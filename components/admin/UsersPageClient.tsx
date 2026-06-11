@@ -97,9 +97,9 @@ export default function UsersPageClient() {
 
   return (
     <div>
-      <div className="mb-6 flex justify-between">
+      <div className="mb-8 flex flex-col gap-4 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted">{users.length} admin accounts</p>
-        <Button size="sm" onClick={() => setInviteOpen(true)}>
+        <Button size="sm" onClick={() => setInviteOpen(true)} className="w-full sm:w-auto">
           <UserPlus size={16} className="mr-2" />
           Invite Admin
         </Button>
@@ -109,7 +109,7 @@ export default function UsersPageClient() {
         data={users}
         keyExtractor={(u) => u.id}
         columns={[
-          { key: "name", header: "Name", render: (u) => u.name },
+          { key: "name", header: "Name", mobilePrimary: true, render: (u) => u.name },
           { key: "email", header: "Email", render: (u) => u.email },
           {
             key: "role",

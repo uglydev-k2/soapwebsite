@@ -40,7 +40,7 @@ export function CustomersTable({
 
   return (
     <div className={className}>
-      <ul className="divide-y divide-green/10 md:hidden">
+      <ul className="admin-mobile-list">
         {customers.map((customer) => (
           <li key={customer.id}>
             <button
@@ -48,24 +48,24 @@ export function CustomersTable({
               onClick={() => onView?.(customer)}
               className="admin-mobile-card w-full text-left"
             >
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-terra/15 font-sans text-xs font-medium text-terra">
+              <div className="flex items-center gap-4">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-terra/15 font-sans text-sm font-medium text-terra">
                   {getInitials(customer.firstName, customer.lastName)}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-green">
                     {customer.firstName} {customer.lastName}
                   </p>
-                  <p className="truncate text-xs text-muted">{customer.email}</p>
+                  <p className="truncate text-sm text-muted">{customer.email}</p>
                 </div>
               </div>
-              <div className="mt-3 flex justify-between text-xs text-muted">
+              <div className="mt-4 flex justify-between text-sm text-muted">
                 <span>{customer.ordersCount} orders</span>
                 <span className="font-medium text-green">
                   {formatPrice(customer.totalSpent)}
                 </span>
               </div>
-              <p className="mt-1 text-[11px] text-muted">
+              <p className="mt-2 text-xs text-muted">
                 Joined {formatDate(customer.createdAt)}
               </p>
             </button>

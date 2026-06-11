@@ -29,7 +29,7 @@ export function SystemHealthPanel({
       : "ok";
 
   return (
-    <div className={cn("admin-card", compact ? "p-4" : "p-6")}>
+    <div className={cn("admin-card", compact && "sm:p-6")}>
       <div className="mb-4 flex items-center justify-between">
         <h2 className="label-caps text-muted">System Health</h2>
         <span
@@ -43,11 +43,11 @@ export function SystemHealthPanel({
         </span>
       </div>
 
-      <ul className="space-y-2">
+      <ul className="space-y-3 sm:space-y-2">
         {services.map((service) => (
           <li
             key={service.id}
-            className="flex flex-col gap-1 border border-green/10 bg-white px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between"
+            className="flex flex-col gap-2 border border-green/10 bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-1 sm:px-3 sm:py-2.5"
           >
             <div className="flex items-center gap-2">
               <span

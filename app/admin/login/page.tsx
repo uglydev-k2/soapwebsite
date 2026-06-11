@@ -46,11 +46,11 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="admin-shell flex min-h-screen items-center justify-center px-4 py-12">
+    <div className="admin-shell flex min-h-screen items-center justify-center px-5 py-12 supports-[padding:max(0px)]:pb-[max(3rem,env(safe-area-inset-bottom))]">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(168,138,74,0.08),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(31,52,44,0.06),transparent_35%)]" />
 
       <div
-        className={`relative w-full max-w-md border border-green/10 bg-white p-8 shadow-xl ${shake ? "animate-shake" : ""}`}
+        className={`relative w-full max-w-md border border-green/10 bg-white p-8 shadow-xl sm:p-8 ${shake ? "animate-shake" : ""}`}
       >
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center bg-green-3 text-gold">

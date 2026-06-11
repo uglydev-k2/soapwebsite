@@ -57,7 +57,7 @@ export function DashboardView({
       {permissions.viewQuickActions && <DashboardQuickActions />}
 
       {kpiCount > 0 && (
-        <div className="mb-6 mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="mb-8 mt-6 grid grid-cols-1 gap-5 sm:mb-6 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
           {permissions.viewRevenueKpis && (
             <>
               <KpiCard
@@ -104,7 +104,7 @@ export function DashboardView({
       )}
 
       {(permissions.viewFulfillment || permissions.viewOps) && (
-        <div className="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <div className="mb-8 grid grid-cols-1 gap-6 sm:mb-6 xl:grid-cols-3">
           {permissions.viewFulfillment && (
             <div className={permissions.viewOps ? "xl:col-span-2" : "xl:col-span-3"}>
               <FulfillmentQueue orders={fulfillmentOrders} />

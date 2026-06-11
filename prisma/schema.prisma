@@ -170,11 +170,10 @@ model AdminPushSubscription {
 }
 
 enum Category {
-  SOAP
-  BODY_WASH
-  LOTION
-  SCRUB
-  AROMATHERAPY
+  BAR_SOAP
+  BATH_BODY
+  CANDLES
+  ACCESSORIES
   GIFT_SET
 
   @@schema("public")

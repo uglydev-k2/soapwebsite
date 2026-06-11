@@ -47,7 +47,7 @@ export default function AnalyticsPageClient() {
           <button
             key={r}
             onClick={() => setRange(r)}
-            className={`label-caps shrink-0 px-4 py-2.5 border transition-colors ${
+            className={`admin-tab border transition-colors ${
               range === r
                 ? "border-terra text-terra bg-terra/5"
                 : "border-green/20 text-muted hover:border-green"
@@ -60,9 +60,9 @@ export default function AnalyticsPageClient() {
       {data && (
         <>
           {(data.totalRevenue != null || data.totalOrders != null) && (
-            <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="mb-8 grid grid-cols-1 gap-5 sm:mb-6 sm:grid-cols-2 sm:gap-4">
               {data.totalRevenue != null && (
-                <div className="admin-card p-4">
+                <div className="admin-card">
                   <p className="label-caps text-muted">Period Revenue</p>
                   <p className="mt-2 font-serif text-3xl font-semibold text-green">
                     {data.totalRevenue.toLocaleString("en-US", {
@@ -73,7 +73,7 @@ export default function AnalyticsPageClient() {
                 </div>
               )}
               {data.totalOrders != null && (
-                <div className="admin-card p-4">
+                <div className="admin-card">
                   <p className="label-caps text-muted">Period Orders</p>
                   <p className="mt-2 font-serif text-3xl font-semibold text-green">
                     {data.totalOrders}

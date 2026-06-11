@@ -170,7 +170,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
     .filter((section) => section.items.length > 0);
 
   const sidebarContent = (
-    <aside className="admin-sidebar flex h-full w-[min(280px,88vw)] max-w-[280px] shrink-0 flex-col sm:w-[260px]">
+    <aside className="admin-sidebar flex h-full w-[min(320px,92vw)] max-w-[320px] shrink-0 flex-col lg:w-[260px] lg:max-w-[260px]">
       <div className="border-b border-white/10 px-5 py-6">
         <Link href="/admin" className="block" onClick={onClose}>
           <p className="font-serif text-2xl leading-none text-cream">
@@ -199,7 +199,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                       href={item.href}
                       onClick={onClose}
                       className={cn(
-                        "flex items-center gap-3 px-3 py-2.5 text-sm transition-colors",
+                        "flex min-h-11 items-center gap-3 px-3 py-3 text-base transition-colors lg:min-h-0 lg:py-2.5 lg:text-sm",
                         active
                           ? "border-l-2 border-gold bg-white/8 pl-[10px] text-cream"
                           : "border-l-2 border-transparent text-cream/70 hover:bg-white/5 hover:text-cream"
@@ -259,7 +259,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
             }
             signOut({ callbackUrl: "/admin/login" });
           }}
-          className="flex w-full items-center justify-center gap-2 border border-white/15 px-3 py-2 text-xs text-cream/70 transition-colors hover:border-gold/40 hover:text-cream"
+          className="flex min-h-11 w-full items-center justify-center gap-2 border border-white/15 px-4 py-3 text-sm text-cream/70 transition-colors hover:border-gold/40 hover:text-cream lg:min-h-0 lg:px-3 lg:py-2 lg:text-xs"
         >
           <LogOut size={14} />
           Log out
@@ -284,7 +284,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
 
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-[min(280px,88vw)] transform transition-transform duration-300 ease-out lg:hidden",
+          "fixed inset-y-0 left-0 z-50 w-[min(320px,92vw)] transform transition-transform duration-300 ease-out lg:hidden",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
@@ -292,7 +292,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           <button
             type="button"
             onClick={onClose}
-            className="absolute right-3 top-4 z-10 text-cream/70 hover:text-cream lg:hidden"
+            className="admin-touch-target absolute right-2 top-3 z-10 text-cream/70 hover:text-cream lg:hidden"
             aria-label="Close menu"
           >
             <X size={20} />

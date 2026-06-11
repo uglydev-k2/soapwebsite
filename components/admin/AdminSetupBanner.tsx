@@ -28,7 +28,7 @@ export function AdminSetupBanner() {
   if (!health || health.status === "ok") return null;
 
   return (
-    <div className="mb-6 border border-amber-300 bg-amber-50 px-4 py-4">
+    <div className="mb-8 border border-amber-300 bg-amber-50 px-5 py-5 sm:mb-6 sm:px-4 sm:py-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex gap-3">
           <AlertTriangle className="mt-0.5 shrink-0 text-amber-700" size={20} />

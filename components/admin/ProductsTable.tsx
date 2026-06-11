@@ -95,13 +95,13 @@ export function ProductsTable({
 
   return (
     <div className={className}>
-      <ul className="divide-y divide-green/10 md:hidden">
+      <ul className="admin-mobile-list">
         {sorted.map((product) => (
           <li key={product.id} className="admin-mobile-card">
-            <div className="flex gap-3">
+            <div className="flex gap-4">
               <div
                 className={cn(
-                  "relative h-14 w-14 shrink-0 overflow-hidden bg-gradient-to-br",
+                  "relative h-16 w-16 shrink-0 overflow-hidden bg-gradient-to-br",
                   getCategoryGradient(product.category)
                 )}
               >
@@ -120,9 +120,9 @@ export function ProductsTable({
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-serif text-base text-green">{product.name}</p>
-                <p className="truncate text-xs text-muted">{product.slug}</p>
-                <div className="mt-2 flex flex-wrap items-center gap-2">
+                <p className="font-serif text-lg text-green">{product.name}</p>
+                <p className="truncate text-sm text-muted">{product.slug}</p>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
                   <Badge variant="default">
                     {categoryLabels[product.category as Category]}
                   </Badge>
@@ -142,7 +142,7 @@ export function ProductsTable({
                 </div>
               </div>
             </div>
-            <div className="mt-3 flex gap-2">
+            <div className="mt-4 flex gap-3">
               <Button
                 variant="ghost"
                 size="sm"

@@ -36,7 +36,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         "bg-terra text-white hover:bg-terra-2 border border-terra transition-colors duration-250",
     };
     const sizes = {
-      sm: "px-4 py-2 text-xs label-caps",
+      sm: "min-h-11 px-4 py-2.5 text-xs label-caps sm:min-h-0 sm:py-2",
       md: "px-6 py-3 text-sm",
       lg: "px-8 py-4 text-sm label-caps",
     };

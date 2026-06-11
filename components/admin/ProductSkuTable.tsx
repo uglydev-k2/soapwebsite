@@ -63,16 +63,16 @@ export function ProductSkuTable({ skus, className }: ProductSkuTableProps) {
         </button>
       </div>
 
-      <ul className="divide-y divide-green/10 md:hidden">
+      <ul className="admin-mobile-list">
         {skus.map((sku) => (
-          <li key={sku.productId} className="admin-mobile-card mx-0 border-0 border-b">
+          <li key={sku.productId} className="admin-mobile-card">
             <Link
               href={`/admin/products/${sku.productId}`}
               className="font-serif text-base text-green hover:text-terra"
             >
               {sku.name}
             </Link>
-            <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+            <div className="mt-3 grid grid-cols-2 gap-3 text-sm sm:text-xs">
               <div>
                 <span className="text-muted">Revenue</span>
                 <p className="font-medium text-green">{formatPrice(sku.revenue)}</p>

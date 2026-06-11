@@ -6,7 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { ProductsTable } from "@/components/admin/ProductsTable";
-import { formatPrice, getCategoryLabel } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
+import { PRODUCT_CATEGORIES } from "@/lib/categories";
 import { CategoryBadge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { useToastStore } from "@/store/toastStore";
@@ -55,28 +56,28 @@ export default function ProductsPageClient({
 
   return (
     <div>
-      <div className="flex flex-wrap gap-4 mb-6 items-center">
+      <div className="mb-8 flex flex-col gap-4 sm:mb-6 sm:flex-row sm:flex-wrap sm:items-center">
         <Input
           placeholder="Search products..."
           variant="admin"
-          className="max-w-xs"
+          className="w-full sm:max-w-xs"
           defaultValue={params.get("search") || ""}
           onChange={(e) => updateFilter("search", e.target.value)}
         />
         <select
-          className="admin-input max-w-[160px]"
+          className="admin-input w-full sm:max-w-[160px]"
           value={params.get("category") || ""}
           onChange={(e) => updateFilter("category", e.target.value)}
         >
           <option value="">All Categories</option>
-          {["SOAP", "BODY_WASH", "LOTION", "SCRUB", "AROMATHERAPY", "GIFT_SET"].map((c) => (
-            <option key={c} value={c}>
-              {getCategoryLabel(c)}
+          {PRODUCT_CATEGORIES.map((c) => (
+            <option key={c.value} value={c.value}>
+              {c.label}
             </option>
           ))}
         </select>
         <select
-          className="admin-input max-w-[140px]"
+          className="admin-input w-full sm:max-w-[140px]"
           value={params.get("status") || ""}
           onChange={(e) => updateFilter("status", e.target.value)}
         >
@@ -84,18 +85,38 @@ export default function ProductsPageClient({
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
         </select>
-        <div className="flex-1" />
-        <div className="flex gap-2">
-          <button onClick={() => setView("grid")} className={view === "grid" ? "text-terra" : "text-muted"}>
-            <LayoutGrid size={18} />
-          </button>
-          <button onClick={() => setView("table")} className={view === "table" ? "text-terra" : "text-muted"}>
-            <List size={18} />
-          </button>
+        <div className="hidden flex-1 sm:block" />
+        <div className="flex items-center justify-between gap-3 sm:justify-end">
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setView("grid")}
+              className={cn(
+                "admin-touch-target",
+                view === "grid" ? "text-terra" : "text-muted"
+              )}
+              aria-label="Grid view"
+            >
+              <LayoutGrid size={20} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("table")}
+              className={cn(
+                "admin-touch-target",
+                view === "table" ? "text-terra" : "text-muted"
+              )}
+              aria-label="List view"
+            >
+              <List size={20} />
+            </button>
+          </div>
+          <Link href="/admin/products/new" className="flex-1 sm:flex-none">
+            <Button size="sm" className="w-full sm:w-auto">
+              + New Product
+            </Button>
+          </Link>
         </div>
-        <Link href="/admin/products/new">
-          <Button size="sm">+ New Product</Button>
-        </Link>
       </div>
 
       {view === "table" ? (

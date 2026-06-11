@@ -85,9 +85,18 @@ export const SCENT_FINDER_OPTIONS = {
     { label: "Warm & cozy", value: "amber", href: "/collections?scent=amber" },
   ],
   format: [
-    { label: "Bar soap", value: "SOAP", href: "/collections/category/bar-soap" },
-    { label: "Body wash", value: "BODY_WASH", href: "/collections/category/body-wash" },
-    { label: "Lotion", value: "LOTION", href: "/collections/category/lotion" },
-    { label: "Gift set", value: "GIFT_SET", href: "/collections/category/gift-set" },
+    { label: "Bar Soap", value: "BAR_SOAP", href: "/collections/category/bar-soap" },
+    {
+      label: "Bath & Body Products",
+      value: "BATH_BODY",
+      href: "/collections/category/bath-body",
+    },
+    { label: "Candles", value: "CANDLES", href: "/collections/category/candles" },
+    {
+      label: "Accessories",
+      value: "ACCESSORIES",
+      href: "/collections/category/accessories",
+    },
+    { label: "Gift Set", value: "GIFT_SET", href: "/collections/category/gift-set" },
   ],
 } as const;

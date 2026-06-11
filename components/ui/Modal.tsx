@@ -32,7 +32,7 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4">
       <div
         className="absolute inset-0 bg-green-3/60"
         onClick={onClose}
@@ -44,7 +44,10 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
         aria-modal
         aria-labelledby="modal-title"
         className={cn(
-          "relative bg-white p-6 w-full max-w-md card-border shadow-xl",
+          "relative w-full max-w-md bg-white p-6 card-border shadow-xl",
+          "max-h-[min(90dvh,640px)] overflow-y-auto",
+          "rounded-t-lg sm:rounded-none",
+          "supports-[padding:max(0px)]:pb-[max(1.5rem,env(safe-area-inset-bottom))]",
           className
         )}
       >
@@ -54,10 +57,10 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
           </h2>
           <button
             onClick={onClose}
-            className="text-muted hover:text-green transition-colors"
+            className="admin-touch-target text-muted transition-colors hover:text-green"
             aria-label="Close"
           >
-            <X size={20} />
+            <X size={22} />
           </button>
         </div>
         {children}

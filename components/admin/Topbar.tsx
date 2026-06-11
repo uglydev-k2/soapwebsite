@@ -45,11 +45,11 @@ export function Topbar({
   return (
     <header
       className={cn(
-        "sticky top-0 z-20 flex flex-col gap-3 border-b border-green/10 bg-white/95 px-4 py-3 backdrop-blur-sm supports-[padding:max(0px)]:pt-[max(0.75rem,env(safe-area-inset-top))] sm:gap-4 sm:px-6 sm:py-5 lg:flex-row lg:items-center lg:justify-between",
+        "sticky top-0 z-20 flex flex-col gap-4 border-b border-green/10 bg-white/95 px-5 py-4 backdrop-blur-sm supports-[padding:max(0px)]:pt-[max(1rem,env(safe-area-inset-top))] sm:gap-4 sm:px-6 sm:py-5 lg:flex-row lg:items-center lg:justify-between",
         className
       )}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-4">
         {onMenuToggle && (
           <button
             type="button"
@@ -61,7 +61,7 @@ export function Topbar({
           </button>
         )}
         <div className="min-w-0 flex-1">
-          <nav className="mb-1 flex flex-wrap items-center gap-1 text-[11px] text-muted sm:text-xs">
+          <nav className="mb-1.5 flex flex-wrap items-center gap-1.5 text-xs text-muted">
             <Link href="/admin" className="transition-colors hover:text-green">
               Admin
             </Link>
@@ -81,16 +81,16 @@ export function Topbar({
               </span>
             ))}
           </nav>
-          <h1 className="truncate font-serif text-xl font-semibold text-green sm:text-2xl">
+          <h1 className="truncate font-serif text-2xl font-semibold text-green sm:text-2xl">
             {title}
           </h1>
-          <p className="mt-0.5 hidden text-xs text-muted sm:block">
+          <p className="mt-1 text-xs text-muted sm:mt-0.5">
             {today}
           </p>
         </div>
       </div>
 
-      <div className="flex w-full items-center justify-end gap-1 sm:w-auto sm:gap-3">
+      <div className="flex w-full items-center justify-end gap-2 sm:w-auto sm:gap-3">
         <button
           type="button"
           onClick={onSearchOpen}
@@ -121,7 +121,7 @@ export function Topbar({
         )}
         <AdminNotificationsPanel />
         <div
-          className="flex h-9 w-9 items-center justify-center bg-terra text-xs font-medium text-white"
+          className="flex h-10 w-10 items-center justify-center bg-terra text-xs font-medium text-white"
           title={session?.user?.name ?? "Admin"}
         >
           {getInitials(session?.user?.name)}

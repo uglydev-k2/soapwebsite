@@ -92,27 +92,28 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
         aria-hidden
       />
       <div className="relative flex max-h-[min(92dvh,640px)] w-full flex-col overflow-hidden border border-green/10 bg-white shadow-2xl sm:max-h-[min(80vh,640px)] sm:max-w-xl sm:rounded-none">
-        <div className="flex items-center gap-3 border-b border-green/10 px-4 py-3">
-          <Search size={18} className="shrink-0 text-muted" />
+        <div className="flex items-center gap-3 border-b border-green/10 px-5 py-4 sm:px-4 sm:py-3">
+          <Search size={20} className="shrink-0 text-muted sm:hidden" />
+          <Search size={18} className="hidden shrink-0 text-muted sm:block" />
           <input
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search orders, products, customers…"
-            className="flex-1 bg-transparent text-sm text-text outline-none placeholder:text-muted"
+            className="flex-1 bg-transparent text-base text-text outline-none placeholder:text-muted sm:text-sm"
           />
           {loading && <Loader2 size={16} className="animate-spin text-muted" />}
           <button
             type="button"
             onClick={onClose}
-            className="text-muted hover:text-green"
+            className="admin-touch-target text-muted hover:text-green"
             aria-label="Close search"
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto p-2 sm:max-h-[360px] sm:flex-none">
+        <div className="min-h-0 flex-1 overflow-y-auto p-3 sm:max-h-[360px] sm:flex-none sm:p-2">
           {query.length < 2 ? (
             <div className="px-3 py-8 text-center text-sm text-muted">
               <Command size={20} className="mx-auto mb-2 opacity-40" />
@@ -123,7 +124,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
               No results for &ldquo;{query}&rdquo;
             </p>
           ) : (
-            <ul className="space-y-0.5">
+            <ul className="space-y-1">
               {results.map((result) => {
                 const Icon = typeIcons[result.type];
                 return (
@@ -131,16 +132,17 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                     <button
                       type="button"
                       onClick={() => navigate(result.href)}
-                      className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-cream"
+                      className="flex min-h-14 w-full items-center gap-4 px-3 py-3 text-left transition-colors hover:bg-cream sm:min-h-0 sm:gap-3 sm:py-2.5"
                     >
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center bg-green/5 text-green">
-                        <Icon size={16} />
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center bg-green/5 text-green sm:h-8 sm:w-8">
+                        <Icon size={18} className="sm:hidden" />
+                        <Icon size={16} className="hidden sm:block" />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-sm text-green">
+                        <span className="block truncate text-base text-green sm:text-sm">
                           {result.title}
                         </span>
-                        <span className="block truncate text-xs text-muted">
+                        <span className="block truncate text-sm text-muted sm:text-xs">
                           {result.subtitle}
                         </span>
                       </span>

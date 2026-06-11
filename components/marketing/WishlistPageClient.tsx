@@ -42,7 +42,7 @@ export function WishlistPageClient() {
           <div
             className={cn(
               "h-24 w-20 shrink-0 bg-gradient-to-br",
-              getCategoryGradient("SOAP")
+              getCategoryGradient("BAR_SOAP")
             )}
           />
           <div className="flex-1">

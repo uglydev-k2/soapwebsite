@@ -18,7 +18,7 @@ const plans = [
     title: "Seasonal Discovery",
     cadence: "Every 3 months",
     perks: "Best for gifting and reset",
-    href: "/collections?category=SOAP&sort=featured",
+    href: "/collections?category=BAR_SOAP&sort=featured",
   },
 ];
 

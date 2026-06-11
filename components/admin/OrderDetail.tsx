@@ -133,8 +133,8 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
   };
 
   return (
-    <div className={cn("space-y-6 print:space-y-4", className)}>
-      <div className="admin-card flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between print:border-0">
+    <div className={cn("space-y-8 sm:space-y-6 print:space-y-4", className)}>
+      <div className="admin-card flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-4 print:border-0">
         <div>
           <p className="label-caps text-muted">Order</p>
           <h2 className="font-serif text-3xl font-semibold text-green">
@@ -148,13 +148,13 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
             {order.status.toLowerCase()}
           </Badge>
         </div>
-        <div className="flex flex-col gap-2 sm:items-end print:hidden">
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:items-end print:hidden">
           <label className="label-caps text-muted">Update Status</label>
           <select
             value={status}
             onChange={(e) => handleStatusChange(e.target.value as OrderStatus)}
             disabled={updating}
-            className="admin-input min-w-[180px]"
+            className="admin-input w-full sm:min-w-[180px]"
           >
             {STATUS_OPTIONS.map((s) => (
               <option key={s} value={s}>
@@ -185,7 +185,46 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
 
         <div className="admin-card lg:col-span-2">
           <h3 className="label-caps mb-4 text-muted">Order Items</h3>
-          <div className="overflow-x-auto">
+
+          <ul className="flex flex-col gap-3 lg:hidden">
+            {order.items.map((item) => (
+              <li key={item.id} className="admin-mobile-card">
+                <div className="flex gap-4">
+                  <div
+                    className={cn(
+                      "relative h-16 w-16 shrink-0 bg-gradient-to-br",
+                      getCategoryGradient(item.product.category)
+                    )}
+                  >
+                    {item.product.images[0] ? (
+                      <Image
+                        src={item.product.images[0]}
+                        alt={item.product.name}
+                        fill
+                        className="object-cover"
+                        sizes="64px"
+                      />
+                    ) : (
+                      <span className="flex h-full items-center justify-center text-lg opacity-40">
+                        🧴
+                      </span>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-green">{item.product.name}</p>
+                    <p className="mt-2 text-sm text-muted">
+                      Qty {item.quantity} · {formatPrice(item.price)} each
+                    </p>
+                    <p className="mt-1 font-medium text-green">
+                      {formatPrice(item.price * item.quantity)}
+                    </p>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <div className="hidden overflow-x-auto lg:block">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-green/10">
@@ -236,7 +275,7 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
             </table>
           </div>
 
-          <dl className="mt-6 space-y-2 border-t border-green/10 pt-4 text-sm">
+          <dl className="mt-6 space-y-3 border-t border-green/10 pt-5 text-sm sm:space-y-2 sm:pt-4">
             <div className="flex justify-between">
               <dt className="text-muted">Subtotal</dt>
               <dd>{formatPrice(order.subtotal)}</dd>
@@ -268,7 +307,7 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
             return (
               <li
                 key={step.key}
-                className="relative flex flex-1 flex-col items-center pb-8 sm:pb-0"
+                className="relative flex flex-1 flex-col items-start pb-6 last:pb-0 sm:items-center sm:pb-0"
               >
                 {i < TIMELINE_STEPS.length - 1 && (
                   <span
@@ -281,7 +320,7 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
                 )}
                 <span
                   className={cn(
-                    "relative z-10 flex h-8 w-8 items-center justify-center border-2 text-xs font-medium",
+                    "relative z-10 flex h-10 w-10 items-center justify-center border-2 text-sm font-medium sm:h-8 sm:w-8 sm:text-xs",
                     complete
                       ? "border-terra bg-terra text-white"
                       : "border-green/20 bg-white text-muted"
@@ -291,7 +330,7 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
                 </span>
                 <p
                   className={cn(
-                    "mt-2 text-center text-xs",
+                    "mt-2 text-sm sm:text-center sm:text-xs",
                     current ? "font-medium text-green" : "text-muted"
                   )}
                 >
@@ -315,8 +354,8 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
         />
       </div>
 
-      <div className="flex flex-wrap gap-3 print:hidden">
-        <Button type="button" variant="outline" onClick={handlePrint} className="gap-2">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap print:hidden">
+        <Button type="button" variant="outline" onClick={handlePrint} className="w-full gap-2 sm:w-auto">
           <Printer size={16} />
           Print Invoice
         </Button>
@@ -324,7 +363,7 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
           type="button"
           onClick={handleSendTracking}
           disabled={sending}
-          className="gap-2"
+          className="w-full gap-2 sm:w-auto"
         >
           <Mail size={16} />
           {sending ? "Sending…" : "Send Tracking Email"}

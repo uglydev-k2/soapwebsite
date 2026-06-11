@@ -157,7 +157,7 @@ export function ProductImageUploader({
           onDrop={onDrop}
           onClick={() => !uploading && inputRef.current?.click()}
           className={cn(
-            "flex cursor-pointer flex-col items-center justify-center gap-3 border-2 border-dashed px-4 py-10 text-center transition-colors",
+            "flex cursor-pointer flex-col items-center justify-center gap-4 border-2 border-dashed px-5 py-12 text-center transition-colors sm:gap-3 sm:px-4 sm:py-10",
             isDragging
               ? "border-terra bg-terra/5"
               : "border-green/20 bg-cream/50 hover:border-green/40",

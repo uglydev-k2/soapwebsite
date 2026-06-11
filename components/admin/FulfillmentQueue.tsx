@@ -71,7 +71,7 @@ export function FulfillmentQueue({ orders }: FulfillmentQueueProps) {
             return (
               <li
                 key={order.id}
-                className="flex flex-col gap-3 border border-green/10 bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
+                className="admin-mobile-card flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
@@ -88,17 +88,17 @@ export function FulfillmentQueue({ orders }: FulfillmentQueueProps) {
                       {order.status.toLowerCase()}
                     </Badge>
                   </div>
-                  <p className="mt-1 text-xs text-muted">
+                  <p className="mt-1.5 text-sm text-muted">
                     {order.customer.firstName} {order.customer.lastName} ·{" "}
                     {itemCount} item{itemCount > 1 ? "s" : ""} ·{" "}
                     {formatPrice(order.total)}
                   </p>
-                  <p className="text-[11px] text-muted">
+                  <p className="text-xs text-muted">
                     {formatDateTime(order.createdAt)}
                   </p>
                 </div>
 
-                <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
+                <div className="flex w-full shrink-0 flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:gap-2">
                   {isPending ? (
                     <Button
                       size="sm"

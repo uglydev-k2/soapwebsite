@@ -81,20 +81,20 @@ export function InventoryPageClient({
 
   return (
     <div>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div className="mb-8 flex flex-col gap-4 sm:mb-6 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <p className="text-sm text-muted">
           {initialProducts.length} SKU{initialProducts.length > 1 ? "s" : ""} at or
           below {threshold} units
         </p>
         {changedIds.length > 0 && (
-          <Button size="sm" onClick={save} disabled={saving} className="gap-2">
+          <Button size="sm" onClick={save} disabled={saving} className="w-full gap-2 sm:w-auto">
             <Save size={14} />
             {saving ? "Saving…" : `Save ${changedIds.length} change${changedIds.length > 1 ? "s" : ""}`}
           </Button>
         )}
       </div>
 
-      <ul className="space-y-3">
+      <ul className="space-y-4 sm:space-y-3">
         {initialProducts.map((product) => {
           const stock = stockMap[product.id] ?? product.stock;
           const changed = stock !== product.stock;
@@ -104,7 +104,7 @@ export function InventoryPageClient({
             <li
               key={product.id}
               className={cn(
-                "admin-card flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between",
+                "admin-card flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between sm:gap-4",
                 critical && "border-terra/30 bg-terra/5"
               )}
             >
@@ -115,16 +115,16 @@ export function InventoryPageClient({
                 >
                   {product.name}
                 </Link>
-                <p className="mt-1 text-xs text-muted">
+                <p className="mt-1.5 text-sm text-muted">
                   {getCategoryLabel(product.category)} · {formatPrice(product.price)}
                 </p>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center justify-between gap-4 sm:justify-end">
                 <button
                   type="button"
                   onClick={() => adjust(product.id, -1)}
-                  className="flex h-9 w-9 items-center justify-center border border-green/15 text-muted hover:text-green"
+                  className="admin-touch-target border border-green/15 text-muted hover:text-green"
                   aria-label="Decrease stock"
                 >
                   <Minus size={16} />
@@ -140,7 +140,7 @@ export function InventoryPageClient({
                     }))
                   }
                   className={cn(
-                    "admin-input w-20 text-center",
+                    "admin-input w-24 text-center text-lg sm:w-20 sm:text-base",
                     changed && "border-terra",
                     critical && "text-terra"
                   )}
@@ -148,7 +148,7 @@ export function InventoryPageClient({
                 <button
                   type="button"
                   onClick={() => adjust(product.id, 1)}
-                  className="flex h-9 w-9 items-center justify-center border border-green/15 text-muted hover:text-green"
+                  className="admin-touch-target border border-green/15 text-muted hover:text-green"
                   aria-label="Increase stock"
                 >
                   <Plus size={16} />

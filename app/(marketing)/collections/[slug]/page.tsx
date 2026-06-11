@@ -124,12 +124,11 @@ export default async function ProductDetailPage({
 
 function getCategoryGradient(category: string): string {
   const gradients: Record<string, string> = {
-    SOAP: "linear-gradient(135deg, #3D6454, #2C4A3E)",
-    BODY_WASH: "linear-gradient(135deg, #2C4A3E, #1a2e26)",
-    LOTION: "linear-gradient(135deg, #C9A96E, #B5552A)",
-    SCRUB: "linear-gradient(135deg, #6B5E52, #3D6454)",
-    AROMATHERAPY: "linear-gradient(135deg, #1a2e26, #2C4A3E)",
+    BAR_SOAP: "linear-gradient(135deg, #3D6454, #2C4A3E)",
+    BATH_BODY: "linear-gradient(135deg, #2C4A3E, #1a2e26)",
+    CANDLES: "linear-gradient(135deg, #C9A96E, #B5552A)",
+    ACCESSORIES: "linear-gradient(135deg, #6B5E52, #3D6454)",
     GIFT_SET: "linear-gradient(135deg, #B5552A, #8C3F1E)",
   };
-  return gradients[category] || gradients.SOAP;
+  return gradients[category] || gradients.BAR_SOAP;
 }

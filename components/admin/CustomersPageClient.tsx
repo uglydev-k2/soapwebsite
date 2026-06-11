@@ -105,21 +105,21 @@ export default function CustomersPageClient({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-end gap-3">
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:gap-3">
         <Input
           label="Search"
           placeholder="Name or email…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="min-w-[200px] flex-1"
+          className="w-full sm:min-w-[200px] sm:flex-1"
         />
-        <div>
-          <label className="label-caps mb-1 block text-muted">Status</label>
+        <div className="w-full sm:w-auto">
+          <label className="label-caps mb-2 block text-muted">Status</label>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="admin-input min-w-[140px]"
+            className="admin-input w-full sm:min-w-[140px]"
           >
             <option value="">All</option>
             <option value="ACTIVE">Active</option>
@@ -128,8 +128,8 @@ export default function CustomersPageClient({
           </select>
         </div>
         {selected.length > 0 && (
-          <>
-            <Button variant="outline" size="sm" onClick={exportCsv}>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button variant="outline" size="sm" onClick={exportCsv} className="w-full sm:w-auto">
               <Download size={14} className="mr-1" />
               Export ({selected.length})
             </Button>
@@ -137,11 +137,12 @@ export default function CustomersPageClient({
               variant="outline"
               size="sm"
               onClick={() => setConfirmDelete(true)}
+              className="w-full sm:w-auto"
             >
               <Trash2 size={14} className="mr-1" />
               Delete ({selected.length})
             </Button>
-          </>
+          </div>
         )}
       </div>
 
@@ -163,6 +164,7 @@ export default function CustomersPageClient({
             {
               key: "name",
               header: "Customer",
+              mobilePrimary: true,
               render: (c) => (
                 <span className="font-medium text-green">
                   {c.firstName} {c.lastName}

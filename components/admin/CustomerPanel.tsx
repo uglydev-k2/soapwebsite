@@ -152,14 +152,14 @@ export function CustomerPanel({
       />
       <aside
         className={cn(
-          "fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col bg-white shadow-xl",
+          "fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col bg-white shadow-xl supports-[padding:max(0px)]:pb-[env(safe-area-inset-bottom)]",
           "transform transition-transform duration-300"
         )}
         role="dialog"
         aria-modal
         aria-labelledby="customer-panel-title"
       >
-        <div className="flex items-center justify-between border-b border-green/10 px-6 py-5">
+        <div className="flex items-center justify-between border-b border-green/10 px-5 py-5 sm:px-6">
           <div>
             <p className="label-caps text-muted">Customer</p>
             <h2
@@ -172,16 +172,16 @@ export function CustomerPanel({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-muted transition-colors hover:text-green"
+            className="admin-touch-target text-muted transition-colors hover:text-green"
             aria-label="Close panel"
           >
             <X size={20} />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-6">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">
+        <div className="flex-1 overflow-y-auto px-5 py-6 sm:px-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <div className="grid gap-5 sm:grid-cols-2 sm:gap-4">
               <Input
                 label="First Name"
                 {...register("firstName")}
@@ -240,7 +240,7 @@ export function CustomerPanel({
                 {orders.map((order) => (
                   <li
                     key={order.id}
-                    className="flex items-center justify-between border border-green/10 p-3"
+                    className="flex items-center justify-between border border-green/10 p-4"
                   >
                     <div>
                       <p className="font-medium text-green">{order.orderNumber}</p>

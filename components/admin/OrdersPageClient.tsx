@@ -59,13 +59,14 @@ export default function OrdersPageClient({
 
   return (
     <div>
-      <div className="admin-tabs-scroll mb-6 border-b border-green/10 pb-2">
+      <div className="admin-tabs-scroll mb-8 border-b border-green/10 sm:mb-6">
         {tabs.map((tab) => (
           <button
             key={tab}
+            type="button"
             onClick={() => setStatus(tab)}
             className={cn(
-              "label-caps shrink-0 px-3 py-2.5 transition-colors",
+              "admin-tab",
               initialStatus === tab
                 ? "text-terra border-b-2 border-terra"
                 : "text-muted hover:text-green"
@@ -76,7 +77,7 @@ export default function OrdersPageClient({
         ))}
       </div>
 
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+      <div className="mb-6 flex flex-col gap-4 sm:mb-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
         <Input
           placeholder="Search order # or email..."
           variant="admin"
@@ -89,7 +90,7 @@ export default function OrdersPageClient({
             router.push(`/admin/orders?${p.toString()}`);
           }}
         />
-        <Button size="sm" variant="ghost" onClick={exportCsv} className="gap-2">
+        <Button size="sm" variant="ghost" onClick={exportCsv} className="w-full gap-2 sm:w-auto">
           <Download size={14} />
           Export CSV
         </Button>

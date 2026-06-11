@@ -52,7 +52,7 @@ export function ProductForm({ product, className }: ProductFormProps) {
           description: "",
           price: 0,
           comparePrice: null,
-          category: "SOAP",
+          category: "BAR_SOAP",
           stock: 0,
           images: [],
           ingredients: "",
@@ -103,8 +103,8 @@ export function ProductForm({ product, className }: ProductFormProps) {
       onSubmit={handleSubmit(onSubmit)}
       className={cn("grid gap-8 lg:grid-cols-[1fr_320px]", className)}
     >
-      <div className="space-y-6">
-        <div className="admin-card space-y-4">
+      <div className="space-y-8 sm:space-y-6">
+        <div className="admin-card space-y-5 sm:space-y-4">
           <h2 className="font-serif text-xl font-semibold text-green">Details</h2>
           <Input
             label="Product Name"
@@ -129,7 +129,7 @@ export function ProductForm({ product, className }: ProductFormProps) {
               {...register("description")}
               rows={5}
               className={cn(
-                "admin-input resize-y",
+                "admin-textarea",
                 errors.description && "border-terra"
               )}
             />
@@ -139,9 +139,9 @@ export function ProductForm({ product, className }: ProductFormProps) {
           </div>
         </div>
 
-        <div className="admin-card space-y-4">
+        <div className="admin-card space-y-5 sm:space-y-4">
           <h2 className="font-serif text-xl font-semibold text-green">Pricing & Inventory</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-5 sm:grid-cols-2 sm:gap-4">
             <Input
               label="Price ($)"
               type="number"
@@ -183,7 +183,7 @@ export function ProductForm({ product, className }: ProductFormProps) {
           </div>
         </div>
 
-        <div className="admin-card space-y-4">
+        <div className="admin-card space-y-5 sm:space-y-4">
           <h2 className="font-serif text-xl font-semibold text-green">Attributes</h2>
           <Input
             label="Fragrance"
@@ -195,14 +195,14 @@ export function ProductForm({ product, className }: ProductFormProps) {
             <textarea
               {...register("ingredients")}
               rows={3}
-              className="admin-input resize-y"
+              className="admin-textarea"
             />
           </div>
         </div>
       </div>
 
-      <div className="space-y-6">
-        <div className="admin-card space-y-4">
+      <div className="space-y-8 sm:space-y-6">
+        <div className="admin-card space-y-5 sm:space-y-4">
           <h2 className="font-serif text-xl font-semibold text-green">Images</h2>
           <ProductImageUploader
             images={images}
@@ -213,7 +213,7 @@ export function ProductForm({ product, className }: ProductFormProps) {
           )}
         </div>
 
-        <div className="admin-card space-y-4">
+        <div className="admin-card space-y-5 sm:space-y-4">
           <h2 className="font-serif text-xl font-semibold text-green">Visibility</h2>
           <label className="flex cursor-pointer items-center gap-3">
             <input
@@ -233,7 +233,7 @@ export function ProductForm({ product, className }: ProductFormProps) {
           </label>
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
           <Button type="submit" disabled={saving} className="w-full">
             {saving ? "Saving…" : product ? "Update Product" : "Create Product"}
           </Button>

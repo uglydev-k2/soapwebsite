@@ -42,11 +42,10 @@ export function formatDateTime(date: Date | string): string {
 }
 
 export const categoryLabels: Record<Category, string> = {
-  SOAP: "Bar Soap",
-  BODY_WASH: "Body Wash",
-  LOTION: "Body Lotion",
-  SCRUB: "Sugar Scrub",
-  AROMATHERAPY: "Aromatherapy",
+  BAR_SOAP: "Bar Soap",
+  BATH_BODY: "Bath & Body Products",
+  CANDLES: "Candles",
+  ACCESSORIES: "Accessories",
   GIFT_SET: "Gift Set",
 };
 
@@ -60,11 +59,10 @@ export const statusColors: Record<OrderStatus, string> = {
 };
 
 const categoryGradients: Record<Category, string> = {
-  SOAP: "from-green-3 to-green",
-  BODY_WASH: "from-green to-green-2",
-  LOTION: "from-green-2 to-gold/40",
-  SCRUB: "from-terra-2 to-terra",
-  AROMATHERAPY: "from-green-3 to-gold/30",
+  BAR_SOAP: "from-green-3 to-green",
+  BATH_BODY: "from-green to-green-2",
+  CANDLES: "from-gold/40 to-terra-2",
+  ACCESSORIES: "from-green-2 to-gold/30",
   GIFT_SET: "from-gold/50 to-terra",
 };
 

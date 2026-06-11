@@ -179,14 +179,14 @@ export function SettingsForm({
   } = inviteForm;
 
   return (
-    <div className={cn("grid gap-8 lg:grid-cols-2", className)}>
+    <div className={cn("grid gap-8 sm:gap-8 lg:grid-cols-2", className)}>
       <PushNotificationToggle className="lg:col-span-2" />
       <form
         onSubmit={handleStoreSubmit(saveStore)}
-        className="admin-card space-y-4 lg:col-span-2"
+        className="admin-card space-y-5 sm:space-y-4 lg:col-span-2"
       >
         <h2 className="font-serif text-xl font-semibold text-green">Store Settings</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-5 sm:grid-cols-2 sm:gap-4">
           <Input
             label="Store Name"
             {...registerStore("name")}

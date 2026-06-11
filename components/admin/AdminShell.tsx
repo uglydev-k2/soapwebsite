@@ -57,7 +57,7 @@ export function AdminShell({
 
         <main
           className={cn(
-            "flex-1 p-4 pb-8 sm:p-6 sm:pb-10",
+            "flex-1 px-5 py-6 pb-[max(3rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-6 sm:pb-10",
             "max-w-full overflow-x-hidden",
             className
           )}

@@ -1,16 +1,8 @@
 import Link from "next/link";
-import {
-  InteractiveCard,
-  InteractiveMedia,
-} from "@/components/motion/InteractiveCard";
+import { ChevronRight } from "lucide-react";
 import { AmbientOrbs } from "@/components/motion/ScrollParallax";
-import {
-  AnimatedSectionHeader,
-  StaggerContainer,
-  StaggerItem,
-} from "@/components/motion/ScrollReveal";
+import { AnimatedSectionHeader } from "@/components/motion/ScrollReveal";
 import { PRODUCT_CATEGORIES } from "@/lib/categories";
-import { getCategoryGradient } from "@/lib/utils";
 
 export default function CategorySection() {
   return (
@@ -19,52 +11,44 @@ export default function CategorySection() {
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <AnimatedSectionHeader
           eyebrow="Shop by Category"
-          title="Find Your Perfect Ritual"
-          description="Browse our collections by product type — from daily bar soaps to gift-ready sets."
+          title="New Categories"
+          description="Explore our collections — from daily bar soaps to gift-ready sets."
+          className="max-w-2xl"
         />
 
-        <StaggerContainer
-          className="mt-12 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3"
-          stagger={0.06}
+        <nav
+          aria-label="Product categories"
+          className="mx-auto mt-10 max-w-xl border border-green/10 bg-cream/30 sm:mt-12"
         >
-          {PRODUCT_CATEGORIES.map((category) => (
-            <StaggerItem key={category.value}>
-              <InteractiveCard>
+          <ul className="divide-y divide-green/10">
+            {PRODUCT_CATEGORIES.map((category) => (
+              <li key={category.value}>
                 <Link
                   href={`/collections/category/${category.slug}`}
-                  className="group block h-full overflow-hidden border border-green/10 bg-white transition-colors duration-250 hover:border-terra/35 hover:shadow-md"
-                  style={{ borderRadius: "2px" }}
+                  className="group flex min-h-14 items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-white sm:min-h-16 sm:px-6 sm:py-5"
                 >
-                  <InteractiveMedia
-                    className={`aspect-[4/3] bg-gradient-to-br ${getCategoryGradient(category.value)}`}
-                  >
-                    {category.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={category.image}
-                        alt=""
-                        className="h-full w-full object-cover"
-                        loading="lazy"
-                      />
-                    ) : null}
-                    <span className="sr-only">{category.label}</span>
-                  </InteractiveMedia>
-                  <div className="p-5 sm:p-6">
-                    <h3 className="font-serif text-xl text-green transition-colors duration-250 group-hover:text-terra sm:text-2xl">
-                      {category.label}
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-muted">
-                      {category.description}
-                    </p>
-                    <span className="mt-4 inline-block label-caps text-green transition-transform duration-250 group-hover:translate-x-1 group-hover:text-terra">
-                      Shop {category.label} →
-                    </span>
-                  </div>
+                  <span className="font-serif text-lg text-green transition-colors group-hover:text-terra sm:text-xl">
+                    {category.label}
+                  </span>
+                  <ChevronRight
+                    size={18}
+                    className="shrink-0 text-green/30 transition-transform group-hover:translate-x-0.5 group-hover:text-terra"
+                    aria-hidden
+                  />
                 </Link>
-              </InteractiveCard>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div className="mx-auto mt-8 max-w-xl text-center sm:mt-10">
+          <Link
+            href="#reviews"
+            className="label-caps inline-flex min-h-11 items-center justify-center text-green transition-colors hover:text-terra"
+          >
+            Reviews
+          </Link>
+        </div>
       </div>
     </section>
   );

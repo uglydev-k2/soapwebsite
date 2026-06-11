@@ -1,19 +1,14 @@
 import { z } from "zod";
 
+import { PRODUCT_CATEGORY_VALUES } from "@/lib/categories";
+
 export const productSchema = z.object({
   name: z.string().min(1, "Name is required"),
   slug: z.string().min(1, "Slug is required"),
   description: z.string().min(1, "Description is required"),
   price: z.coerce.number().positive("Price must be positive"),
   comparePrice: z.coerce.number().positive().optional().nullable(),
-  category: z.enum([
-    "SOAP",
-    "BODY_WASH",
-    "LOTION",
-    "SCRUB",
-    "AROMATHERAPY",
-    "GIFT_SET",
-  ]),
+  category: z.enum(PRODUCT_CATEGORY_VALUES),
   stock: z.coerce.number().int().min(0),
   images: z
     .array(z.union([z.string().url(), z.string().startsWith("/")]))

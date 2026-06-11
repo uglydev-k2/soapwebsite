@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import type { Category } from "@prisma/client";
 
 const CARE_BY_CATEGORY: Partial<Record<Category, { title: string; tips: string[] }>> = {
-  SOAP: {
+  BAR_SOAP: {
     title: "Bar soap care",
     tips: [
       "Keep on a draining dish so the bar stays dry between uses.",
@@ -14,20 +14,27 @@ const CARE_BY_CATEGORY: Partial<Record<Category, { title: string; tips: string[]
       "Lather in hands or on a washcloth — a little goes a long way.",
     ],
   },
-  BODY_WASH: {
-    title: "Body wash tips",
+  BATH_BODY: {
+    title: "Bath & body tips",
     tips: [
       "Use a small amount on a sponge or palms; add water to build lather.",
       "Follow with lotion while skin is still slightly damp.",
       "Pair with the same scent family for a layered fragrance ritual.",
     ],
   },
-  LOTION: {
-    title: "How to apply",
+  CANDLES: {
+    title: "Candle care",
     tips: [
-      "Apply to clean, damp skin from shoulders down.",
-      "Press in with slow strokes — don't rub aggressively.",
-      "Layer over matching wash or soap for longer-lasting scent.",
+      "Trim the wick to ¼ inch before each burn for an even flame.",
+      "Allow the first burn to melt the full surface to prevent tunneling.",
+      "Never leave a lit candle unattended.",
+    ],
+  },
+  ACCESSORIES: {
+    title: "Accessory care",
+    tips: [
+      "Rinse soap dishes and bags regularly to keep products fresh.",
+      "Store accessories in a dry place between uses.",
     ],
   },
   GIFT_SET: {

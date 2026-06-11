@@ -18,7 +18,7 @@ export const STATIC_PRODUCTS: ProductWithMeta[] = [
       "A hand-poured bar with soft rose clay and creamy coconut lather. Gentle enough for daily use, luxurious enough for evening ritual.",
     price: 16,
     comparePrice: null,
-    category: "SOAP",
+    category: "BAR_SOAP",
     stock: 52,
     images: ["/images/products/blush-rose-bar.jpg"],
     ingredients:
@@ -37,7 +37,7 @@ export const STATIC_PRODUCTS: ProductWithMeta[] = [
       "Marbled sage and deep blue swirls over a sunny botanical base. Small-batch poured for a rich, silky cleanse with forest-fresh scent.",
     price: 18,
     comparePrice: null,
-    category: "SOAP",
+    category: "BAR_SOAP",
     stock: 38,
     images: ["/images/products/botanical-swirl-bar.jpg"],
     ingredients:
@@ -56,7 +56,7 @@ export const STATIC_PRODUCTS: ProductWithMeta[] = [
       "Warm caramel tones with colloidal oat and raw honey for skin that feels nourished, never tight. Our go-to for sensitive or dry skin.",
     price: 15,
     comparePrice: null,
-    category: "SOAP",
+    category: "BAR_SOAP",
     stock: 44,
     images: ["/images/products/oat-honey-bar.jpg"],
     ingredients:
@@ -94,7 +94,7 @@ export const STATIC_PRODUCTS: ProductWithMeta[] = [
       "A grounding botanical wash with cedarwood, pine needle, and wild moss. Cleanses deeply without stripping your skin barrier.",
     price: 28,
     comparePrice: null,
-    category: "BODY_WASH",
+    category: "BATH_BODY",
     stock: 45,
     images: [],
     ingredients:
@@ -113,7 +113,7 @@ export const STATIC_PRODUCTS: ProductWithMeta[] = [
       "Silky hydration with amber resin, vanilla orchid, and shea butter. Absorbs quickly and leaves a soft, healthy glow.",
     price: 34,
     comparePrice: null,
-    category: "LOTION",
+    category: "BATH_BODY",
     stock: 31,
     images: [],
     ingredients:
@@ -132,7 +132,7 @@ export const STATIC_PRODUCTS: ProductWithMeta[] = [
       "Bright, sun-kissed citrus layered with neroli and white florals. Three bars per set — perfect for guest baths or gifting.",
     price: 22,
     comparePrice: null,
-    category: "SOAP",
+    category: "BAR_SOAP",
     stock: 8,
     images: [],
     ingredients:
@@ -151,7 +151,7 @@ export const STATIC_PRODUCTS: ProductWithMeta[] = [
       "Nourishing bar with rosehip and mango seed butter for a silky, radiant cleanse. A floral favorite beyond our hero trio.",
     price: 14,
     comparePrice: null,
-    category: "SOAP",
+    category: "BAR_SOAP",
     stock: 40,
     images: [],
     ingredients:
@@ -170,7 +170,7 @@ export const STATIC_PRODUCTS: ProductWithMeta[] = [
       "Gentle exfoliation with colloidal oat and calming lavender. Polishes away dullness while comforting stressed skin.",
     price: 26,
     comparePrice: null,
-    category: "SCRUB",
+    category: "BATH_BODY",
     stock: 20,
     images: [],
     ingredients:
@@ -189,7 +189,7 @@ export const STATIC_PRODUCTS: ProductWithMeta[] = [
       "A pocket-sized aromatherapy blend for wrists and pulse points — cedar and lavender to unwind before sleep or travel.",
     price: 18,
     comparePrice: null,
-    category: "AROMATHERAPY",
+    category: "CANDLES",
     stock: 35,
     images: [],
     ingredients:

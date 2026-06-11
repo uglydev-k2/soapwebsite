@@ -56,19 +56,19 @@ const actions = [
 
 export function DashboardQuickActions() {
   return (
-    <div className="admin-card p-4">
-      <p className="label-caps mb-3 text-muted">Quick Actions</p>
-      <div className="admin-actions-scroll">
+    <div className="admin-card">
+      <p className="label-caps mb-4 text-muted">Quick Actions</p>
+      <div className="admin-actions-scroll gap-3 sm:gap-2">
         {actions.map((action) => (
           <Link
             key={action.href + action.label}
             href={action.href}
-            className="inline-flex items-center gap-2 border border-green/10 bg-white px-3 py-2.5 text-xs text-green transition-all hover:border-green/25 hover:shadow-sm"
+            className="inline-flex min-h-11 items-center gap-2.5 border border-green/10 bg-white px-4 py-3 text-sm text-green transition-all hover:border-green/25 hover:shadow-sm sm:px-3 sm:py-2.5 sm:text-xs"
           >
             <span
-              className={`flex h-6 w-6 items-center justify-center ${action.accent}`}
+              className={`flex h-7 w-7 items-center justify-center sm:h-6 sm:w-6 ${action.accent}`}
             >
-              <action.icon size={13} />
+              <action.icon size={14} />
             </span>
             {action.label}
           </Link>

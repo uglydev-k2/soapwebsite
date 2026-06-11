@@ -45,13 +45,13 @@ export function OpsCenter({
         </Link>
       </div>
 
-      <div className="mb-6 grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
+      <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-3">
         {tiles.map((tile) => (
           <Link
             key={tile.label}
             href={tile.href}
             className={cn(
-              "border px-4 py-4 text-center transition-colors hover:bg-cream",
+              "border px-5 py-5 text-center transition-colors hover:bg-cream sm:px-4 sm:py-4",
               tile.urgent
                 ? "border-terra/30 bg-terra/5"
                 : "border-green/10 bg-white"
@@ -65,7 +65,7 @@ export function OpsCenter({
             >
               {tile.value}
             </p>
-            <p className="mt-1 text-[11px] uppercase tracking-wider text-muted">
+            <p className="mt-2 text-xs uppercase tracking-wider text-muted">
               {tile.label}
             </p>
           </Link>
@@ -73,12 +73,12 @@ export function OpsCenter({
       </div>
 
       {alerts.length > 0 ? (
-        <ul className="space-y-2">
+        <ul className="space-y-3">
           {alerts.slice(0, 4).map((alert) => (
             <li key={alert.id}>
               <Link
                 href={alert.href}
-                className="flex flex-col gap-1 border border-green/10 bg-cream/50 px-4 py-3 text-sm transition-colors hover:bg-cream sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-2 border border-green/10 bg-cream/50 px-5 py-4 text-sm transition-colors hover:bg-cream sm:flex-row sm:items-center sm:justify-between sm:gap-1 sm:px-4 sm:py-3"
               >
                 <span className="font-medium text-green">{alert.title}</span>
                 <span className="text-xs text-muted sm:max-w-[50%] sm:text-right">

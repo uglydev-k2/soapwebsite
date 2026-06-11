@@ -10,7 +10,7 @@ const products = [
     description:
       "A hand-poured bar with soft rose clay and creamy coconut lather. Gentle enough for daily use, luxurious enough for evening ritual.",
     price: 16,
-    category: Category.SOAP,
+    category: Category.BAR_SOAP,
     stock: 52,
     fragrance: "Soft Rose & Petal",
     featured: true,
@@ -24,7 +24,7 @@ const products = [
     description:
       "Marbled sage and deep blue swirls over a sunny botanical base. Small-batch poured for a rich, silky cleanse with forest-fresh scent.",
     price: 18,
-    category: Category.SOAP,
+    category: Category.BAR_SOAP,
     stock: 38,
     fragrance: "Forest & Eucalyptus",
     featured: true,
@@ -38,7 +38,7 @@ const products = [
     description:
       "Warm caramel tones with colloidal oat and raw honey for skin that feels nourished, never tight. Our go-to for sensitive or dry skin.",
     price: 15,
-    category: Category.SOAP,
+    category: Category.BAR_SOAP,
     stock: 44,
     fragrance: "Oat, Honey & Chamomile",
     featured: true,
@@ -66,7 +66,7 @@ const products = [
     description:
       "A grounding botanical wash with cedarwood, pine needle, and wild moss. Cleanses deeply without stripping your skin barrier.",
     price: 28,
-    category: Category.BODY_WASH,
+    category: Category.BATH_BODY,
     stock: 45,
     fragrance: "Forest & Cedar",
     featured: false,
@@ -80,7 +80,7 @@ const products = [
     description:
       "Silky hydration with amber resin, vanilla orchid, and shea butter. Absorbs quickly and leaves a soft, healthy glow.",
     price: 34,
-    category: Category.LOTION,
+    category: Category.BATH_BODY,
     stock: 31,
     fragrance: "Warm Amber",
     featured: false,
@@ -93,7 +93,7 @@ const products = [
     description:
       "Bright, sun-kissed citrus layered with neroli and white florals. Three bars per set — perfect for guest baths or gifting.",
     price: 22,
-    category: Category.SOAP,
+    category: Category.BAR_SOAP,
     stock: 8,
     fragrance: "Citrus Bloom",
     featured: false,
@@ -107,7 +107,7 @@ const products = [
     description:
       "Nourishing bar with rosehip and mango seed butter for a silky, radiant cleanse. A floral favorite beyond our hero trio.",
     price: 14,
-    category: Category.SOAP,
+    category: Category.BAR_SOAP,
     stock: 40,
     fragrance: "Soft Floral",
     featured: false,
@@ -120,7 +120,7 @@ const products = [
     description:
       "Gentle exfoliation with colloidal oat and calming lavender. Polishes away dullness while comforting stressed skin.",
     price: 26,
-    category: Category.SCRUB,
+    category: Category.BATH_BODY,
     stock: 20,
     fragrance: "Lavender & Oat",
     featured: false,
@@ -134,7 +134,7 @@ const products = [
     description:
       "A pocket-sized aromatherapy blend for wrists and pulse points — cedar and lavender to unwind before sleep or travel.",
     price: 18,
-    category: Category.AROMATHERAPY,
+    category: Category.CANDLES,
     stock: 35,
     fragrance: "Forest & Lavender",
     featured: false,

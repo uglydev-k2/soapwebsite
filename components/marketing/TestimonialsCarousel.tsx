@@ -69,7 +69,7 @@ export default function TestimonialsCarousel() {
   const testimonial = testimonials[active];
 
   return (
-    <section className="relative overflow-hidden bg-white py-20 lg:py-28">
+    <section id="reviews" className="relative overflow-hidden bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <AnimatedSectionHeader eyebrow="Kind Words" title="Loved by Ritualists" />
 

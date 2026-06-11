@@ -40,7 +40,7 @@ export function OrdersTable({
 
   return (
     <div className={className}>
-      <ul className="divide-y divide-green/10 md:hidden">
+      <ul className="admin-mobile-list">
         {orders.map((order) => {
           const itemCount = order.items.reduce((s, i) => s + i.quantity, 0);
           return (
@@ -53,10 +53,10 @@ export function OrdersTable({
                   >
                     {order.orderNumber}
                   </Link>
-                  <p className="mt-1 text-sm text-text">
+                  <p className="mt-1.5 text-sm text-text">
                     {order.customer.firstName} {order.customer.lastName}
                   </p>
-                  <p className="truncate text-xs text-muted">{order.customer.email}</p>
+                  <p className="truncate text-sm text-muted">{order.customer.email}</p>
                 </div>
                 <Badge
                   variant="status"
@@ -68,7 +68,7 @@ export function OrdersTable({
                   {order.status.toLowerCase()}
                 </Badge>
               </div>
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-sm text-muted">
                 <span>{formatDate(order.createdAt)}</span>
                 <span>
                   {itemCount} {itemCount === 1 ? "item" : "items"} ·{" "}
@@ -77,7 +77,7 @@ export function OrdersTable({
               </div>
               <Link
                 href={`/admin/orders/${order.id}`}
-                className="mt-3 inline-flex text-xs font-medium text-terra underline-offset-2 hover:underline"
+                className="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-terra underline-offset-2 hover:underline"
               >
                 View order →
               </Link>
