@@ -4,17 +4,18 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { Product } from "@prisma/client";
+import type { AdminProduct } from "@/lib/admin-product-select";
 import { ProductImageUploader } from "@/components/admin/ProductImageUploader";
 import { productSchema, type ProductFormData } from "@/lib/validations";
 import { cn, slugify } from "@/lib/utils";
 import { PRODUCT_CATEGORIES } from "@/lib/categories";
+import { getCategoryDefaultWeightOz } from "@/lib/product-weight";
 import { useToastStore } from "@/store/toastStore";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
 interface ProductFormProps {
-  product?: Product | null;
+  product?: AdminProduct | null;
   className?: string;
 }
 
@@ -43,6 +44,7 @@ export function ProductForm({ product, className }: ProductFormProps) {
           images: product.images,
           ingredients: product.ingredients,
           fragrance: product.fragrance,
+          weightOz: product.weightOz,
           featured: product.featured,
           active: product.active,
         }
@@ -57,6 +59,7 @@ export function ProductForm({ product, className }: ProductFormProps) {
           images: [],
           ingredients: "",
           fragrance: "",
+          weightOz: null,
           featured: false,
           active: true,
         },
@@ -64,6 +67,7 @@ export function ProductForm({ product, className }: ProductFormProps) {
 
   const name = watch("name");
   const images = watch("images");
+  const category = watch("category");
 
   useEffect(() => {
     if (!slugManual && name) {
@@ -181,6 +185,26 @@ export function ProductForm({ product, className }: ProductFormProps) {
               error={errors.stock?.message}
             />
           </div>
+        </div>
+
+        <div className="admin-card space-y-5 sm:space-y-4">
+          <h2 className="font-serif text-xl font-semibold text-green">Shipping Weight</h2>
+          <Input
+            label="Weight (oz)"
+            type="number"
+            step="0.1"
+            min="0"
+            placeholder={`Default: ${getCategoryDefaultWeightOz(category)} oz`}
+            {...register("weightOz")}
+            error={errors.weightOz?.message}
+          />
+          <p className="text-xs text-muted leading-relaxed">
+            Used for USPS shipping quotes at checkout. Leave blank to use the category
+            default ({getCategoryDefaultWeightOz(category)} oz for{" "}
+            {PRODUCT_CATEGORIES.find((c) => c.value === category)?.label ?? "this category"}).
+            Typical values: bar soap 6 oz, bath &amp; body jar 10 oz, candles 10 oz,
+            samples 4 oz.
+          </p>
         </div>
 
         <div className="admin-card space-y-5 sm:space-y-4">

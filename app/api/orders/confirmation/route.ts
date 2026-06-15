@@ -1,18 +1,21 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { jsonResponse, errorResponse } from "@/lib/api-helpers";
-import { getSupabaseOrderByStripeSession } from "@/lib/supabase/orders";
+import { getSupabaseOrderByPaymentId } from "@/lib/supabase/orders";
 import { isDatabaseConfigured } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
-  const sessionId = request.nextUrl.searchParams.get("session_id");
-  if (!sessionId) {
-    return errorResponse("Missing session_id", 400);
+  const paymentId =
+    request.nextUrl.searchParams.get("payment_id") ||
+    request.nextUrl.searchParams.get("session_id");
+
+  if (!paymentId) {
+    return errorResponse("Missing payment_id", 400);
   }
 
-  const supabaseOrder = await getSupabaseOrderByStripeSession(sessionId);
+  const supabaseOrder = await getSupabaseOrderByPaymentId(paymentId);
   if (supabaseOrder) {
     return jsonResponse({
       source: "supabase",
@@ -38,7 +41,7 @@ export async function GET(request: NextRequest) {
 
   if (isDatabaseConfigured()) {
     const order = await prisma.order.findFirst({
-      where: { stripeId: sessionId },
+      where: { paymentId },
       include: {
         items: { include: { product: { select: { name: true } } } },
         customer: true,

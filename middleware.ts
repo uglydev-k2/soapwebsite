@@ -30,7 +30,11 @@ async function handleAdminAuth(
   let isLoggedIn = false;
 
   if (secret) {
-    const token = await getToken({ req: request, secret });
+    const token = await getToken({
+      req: request,
+      secret,
+      secureCookie: request.nextUrl.protocol === "https:",
+    });
     if (token?.role && canAccessAdmin(token.role as string)) {
       isLoggedIn = true;
       role = token.role as string;

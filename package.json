@@ -39,6 +39,7 @@
     "react-hook-form": "^7.53.2",
     "recharts": "^2.13.3",
     "resend": "^4.0.1",
+    "square": "^44.1.0",
     "stripe": "^17.4.0",
     "tailwind-merge": "^2.5.4",
     "uploadthing": "^7.3.0",

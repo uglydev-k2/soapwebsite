@@ -29,6 +29,7 @@ CREATE TABLE "public"."Product" (
     "images" TEXT[],
     "ingredients" TEXT,
     "fragrance" TEXT,
+    "weightOz" DOUBLE PRECISION,
     "featured" BOOLEAN NOT NULL DEFAULT false,
     "active" BOOLEAN NOT NULL DEFAULT true,
     "moderationStatus" "public"."ModerationStatus" NOT NULL DEFAULT 'APPROVED',

@@ -1,32 +1,43 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCartStore } from "@/store/cartStore";
 import { useToastStore } from "@/store/toastStore";
-import { checkoutFormSchema, checkoutSchema, type CheckoutFormData } from "@/lib/validations";
+import { checkoutFormSchema, checkoutPaymentSchema, type CheckoutFormData } from "@/lib/validations";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { formatPrice } from "@/lib/utils";
+import { getBundleLineTotal } from "@/lib/bundle-pricing";
 import { AuthSpinner } from "@/components/auth/AuthSpinner";
 import {
   calculateCartTotals,
   FREE_SHIPPING_THRESHOLD,
-  US_COUNTRY,
+  SHIPPING_COUNTRIES,
+  US_COUNTRY_CODE,
   US_STATES,
+  isUsCountry,
 } from "@/lib/shipping";
+import {
+  SquarePaymentForm,
+  type SquarePaymentFormHandle,
+} from "@/components/marketing/SquarePaymentForm";
+import type { ShippingQuote } from "@/lib/shipping-calculator";
 
 export default function CheckoutPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { items, subtotal } = useCartStore();
   const addToast = useToastStore((s) => s.addToast);
+  const squareRef = useRef<SquarePaymentFormHandle>(null);
   const [loading, setLoading] = useState(false);
   const [prefillEmail, setPrefillEmail] = useState("");
+  const [shippingQuote, setShippingQuote] = useState<ShippingQuote | null>(null);
+  const [quoteLoading, setQuoteLoading] = useState(false);
 
   useEffect(() => {
     if (searchParams.get("cancelled") === "true") {
@@ -43,20 +54,26 @@ export default function CheckoutPageClient() {
       .catch(() => {});
   }, []);
 
-  const totals = useMemo(() => calculateCartTotals(subtotal()), [subtotal]);
+  const sub = subtotal();
 
   const {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutFormSchema),
     defaultValues: {
-      country: US_COUNTRY,
+      country: US_COUNTRY_CODE,
       state: "",
     },
   });
+
+  const watchedCountry = watch("country");
+  const watchedState = watch("state");
+  const watchedPostal = watch("postalCode");
+  const isDomestic = isUsCountry(watchedCountry);
 
   useEffect(() => {
     if (prefillEmail) setValue("email", prefillEmail);
@@ -68,11 +85,86 @@ export default function CheckoutPageClient() {
     }
   }, [items.length, router]);
 
+  useEffect(() => {
+    if (!items.length) return;
+
+    const needsState = isUsCountry(watchedCountry);
+    if (needsState && !watchedState?.trim()) {
+      setShippingQuote(null);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setQuoteLoading(true);
+      try {
+        const res = await fetch("/api/shipping/quote", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            items: items.map((item) => ({
+              productId: item.productId,
+              quantity: item.quantity,
+              price: item.price,
+            })),
+            country: watchedCountry,
+            state: watchedState,
+            postalCode: watchedPostal,
+          }),
+        });
+        const json = await res.json();
+        if (res.ok && json.data) {
+          setShippingQuote(json.data as ShippingQuote);
+        }
+      } catch {
+        setShippingQuote(null);
+      } finally {
+        setQuoteLoading(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [items, watchedCountry, watchedState, watchedPostal]);
+
+  const totals = useMemo(
+    () => calculateCartTotals(sub, shippingQuote?.shipping),
+    [sub, shippingQuote?.shipping]
+  );
+
   const onSubmit = async (data: CheckoutFormData) => {
+    if (!squareRef.current?.isReady) {
+      addToast("Payment form is still loading. Please wait a moment.", "error");
+      return;
+    }
+
+    if (!shippingQuote) {
+      addToast("Enter your shipping address to calculate delivery.", "error");
+      return;
+    }
+
     setLoading(true);
     try {
+      let sourceId: string;
+      try {
+        const token = await squareRef.current.tokenize();
+        if (!token) {
+          addToast("Please enter valid card details.", "error");
+          setLoading(false);
+          return;
+        }
+        sourceId = token;
+      } catch (err) {
+        addToast(
+          err instanceof Error ? err.message : "Card verification failed.",
+          "error"
+        );
+        setLoading(false);
+        return;
+      }
+
       const payload = {
         ...data,
+        sourceId,
+        idempotencyKey: crypto.randomUUID(),
         items: items.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,
@@ -83,7 +175,7 @@ export default function CheckoutPageClient() {
         })),
       };
 
-      const parsed = checkoutSchema.safeParse(payload);
+      const parsed = checkoutPaymentSchema.safeParse(payload);
       if (!parsed.success) {
         addToast(parsed.error.errors[0]?.message || "Invalid checkout data", "error");
         setLoading(false);
@@ -97,13 +189,15 @@ export default function CheckoutPageClient() {
       });
       const json = await res.json();
 
-      if (!res.ok || !json.data?.url) {
+      if (!res.ok || !json.data?.paymentId) {
         addToast(json.error || "Checkout failed", "error");
         setLoading(false);
         return;
       }
 
-      window.location.href = json.data.url;
+      router.push(
+        `/order/confirmation?payment_id=${encodeURIComponent(json.data.paymentId)}`
+      );
     } catch {
       addToast("Checkout failed", "error");
       setLoading(false);
@@ -166,10 +260,29 @@ export default function CheckoutPageClient() {
             <div className="card-border bg-white p-6">
               <h2 className="font-serif text-2xl text-green mb-2">Shipping Address</h2>
               <p className="mb-6 text-sm text-muted">
-                United States only · Free shipping on orders {formatPrice(FREE_SHIPPING_THRESHOLD)}+
+                USPS rates by weight & destination · Free U.S. shipping on orders{" "}
+                {formatPrice(FREE_SHIPPING_THRESHOLD)}+
               </p>
-              <input type="hidden" {...register("country")} />
               <div className="grid gap-4 sm:grid-cols-2">
+                <div className="sm:col-span-2">
+                  <Label htmlFor="country" className="mb-2 block">
+                    Country
+                  </Label>
+                  <select
+                    id="country"
+                    className="admin-input w-full"
+                    {...register("country")}
+                  >
+                    {SHIPPING_COUNTRIES.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.country && (
+                    <p className="mt-1 text-sm text-terra">{errors.country.message}</p>
+                  )}
+                </div>
                 <div className="sm:col-span-2">
                   <Input
                     label="Address line 1"
@@ -192,42 +305,48 @@ export default function CheckoutPageClient() {
                   error={errors.city?.message}
                   {...register("city")}
                 />
-                <div>
-                  <Label htmlFor="state" className="mb-2 block">
-                    State
-                  </Label>
-                  <select
-                    id="state"
-                    className="admin-input w-full"
-                    defaultValue=""
-                    {...register("state")}
-                  >
-                    <option value="" disabled>
-                      Select state
-                    </option>
-                    {US_STATES.map((s) => (
-                      <option key={s.code} value={s.code}>
-                        {s.name}
+                {isDomestic ? (
+                  <div>
+                    <Label htmlFor="state" className="mb-2 block">
+                      State
+                    </Label>
+                    <select
+                      id="state"
+                      className="admin-input w-full"
+                      defaultValue=""
+                      {...register("state")}
+                    >
+                      <option value="" disabled>
+                        Select state
                       </option>
-                    ))}
-                  </select>
-                  {errors.state && (
-                    <p className="mt-1 text-sm text-terra">{errors.state.message}</p>
-                  )}
-                </div>
+                      {US_STATES.map((s) => (
+                        <option key={s.code} value={s.code}>
+                          {s.name}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.state && (
+                      <p className="mt-1 text-sm text-terra">{errors.state.message}</p>
+                    )}
+                  </div>
+                ) : (
+                  <Input
+                    label="State / Province (optional)"
+                    variant="marketing"
+                    error={errors.state?.message}
+                    {...register("state")}
+                  />
+                )}
                 <Input
-                  label="ZIP code"
+                  label={isDomestic ? "ZIP code" : "Postal code"}
                   variant="marketing"
                   error={errors.postalCode?.message}
                   {...register("postalCode")}
                 />
-                <div className="sm:col-span-2">
-                  <p className="text-sm text-muted">
-                    Country: <span className="text-green">{US_COUNTRY}</span>
-                  </p>
-                </div>
               </div>
             </div>
+
+            <SquarePaymentForm ref={squareRef} />
           </div>
 
           <div className="card-border bg-white p-6 h-fit">
@@ -238,10 +357,16 @@ export default function CheckoutPageClient() {
                   <span className="text-muted">
                     {item.name} × {item.quantity}
                   </span>
-                  <span>{formatPrice(item.price * item.quantity)}</span>
+                  <span>{formatPrice(getBundleLineTotal(item.price, item.quantity))}</span>
                 </li>
               ))}
             </ul>
+            {shippingQuote && (
+              <p className="mb-4 text-xs text-muted">
+                Est. {shippingQuote.weightOz} oz · {shippingQuote.method}
+                {shippingQuote.zone ? ` · Zone ${shippingQuote.zone}` : ""}
+              </p>
+            )}
             <div className="space-y-2 text-sm mb-6 border-t border-green/10 pt-4">
               <div className="flex justify-between">
                 <span className="text-muted">Subtotal</span>
@@ -250,7 +375,15 @@ export default function CheckoutPageClient() {
               <div className="flex justify-between">
                 <span className="text-muted">Shipping</span>
                 <span>
-                  {totals.shipping === 0 ? "Free" : formatPrice(totals.shipping)}
+                  {quoteLoading
+                    ? "Calculating…"
+                    : shippingQuote
+                      ? shippingQuote.shipping === 0
+                        ? "Free"
+                        : formatPrice(shippingQuote.shipping)
+                      : isDomestic
+                        ? "Select state"
+                        : "Enter address"}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -262,12 +395,16 @@ export default function CheckoutPageClient() {
                 <span>{formatPrice(totals.total)}</span>
               </div>
             </div>
-            <Button type="submit" className="w-full gap-2" disabled={loading}>
+            <Button
+              type="submit"
+              className="w-full gap-2"
+              disabled={loading || quoteLoading || !shippingQuote}
+            >
               {loading && <AuthSpinner />}
-              {loading ? "Redirecting…" : "Pay with Stripe"}
+              {loading ? "Processing…" : `Pay ${formatPrice(totals.total)}`}
             </Button>
             <p className="mt-3 text-xs text-muted text-center">
-              Secure payment via Stripe. Orders ship to U.S. addresses only.
+              Secure payment via Square · Ships via USPS
             </p>
           </div>
         </form>

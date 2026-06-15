@@ -25,16 +25,9 @@ const CARE_BY_CATEGORY: Partial<Record<Category, { title: string; tips: string[]
   CANDLES: {
     title: "Candle care",
     tips: [
-      "Trim the wick to ¼ inch before each burn for an even flame.",
-      "Allow the first burn to melt the full surface to prevent tunneling.",
+      "Trim the wick to ¼ inch before each burn.",
+      "Allow the first burn to melt the full surface for even use.",
       "Never leave a lit candle unattended.",
-    ],
-  },
-  ACCESSORIES: {
-    title: "Accessory care",
-    tips: [
-      "Rinse soap dishes and bags regularly to keep products fresh.",
-      "Store accessories in a dry place between uses.",
     ],
   },
   GIFT_SET: {

@@ -3,7 +3,8 @@
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
-import type { Category, Product } from "@prisma/client";
+import type { Category } from "@prisma/client";
+import type { AdminProduct } from "@/lib/admin-product-select";
 import {
   categoryLabels,
   cn,
@@ -15,9 +16,9 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 
 interface ProductsTableProps {
-  products: Product[];
-  onEdit?: (product: Product) => void;
-  onDelete?: (product: Product) => void;
+  products: AdminProduct[];
+  onEdit?: (product: AdminProduct) => void;
+  onDelete?: (product: AdminProduct) => void;
   className?: string;
 }
 

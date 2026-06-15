@@ -37,15 +37,16 @@ type ConfirmationOrder = {
 
 export default function OrderConfirmationPage() {
   const searchParams = useSearchParams();
-  const sessionId = searchParams.get("session_id");
+  const paymentId =
+    searchParams.get("payment_id") || searchParams.get("session_id");
   const clearCart = useCartStore((s) => s.clearCart);
   const [order, setOrder] = useState<ConfirmationOrder | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!sessionId) {
-      setError("Missing payment session.");
+    if (!paymentId) {
+      setError("Missing payment reference.");
       setLoading(false);
       return;
     }
@@ -55,7 +56,7 @@ export default function OrderConfirmationPage() {
       attempts += 1;
       try {
         const res = await fetch(
-          `/api/orders/confirmation?session_id=${encodeURIComponent(sessionId)}`
+          `/api/orders/confirmation?payment_id=${encodeURIComponent(paymentId)}`
         );
         const json = (await res.json()) as ApiResponse<ConfirmationOrder>;
         if (res.ok && json.data) {
@@ -76,7 +77,7 @@ export default function OrderConfirmationPage() {
     };
 
     load();
-  }, [sessionId, clearCart]);
+  }, [paymentId, clearCart]);
 
   if (loading) {
     return (

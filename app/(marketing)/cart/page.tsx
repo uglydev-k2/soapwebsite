@@ -2,7 +2,8 @@
 
 import { useCartStore } from "@/store/cartStore";
 import { formatPrice } from "@/lib/utils";
-import { calculateCartTotals } from "@/lib/shipping";
+import { getBundleLineTotal, getBundleDiscount } from "@/lib/bundle-pricing";
+import { TAX_RATE } from "@/lib/shipping";
 import { FreeShippingProgress } from "@/components/marketing/FreeShippingProgress";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
@@ -12,7 +13,7 @@ export default function CartPage() {
   const { items, updateQuantity, removeItem, subtotal } = useCartStore();
 
   const sub = subtotal();
-  const { shipping, tax, total } = calculateCartTotals(sub);
+  const estTax = Math.round(sub * TAX_RATE * 100) / 100;
 
   if (items.length === 0) {
     return (
@@ -58,7 +59,15 @@ export default function CartPage() {
                   >
                     {item.name}
                   </Link>
-                  <p className="text-muted text-sm mt-1">{formatPrice(item.price)}</p>
+                  <p className="text-muted text-sm mt-1">
+                    {formatPrice(item.price)} each
+                    {getBundleDiscount(item.quantity) > 0 ? (
+                      <span className="text-terra">
+                        {" "}
+                        · Save ${getBundleDiscount(item.quantity)}
+                      </span>
+                    ) : null}
+                  </p>
                   <div className="flex items-center gap-3 mt-3">
                     <button
                       type="button"
@@ -88,7 +97,7 @@ export default function CartPage() {
                   </div>
                 </div>
                 <p className="font-serif text-green">
-                  {formatPrice(item.price * item.quantity)}
+                  {formatPrice(getBundleLineTotal(item.price, item.quantity))}
                 </p>
               </div>
             ))}
@@ -105,16 +114,19 @@ export default function CartPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-muted">Shipping</span>
-                <span>{shipping === 0 ? "Free" : formatPrice(shipping)}</span>
+                <span className="text-muted text-right text-sm">
+                  Calculated at checkout
+                  <br />
+                  <span className="text-xs">USPS · by weight & state</span>
+                </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted">Tax</span>
-                <span>{formatPrice(tax)}</span>
+                <span className="text-muted">Est. tax</span>
+                <span>{formatPrice(estTax)}</span>
               </div>
-              <div className="flex justify-between font-serif text-lg text-green pt-2 border-t border-green/10">
-                <span>Total</span>
-                <span>{formatPrice(total)}</span>
-              </div>
+              <p className="pt-2 text-xs text-muted">
+                Shipping & final total calculated at checkout based on your state and order weight.
+              </p>
             </div>
             <Link href="/checkout">
               <Button className="w-full">Proceed to Checkout</Button>

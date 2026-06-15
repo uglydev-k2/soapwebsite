@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getActiveProducts } from "@/lib/products";
-import { getCategoryBySlug } from "@/lib/categories";
+import { getShopCategoryBySlug } from "@/lib/categories";
 import ProductCard from "@/components/marketing/ProductCard";
 import {
   AnimatedSectionHeader,
@@ -16,7 +16,7 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }) {
-  const category = getCategoryBySlug(params.slug);
+  const category = getShopCategoryBySlug(params.slug);
   if (!category) return { title: "Category — MsVee Soaps" };
   return {
     title: `${category.label} — MsVee Soaps`,
@@ -29,13 +29,16 @@ export default async function CategoryCollectionPage({
 }: {
   params: { slug: string };
 }) {
-  const category = getCategoryBySlug(params.slug);
+  const category = getShopCategoryBySlug(params.slug);
   if (!category) notFound();
 
-  const products = await getActiveProducts({
-    category: category.value,
-    sort: "featured",
-  });
+  const products =
+    category.values.length > 0
+      ? await getActiveProducts({
+          categories: category.values,
+          sort: "featured",
+        })
+      : [];
 
   return (
     <section className="marketing-header-offset min-h-screen bg-cream px-4 pb-24 sm:px-6">

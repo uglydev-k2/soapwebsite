@@ -5,8 +5,8 @@ import { withApiHandler } from "@/lib/api-handler";
 import { productSchema } from "@/lib/validations";
 import { logAdminAction } from "@/lib/audit";
 import { getClientIp } from "@/lib/rate-limit";
-import type { Prisma } from "@prisma/client";
 import { isDatabaseConfigured } from "@/lib/env";
+import { parseProductListFilters } from "@/lib/parse-product-filters";
 
 export const GET = withApiHandler("products.list", async (request: NextRequest) => {
   if (!isDatabaseConfigured()) {
@@ -14,24 +14,15 @@ export const GET = withApiHandler("products.list", async (request: NextRequest) 
   }
 
   const { searchParams } = request.nextUrl;
-  const category = searchParams.get("category");
-  const active = searchParams.get("active");
   const featured = searchParams.get("featured");
-  const search = searchParams.get("search");
   const page = parseInt(searchParams.get("page") || "1");
   const limit = parseInt(searchParams.get("limit") || "12");
+  const active = searchParams.get("active");
 
-  const where: Prisma.ProductWhereInput = {};
-  if (category) where.category = category as Prisma.ProductWhereInput["category"];
+  const where = parseProductListFilters(searchParams);
   if (active !== null && active !== undefined && active !== "")
     where.active = active === "true";
   if (featured === "true") where.featured = true;
-  if (search) {
-    where.OR = [
-      { name: { contains: search, mode: "insensitive" } },
-      { slug: { contains: search, mode: "insensitive" } },
-    ];
-  }
 
   const [products, total] = await Promise.all([
     prisma.product.findMany({

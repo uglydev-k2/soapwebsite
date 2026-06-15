@@ -1,8 +1,25 @@
 /** Shared shipping constants for cart, checkout, and marketing copy */
 export const US_COUNTRY = "United States";
+export const US_COUNTRY_CODE = "US";
 export const FREE_SHIPPING_THRESHOLD = 60;
 export const FLAT_SHIPPING_RATE = 8;
 export const TAX_RATE = 0.08;
+
+/** Countries available at checkout (ISO 3166-1 alpha-2). */
+export const SHIPPING_COUNTRIES = [
+  { code: "US", name: "United States" },
+  { code: "CA", name: "Canada" },
+  { code: "MX", name: "Mexico" },
+  { code: "GB", name: "United Kingdom" },
+  { code: "AU", name: "Australia" },
+  { code: "DE", name: "Germany" },
+  { code: "FR", name: "France" },
+  { code: "IE", name: "Ireland" },
+  { code: "NL", name: "Netherlands" },
+  { code: "JP", name: "Japan" },
+  { code: "NZ", name: "New Zealand" },
+  { code: "SG", name: "Singapore" },
+] as const;
 
 export const US_STATES = [
   { code: "AL", name: "Alabama" },
@@ -59,8 +76,22 @@ export const US_STATES = [
 ] as const;
 
 export function isUsCountry(country: string): boolean {
-  const normalized = country.trim().toLowerCase();
-  return normalized === "united states" || normalized === "us" || normalized === "usa";
+  const trimmed = country.trim();
+  const normalized = trimmed.toLowerCase();
+  return (
+    normalized === "united states" ||
+    normalized === "us" ||
+    normalized === "usa" ||
+    trimmed.toUpperCase() === "US"
+  );
+}
+
+export function getCountryCode(country: string): string {
+  if (isUsCountry(country)) return "US";
+  const match = SHIPPING_COUNTRIES.find(
+    (c) => c.code === country.toUpperCase() || c.name.toLowerCase() === country.toLowerCase()
+  );
+  return match?.code ?? country.toUpperCase();
 }
 
 export function getFreeShippingProgress(subtotal: number) {
@@ -70,10 +101,11 @@ export function getFreeShippingProgress(subtotal: number) {
   return { progress, amountRemaining, qualifies };
 }
 
-export function calculateCartTotals(subtotal: number) {
-  const shipping =
-    subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : FLAT_SHIPPING_RATE;
+export function calculateCartTotals(subtotal: number, shipping?: number) {
+  const shippingCost =
+    shipping ??
+    (subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : FLAT_SHIPPING_RATE);
   const tax = Math.round(subtotal * TAX_RATE * 100) / 100;
-  const total = Math.round((subtotal + shipping + tax) * 100) / 100;
-  return { subtotal, shipping, tax, total };
+  const total = Math.round((subtotal + shippingCost + tax) * 100) / 100;
+  return { subtotal, shipping: shippingCost, tax, total };
 }

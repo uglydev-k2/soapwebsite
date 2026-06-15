@@ -18,6 +18,14 @@ function run(cmd) {
 }
 
 const initSql = join(process.cwd(), "scripts", "init-prisma-tables.sql");
+const weightSql = join(process.cwd(), "scripts", "add-product-weight.sql");
+
+if (existsSync(weightSql)) {
+  run(
+    "npx prisma db execute --file scripts/add-product-weight.sql --schema prisma/schema.prisma"
+  );
+}
+
 if (existsSync(initSql)) {
   console.log("[vercel-db-push] Applying Prisma tables via SQL (Supabase-compatible)…");
   if (

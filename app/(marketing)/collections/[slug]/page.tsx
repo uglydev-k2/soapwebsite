@@ -14,6 +14,7 @@ import { ShareProductButton } from "@/components/marketing/ShareProductButton";
 import { StockNotifyForm } from "@/components/marketing/StockNotifyForm";
 import { ProductCareAccordion } from "@/components/marketing/ProductCareAccordion";
 import { WishlistButton } from "@/components/marketing/WishlistButton";
+import { getUnitWeightOz } from "@/lib/product-weight";
 import type { Category } from "@prisma/client";
 
 export async function generateMetadata({
@@ -34,6 +35,12 @@ export default async function ProductDetailPage({
   if (!product) notFound();
 
   const gradient = getCategoryGradient(product.category);
+  const weightOz = getUnitWeightOz(
+    product.category,
+    product.name,
+    product.slug,
+    product.weightOz
+  );
 
   return (
     <section className="marketing-header-offset min-h-screen bg-cream px-4 pb-24 sm:px-6">
@@ -82,6 +89,10 @@ export default async function ProductDetailPage({
                 <span className="text-green">{product.fragrance}</span>
               </p>
             )}
+            <p className="mb-4">
+              <span className="label-caps text-muted">Weight · </span>
+              <span className="text-green">{weightOz} oz</span>
+            </p>
             {product.ingredients && (
               <div className="mb-8">
                 <p className="label-caps text-muted mb-2">Ingredients</p>
@@ -124,10 +135,15 @@ export default async function ProductDetailPage({
 
 function getCategoryGradient(category: string): string {
   const gradients: Record<string, string> = {
+    SOAP: "linear-gradient(135deg, #3D6454, #2C4A3E)",
     BAR_SOAP: "linear-gradient(135deg, #3D6454, #2C4A3E)",
+    BODY_WASH: "linear-gradient(135deg, #2C4A3E, #1a2e26)",
     BATH_BODY: "linear-gradient(135deg, #2C4A3E, #1a2e26)",
-    CANDLES: "linear-gradient(135deg, #C9A96E, #B5552A)",
-    ACCESSORIES: "linear-gradient(135deg, #6B5E52, #3D6454)",
+    CANDLES: "linear-gradient(135deg, #B5552A, #8C3F1E)",
+    ACCESSORIES: "linear-gradient(135deg, #4a6741, #2C4A3E)",
+    LOTION: "linear-gradient(135deg, #C9A96E, #B5552A)",
+    SCRUB: "linear-gradient(135deg, #6B5E52, #3D6454)",
+    AROMATHERAPY: "linear-gradient(135deg, #1a2e26, #2C4A3E)",
     GIFT_SET: "linear-gradient(135deg, #B5552A, #8C3F1E)",
   };
   return gradients[category] || gradients.BAR_SOAP;

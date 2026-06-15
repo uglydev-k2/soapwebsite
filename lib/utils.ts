@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { Category, OrderStatus } from "@prisma/client";
+import { getCategoryDisplayLabel, PRODUCT_CATEGORIES } from "@/lib/categories";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -41,13 +42,9 @@ export function formatDateTime(date: Date | string): string {
   }).format(new Date(date));
 }
 
-export const categoryLabels: Record<Category, string> = {
-  BAR_SOAP: "Bar Soap",
-  BATH_BODY: "Bath & Body Products",
-  CANDLES: "Candles",
-  ACCESSORIES: "Accessories",
-  GIFT_SET: "Gift Set",
-};
+export const categoryLabels: Record<Category, string> = Object.fromEntries(
+  PRODUCT_CATEGORIES.map((c) => [c.value, c.label])
+) as Record<Category, string>;
 
 export const statusColors: Record<OrderStatus, string> = {
   PENDING: "bg-gray-100 text-gray-600",
@@ -61,9 +58,9 @@ export const statusColors: Record<OrderStatus, string> = {
 const categoryGradients: Record<Category, string> = {
   BAR_SOAP: "from-green-3 to-green",
   BATH_BODY: "from-green to-green-2",
-  CANDLES: "from-gold/40 to-terra-2",
-  ACCESSORIES: "from-green-2 to-gold/30",
-  GIFT_SET: "from-gold/50 to-terra",
+  CANDLES: "from-gold/50 to-terra",
+  ACCESSORIES: "from-green-2 to-gold/40",
+  GIFT_SET: "from-terra-2 to-terra",
 };
 
 export function getCategoryGradient(category: Category | string): string {
@@ -86,7 +83,7 @@ export function generateOrderNumber(): string {
 }
 
 export function getCategoryLabel(category: string): string {
-  return category.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return getCategoryDisplayLabel(category);
 }
 
 export function getInitials(name: string): string {

@@ -1,5 +1,6 @@
-import { prisma } from "@/lib/prisma";
+import { adminProductSelect } from "@/lib/admin-product-select";
 import { safeDbQuery } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 import {
   getMissingProductionEnv,
   isDatabaseConfigured,
@@ -107,7 +108,10 @@ async function fetchAdminOverview() {
 
 function buildServiceHealth(missingRequired: string[]): ServiceHealth[] {
   const dbOk = isDatabaseConfigured();
-  const stripeOk = Boolean(process.env.STRIPE_SECRET_KEY?.trim());
+  const squareOk = Boolean(
+    process.env.SQUARE_ACCESS_TOKEN?.trim() &&
+      process.env.NEXT_PUBLIC_SQUARE_APPLICATION_ID?.trim()
+  );
   const resendOk = Boolean(process.env.RESEND_API_KEY?.trim());
   const uploadOk = isSupabaseConfigured();
   const pushOk = isPushConfigured();
@@ -132,10 +136,10 @@ function buildServiceHealth(missingRequired: string[]): ServiceHealth[] {
         : "NextAuth configured",
     },
     {
-      id: "stripe",
-      label: "Stripe Payments",
-      status: stripeOk ? "ok" : "degraded",
-      detail: stripeOk ? "Live checkout enabled" : "STRIPE_SECRET_KEY not set",
+      id: "square",
+      label: "Square Payments",
+      status: squareOk ? "ok" : "degraded",
+      detail: squareOk ? "Live checkout enabled" : "Square credentials not set",
     },
     {
       id: "email",
@@ -214,6 +218,7 @@ async function fetchSearchResults(query: string, limit: number) {
       },
       take: limit,
       orderBy: { name: "asc" },
+      select: adminProductSelect,
     }),
     prisma.customer.findMany({
       where: {

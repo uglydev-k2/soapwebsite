@@ -1,10 +1,10 @@
 import Link from "next/link";
 
-import { PRODUCT_CATEGORIES } from "@/lib/categories";
+import { SHOP_CATEGORY_MENU } from "@/lib/categories";
 
 const shopLinks = [
   { label: "All Products", href: "/collections" },
-  ...PRODUCT_CATEGORIES.map((c) => ({
+  ...SHOP_CATEGORY_MENU.map((c) => ({
     label: c.label,
     href: `/collections/category/${c.slug}`,
   })),

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/lib/validations";
@@ -15,7 +14,6 @@ import { Shield } from "lucide-react";
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function AdminLoginPage() {
-  const router = useRouter();
   const [error, setError] = useState("");
   const [shake, setShake] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -41,8 +39,7 @@ export default function AdminLoginPage() {
       setTimeout(() => setShake(false), 500);
       return;
     }
-    router.push("/admin");
-    router.refresh();
+    window.location.assign("/admin");
   };
 
   return (

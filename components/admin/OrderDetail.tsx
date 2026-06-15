@@ -61,7 +61,7 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
   const [updating, setUpdating] = useState(false);
   const [sending, setSending] = useState(false);
 
-  const timelineIndex = getTimelineIndex(order.status, !!order.stripeId);
+  const timelineIndex = getTimelineIndex(order.status, !!order.paymentId);
 
   const patchOrder = useCallback(
     async (payload: { status?: OrderStatus; notes?: string | null }) => {

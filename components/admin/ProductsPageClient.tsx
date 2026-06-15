@@ -1,32 +1,46 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { ProductsTable } from "@/components/admin/ProductsTable";
-import { cn, formatPrice } from "@/lib/utils";
 import { PRODUCT_CATEGORIES } from "@/lib/categories";
+import { cn, formatPrice } from "@/lib/utils";
 import { CategoryBadge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { useToastStore } from "@/store/toastStore";
-import type { Product } from "@prisma/client";
+import type { AdminProduct } from "@/lib/admin-product-select";
 import { LayoutGrid, List, Trash2, Pencil } from "lucide-react";
 
 export default function ProductsPageClient({
-  products,
   initialView,
+  initialProducts,
+  loadError,
+  productCount,
 }: {
-  products: Product[];
   initialView: string;
+  initialProducts: AdminProduct[];
+  loadError?: string | null;
+  productCount: number;
 }) {
   const router = useRouter();
   const params = useSearchParams();
   const addToast = useToastStore((s) => s.addToast);
   const [view, setView] = useState(initialView);
+  const [products, setProducts] = useState(initialProducts);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [confirmText, setConfirmText] = useState("");
+  const [searchDraft, setSearchDraft] = useState(params.get("search") || "");
+
+  useEffect(() => {
+    setProducts(initialProducts);
+  }, [initialProducts]);
+
+  useEffect(() => {
+    setSearchDraft(params.get("search") || "");
+  }, [params]);
 
   const updateFilter = (key: string, value: string) => {
     const p = new URLSearchParams(params.toString());
@@ -56,13 +70,22 @@ export default function ProductsPageClient({
 
   return (
     <div>
+      {loadError && (
+        <div className="mb-6 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          Could not load products: {loadError}
+        </div>
+      )}
+
       <div className="mb-8 flex flex-col gap-4 sm:mb-6 sm:flex-row sm:flex-wrap sm:items-center">
         <Input
           placeholder="Search products..."
           variant="admin"
           className="w-full sm:max-w-xs"
-          defaultValue={params.get("search") || ""}
-          onChange={(e) => updateFilter("search", e.target.value)}
+          value={searchDraft}
+          onChange={(e) => setSearchDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") updateFilter("search", searchDraft.trim());
+          }}
         />
         <select
           className="admin-input w-full sm:max-w-[160px]"
@@ -87,6 +110,9 @@ export default function ProductsPageClient({
         </select>
         <div className="hidden flex-1 sm:block" />
         <div className="flex items-center justify-between gap-3 sm:justify-end">
+          <p className="label-caps text-muted">
+            {productCount} product{productCount === 1 ? "" : "s"}
+          </p>
           <div className="flex gap-2">
             <button
               type="button"
@@ -125,14 +151,19 @@ export default function ProductsPageClient({
           onDelete={(product) => setDeleteId(product.id)}
         />
       ) : products.length === 0 ? (
-        <div className="text-center py-16 text-muted">
-          <p className="font-serif text-xl text-green mb-2">No products yet</p>
+        <div className="py-16 text-center text-muted">
+          <p className="mb-2 font-serif text-xl text-green">No products in catalog</p>
+          <p className="mb-4 text-sm">
+            {loadError
+              ? "Fix the database connection, then refresh this page."
+              : "Create a product or clear any active filters."}
+          </p>
           <Link href="/admin/products/new">
-            <Button className="mt-4">Create your first product</Button>
+            <Button className="mt-4">+ New Product</Button>
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {products.map((p) => (
             <div key={p.id} className="admin-card overflow-hidden">
               <div
@@ -142,21 +173,21 @@ export default function ProductsPageClient({
                 }}
               />
               <div className="p-4">
-                <div className="flex justify-between items-start mb-2">
+                <div className="mb-2 flex items-start justify-between">
                   <h3 className="font-serif text-lg text-green">{p.name}</h3>
                   <CategoryBadge category={p.category} />
                 </div>
-                <p className="label-caps text-muted text-[0.65rem] mb-2">{p.slug}</p>
-                <div className="flex gap-2 items-baseline mb-2">
+                <p className="label-caps mb-2 text-[0.65rem] text-muted">{p.slug}</p>
+                <div className="mb-2 flex items-baseline gap-2">
                   <span className="font-serif text-green">{formatPrice(p.price)}</span>
                   {p.comparePrice && (
-                    <span className="text-muted line-through text-sm">
+                    <span className="text-sm text-muted line-through">
                       {formatPrice(p.comparePrice)}
                     </span>
                   )}
                 </div>
                 <p
-                  className={`label-caps text-xs mb-4 ${
+                  className={`label-caps mb-4 text-xs ${
                     p.stock > 20
                       ? "text-green"
                       : p.stock >= 5
@@ -196,7 +227,7 @@ export default function ProductsPageClient({
       )}
 
       <Modal open={!!deleteId} onClose={() => setDeleteId(null)} title="Delete Product">
-        <p className="text-sm text-muted mb-4">
+        <p className="mb-4 text-sm text-muted">
           Are you sure? This cannot be undone. Type DELETE to confirm.
         </p>
         <Input
@@ -205,7 +236,7 @@ export default function ProductsPageClient({
           onChange={(e) => setConfirmText(e.target.value)}
           placeholder="DELETE"
         />
-        <div className="flex gap-3 mt-4">
+        <div className="mt-4 flex gap-3">
           <Button variant="danger" onClick={handleDelete} disabled={confirmText !== "DELETE"}>
             Delete Permanently
           </Button>

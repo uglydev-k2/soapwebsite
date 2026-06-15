@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import {
   requireAdmin,
@@ -10,6 +11,7 @@ import { withApiHandler } from "@/lib/api-handler";
 import { logAdminAction } from "@/lib/audit";
 import { getClientIp } from "@/lib/rate-limit";
 import { getStripe } from "@/lib/stripe";
+import { getSquareClient, isSquareConfigured } from "@/lib/square";
 import type { OrderStatus } from "@prisma/client";
 
 export const GET = withApiHandler("admin.billing", async () => {
@@ -69,7 +71,7 @@ export const GET = withApiHandler("admin.billing", async () => {
       status: o.status,
       amount: o.total,
       renewalDate: o.createdAt,
-      stripeId: o.stripeId,
+      paymentId: o.paymentId,
       items: o.items.length,
     })),
     metrics: {
@@ -82,6 +84,16 @@ export const GET = withApiHandler("admin.billing", async () => {
     },
   });
 });
+
+function getPaymentProvider(notes: string | null | undefined): "square" | "stripe" {
+  if (!notes) return "square";
+  try {
+    const parsed = JSON.parse(notes) as { paymentProvider?: string };
+    return parsed.paymentProvider === "stripe" ? "stripe" : "square";
+  } catch {
+    return "square";
+  }
+}
 
 async function stripeRefund(sessionId: string): Promise<boolean> {
   if (!process.env.STRIPE_SECRET_KEY) return false;
@@ -96,6 +108,24 @@ async function stripeRefund(sessionId: string): Promise<boolean> {
     return true;
   } catch (err) {
     console.error("[msvee:billing] Stripe refund failed:", err);
+    return false;
+  }
+}
+
+async function squareRefund(paymentId: string, amount: number): Promise<boolean> {
+  if (!isSquareConfigured()) return false;
+  try {
+    await getSquareClient().refunds.refundPayment({
+      idempotencyKey: randomUUID(),
+      paymentId,
+      amountMoney: {
+        amount: BigInt(Math.round(amount * 100)),
+        currency: "USD",
+      },
+    });
+    return true;
+  } catch (err) {
+    console.error("[msvee:billing] Square refund failed:", err);
     return false;
   }
 }
@@ -122,7 +152,7 @@ export const PATCH = withApiHandler(
     if (!order) return errorResponse("Order not found", 404);
 
     let newStatus: OrderStatus;
-    let stripeRefunded = false;
+    let paymentRefunded = false;
 
     if (action === "cancel") {
       if (["CANCELLED", "REFUNDED"].includes(order.status)) {
@@ -133,8 +163,13 @@ export const PATCH = withApiHandler(
       if (order.status === "REFUNDED") {
         return errorResponse("Order already refunded");
       }
-      if (order.stripeId) {
-        stripeRefunded = await stripeRefund(order.stripeId);
+      if (order.paymentId) {
+        const provider = getPaymentProvider(order.notes);
+        if (provider === "stripe" || order.paymentId.startsWith("cs_")) {
+          paymentRefunded = await stripeRefund(order.paymentId);
+        } else {
+          paymentRefunded = await squareRefund(order.paymentId, order.total);
+        }
       }
       newStatus = "REFUNDED";
     }
@@ -158,7 +193,7 @@ export const PATCH = withApiHandler(
         action,
         previousStatus: order.status,
         newStatus,
-        stripeRefunded,
+        paymentRefunded,
         orderNumber: order.orderNumber,
       },
       ipAddress: getClientIp(request),
@@ -166,7 +201,7 @@ export const PATCH = withApiHandler(
 
     return jsonResponse({
       order: updated,
-      stripeRefunded,
+      paymentRefunded,
     });
   }
 );

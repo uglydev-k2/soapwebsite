@@ -17,7 +17,7 @@ interface Subscription {
   status: string;
   amount: number;
   renewalDate: string;
-  stripeId: string | null;
+  paymentId: string | null;
   items: number;
 }
 
@@ -71,7 +71,7 @@ export default function BillingPageClient() {
       }
       const msg =
         confirm.action === "refund"
-          ? json.data?.stripeRefunded
+          ? json.data?.paymentRefunded
             ? "Order refunded via Stripe"
             : "Order marked refunded"
           : "Order cancelled";
@@ -214,7 +214,7 @@ export default function BillingPageClient() {
           <>
             <p className="mb-4 text-sm text-muted">
               {confirm.action === "refund"
-                ? `Refund ${confirm.order.orderNumber} (${formatPrice(confirm.order.amount)})?${confirm.order.stripeId ? " Stripe will be charged back if configured." : ""}`
+                ? `Refund ${confirm.order.orderNumber} (${formatPrice(confirm.order.amount)})?${confirm.order.paymentId ? " The payment will be refunded via Square if configured." : ""}`
                 : `Cancel ${confirm.order.orderNumber}? This cannot be undone.`}
             </p>
             <div className="flex justify-end gap-2">

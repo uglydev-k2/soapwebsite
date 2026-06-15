@@ -1,5 +1,8 @@
+import type { Category } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { isDatabaseConfigured } from "@/lib/env";
+import { calculateShippingQuote } from "@/lib/shipping-calculator";
+import { getCountryCode } from "@/lib/shipping";
 
 const TAX_RATE = 0.08;
 
@@ -38,13 +41,54 @@ export async function getCheckoutSettings(): Promise<CheckoutSettings> {
 
 export function calculateOrderTotals(
   subtotal: number,
-  settings: CheckoutSettings
+  settings: CheckoutSettings,
+  shippingOverride?: number
 ) {
   const shipping =
-    subtotal >= settings.freeShippingThreshold ? 0 : settings.flatShippingRate;
+    shippingOverride ??
+    (subtotal >= settings.freeShippingThreshold ? 0 : settings.flatShippingRate);
   const tax = Math.round(subtotal * settings.taxRate * 100) / 100;
   const total = Math.round((subtotal + shipping + tax) * 100) / 100;
   return { subtotal, shipping, tax, total };
+}
+
+export async function calculateCheckoutShipping(
+  items: ValidatedCartItem[],
+  address: Pick<ShippingAddress, "country" | "state" | "postalCode">,
+  subtotal: number
+) {
+  const products = await Promise.all(
+    items.map(async (item) => {
+      if (!isDatabaseConfigured()) {
+        return { item, category: "BAR_SOAP" as Category, weightOz: null };
+      }
+      const product = await prisma.product.findUnique({
+        where: { id: item.productId },
+        select: { category: true, weightOz: true },
+      });
+      return {
+        item,
+        category: product?.category ?? ("BAR_SOAP" as Category),
+        weightOz: product?.weightOz ?? null,
+      };
+    })
+  );
+
+  return calculateShippingQuote({
+    items: products.map(({ item, category, weightOz }) => ({
+      productId: item.productId,
+      quantity: item.quantity,
+      price: item.price,
+      category,
+      name: item.name,
+      slug: item.slug,
+      weightOz,
+    })),
+    country: getCountryCode(address.country),
+    state: address.state,
+    postalCode: address.postalCode,
+    subtotal,
+  });
 }
 
 export type ShippingAddress = {

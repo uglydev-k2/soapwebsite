@@ -28,6 +28,7 @@ type ProductSort = "featured" | "newest" | "price-asc" | "price-desc" | "name";
 
 interface ActiveProductOptions {
   category?: Category;
+  categories?: Category[];
   scent?: string;
   sort?: ProductSort;
   q?: string;
@@ -71,11 +72,13 @@ function matchesSearch(product: Product, query: string): boolean {
 
 function applyFallbackFilters(
   products: Product[],
-  { category, scent, sort = "featured", q }: ActiveProductOptions
+  { category, categories, scent, sort = "featured", q }: ActiveProductOptions
 ): Product[] {
   let filtered = products.filter((p) => p.active);
 
-  if (category) {
+  if (categories?.length) {
+    filtered = filtered.filter((p) => categories.includes(p.category));
+  } else if (category) {
     filtered = filtered.filter((p) => p.category === category);
   }
 
@@ -124,14 +127,20 @@ function applyFallbackFilters(
 export async function getActiveProducts(
   options: ActiveProductOptions = {}
 ): Promise<Product[]> {
-  const { category, scent, sort = "featured", q } = options;
+  const { category, categories, scent, sort = "featured", q } = options;
+  const categoryFilter = categories?.length
+    ? { category: { in: categories } }
+    : category
+      ? { category }
+      : {};
+
   const products = await safeDbQuery(
     "getActiveProducts",
     () =>
       prisma.product.findMany({
         where: {
           active: true,
-          ...(category ? { category } : {}),
+          ...categoryFilter,
           ...(scent
             ? {
                 OR: [

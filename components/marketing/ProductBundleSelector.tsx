@@ -5,12 +5,10 @@ import type { Product } from "@prisma/client";
 import { formatPrice } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import AddToCartButton from "@/components/marketing/AddToCartButton";
-
-const bundleOptions = [
-  { label: "Single", quantity: 1, note: "Perfect for first try" },
-  { label: "3-Pack", quantity: 3, note: "Best for weekly ritual" },
-  { label: "6-Pack", quantity: 6, note: "Stock up and save trips" },
-] as const;
+import {
+  BUNDLE_OPTIONS,
+  getBundleLineTotal,
+} from "@/lib/bundle-pricing";
 
 export default function ProductBundleSelector({
   product,
@@ -20,7 +18,10 @@ export default function ProductBundleSelector({
   disabled?: boolean;
 }) {
   const [selectedQty, setSelectedQty] = useState<number>(1);
-  const totalPrice = useMemo(() => product.price * selectedQty, [product.price, selectedQty]);
+  const totalPrice = useMemo(
+    () => getBundleLineTotal(product.price, selectedQty),
+    [product.price, selectedQty]
+  );
 
   return (
     <div className="space-y-4 border border-green/10 bg-white p-5" style={{ borderRadius: "2px" }}>
@@ -33,7 +34,7 @@ export default function ProductBundleSelector({
       </div>
 
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-        {bundleOptions.map((option) => (
+        {BUNDLE_OPTIONS.map((option) => (
           <button
             key={option.quantity}
             type="button"
@@ -48,6 +49,12 @@ export default function ProductBundleSelector({
           >
             <p className="label-caps text-green">{option.label}</p>
             <p className="mt-1 text-xs text-muted">{option.note}</p>
+            <p className="mt-2 text-sm font-medium text-green">
+              {formatPrice(getBundleLineTotal(product.price, option.quantity))}
+              {option.discount > 0 ? (
+                <span className="ml-1 text-xs text-terra">Save ${option.discount}</span>
+              ) : null}
+            </p>
           </button>
         ))}
       </div>

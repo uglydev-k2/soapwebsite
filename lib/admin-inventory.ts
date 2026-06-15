@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { safeDbQuery } from "@/lib/db";
+import { adminProductSelect } from "@/lib/admin-product-select";
 
 const LOW_STOCK_THRESHOLD = 10;
 
@@ -10,6 +11,7 @@ export async function getLowStockProducts(threshold = LOW_STOCK_THRESHOLD) {
       prisma.product.findMany({
         where: { active: true, stock: { lte: threshold } },
         orderBy: [{ stock: "asc" }, { name: "asc" }],
+        select: adminProductSelect,
       }),
     []
   );

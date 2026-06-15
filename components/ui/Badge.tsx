@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { getCategoryDisplayLabel } from "@/lib/categories";
 import type { OrderStatus } from "@prisma/client";
 import type { ReactNode } from "react";
 
@@ -65,7 +66,7 @@ export function CategoryBadge({
       )}
       style={{ borderRadius: 0 }}
     >
-      {category.replace(/_/g, " ")}
+      {getCategoryDisplayLabel(category)}
     </span>
   );
 }

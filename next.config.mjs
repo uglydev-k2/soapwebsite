@@ -24,6 +24,20 @@ const nextConfig = {
       { protocol: "https", hostname: "uploadthing.com" },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/collections/all",
+        destination: "/collections",
+        permanent: true,
+      },
+      {
+        source: "/collections/all/products/:handle",
+        destination: "/products/:handle",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

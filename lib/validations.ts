@@ -1,6 +1,8 @@
 import { z } from "zod";
+import { SHIPPING_COUNTRIES } from "@/lib/shipping";
 
-import { PRODUCT_CATEGORY_VALUES } from "@/lib/categories";
+const countryCodes = SHIPPING_COUNTRIES.map((c) => c.code) as [string, ...string[]];
+const countryNames = SHIPPING_COUNTRIES.map((c) => c.name) as [string, ...string[]];
 
 export const productSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -8,7 +10,13 @@ export const productSchema = z.object({
   description: z.string().min(1, "Description is required"),
   price: z.coerce.number().positive("Price must be positive"),
   comparePrice: z.coerce.number().positive().optional().nullable(),
-  category: z.enum(PRODUCT_CATEGORY_VALUES),
+  category: z.enum([
+    "BAR_SOAP",
+    "BATH_BODY",
+    "CANDLES",
+    "ACCESSORIES",
+    "GIFT_SET",
+  ]),
   stock: z.coerce.number().int().min(0),
   images: z
     .array(z.union([z.string().url(), z.string().startsWith("/")]))
@@ -16,6 +24,10 @@ export const productSchema = z.object({
     .default([]),
   ingredients: z.string().optional().nullable(),
   fragrance: z.string().optional().nullable(),
+  weightOz: z.preprocess(
+    (val) => (val === "" || val === null || val === undefined ? null : val),
+    z.coerce.number().positive("Weight must be greater than 0").nullable().optional()
+  ),
   featured: z.boolean().default(false),
   active: z.boolean().default(true),
 });
@@ -134,7 +146,7 @@ export const changePasswordSchema = z
     path: ["confirmPassword"],
   });
 
-export const checkoutFormSchema = z.object({
+const checkoutAddressBase = z.object({
   email: z.string().email("Please enter a valid email"),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
@@ -142,15 +154,29 @@ export const checkoutFormSchema = z.object({
   line1: z.string().min(1, "Address is required"),
   line2: z.string().optional(),
   city: z.string().min(1, "City is required"),
-  state: z.string().min(2, "State is required"),
-  postalCode: z
-    .string()
-    .min(5, "ZIP code is required")
-    .max(10, "Enter a valid US ZIP code"),
-  country: z.literal("United States"),
+  state: z.string().optional(),
+  postalCode: z.string().min(3, "Postal code is required").max(12),
+  country: z.union([z.enum(countryCodes), z.enum(countryNames)]),
 });
 
-export const checkoutSchema = checkoutFormSchema.extend({
+function refineUsState(
+  data: z.infer<typeof checkoutAddressBase>,
+  ctx: z.RefinementCtx
+) {
+  const isUs = data.country === "US" || data.country === "United States";
+  if (isUs && (!data.state || data.state.length < 2)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "State is required",
+      path: ["state"],
+    });
+  }
+}
+
+export const checkoutFormSchema = checkoutAddressBase.superRefine(refineUsState);
+
+export const checkoutSchema = checkoutAddressBase
+  .extend({
   items: z
     .array(
       z.object({
@@ -163,7 +189,27 @@ export const checkoutSchema = checkoutFormSchema.extend({
       })
     )
     .min(1, "Cart is empty"),
-});
+})
+  .superRefine(refineUsState);
+
+export const checkoutPaymentSchema = checkoutAddressBase
+  .extend({
+    items: z
+      .array(
+        z.object({
+          productId: z.string().min(1),
+          quantity: z.number().int().min(1),
+          price: z.number().positive(),
+          name: z.string().optional(),
+          slug: z.string().optional(),
+          image: z.string().optional(),
+        })
+      )
+      .min(1, "Cart is empty"),
+    sourceId: z.string().min(1, "Payment token is required"),
+    idempotencyKey: z.string().uuid("Invalid payment request"),
+  })
+  .superRefine(refineUsState);
 
 export type CheckoutFormData = z.infer<typeof checkoutFormSchema>;
 export type CheckoutPayload = z.infer<typeof checkoutSchema>;

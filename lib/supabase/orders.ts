@@ -1,5 +1,6 @@
 import { createAdminClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin";
 import type { ShippingAddress, ValidatedCartItem } from "@/lib/checkout";
+import { getBundleLineTotal } from "@/lib/bundle-pricing";
 
 export type SupabaseOrderRecord = {
   id: string;
@@ -41,7 +42,8 @@ interface SaveSupabaseOrderInput {
   shipping: number;
   tax: number;
   total: number;
-  stripeSessionId: string;
+  paymentExternalId: string;
+  paymentProvider?: "square" | "stripe";
   shippingAddress: ShippingAddress;
   items: ValidatedCartItem[];
 }
@@ -69,8 +71,8 @@ export async function saveOrderToSupabase(
         tax: input.tax,
         total: input.total,
         currency: "usd",
-        payment_provider: "stripe",
-        stripe_session_id: input.stripeSessionId,
+        payment_provider: input.paymentProvider ?? "square",
+        stripe_session_id: input.paymentExternalId,
         shipping_address: input.shippingAddress,
       })
       .select("id")
@@ -81,15 +83,18 @@ export async function saveOrderToSupabase(
       return null;
     }
 
-    const orderItems = input.items.map((item) => ({
-      order_id: order.id,
-      product_id: item.productId,
-      product_name: item.name,
-      product_slug: item.slug,
-      quantity: item.quantity,
-      unit_price: item.price,
-      line_total: Math.round(item.price * item.quantity * 100) / 100,
-    }));
+    const orderItems = input.items.map((item) => {
+      const lineTotal = getBundleLineTotal(item.price, item.quantity);
+      return {
+        order_id: order.id,
+        product_id: item.productId,
+        product_name: item.name,
+        product_slug: item.slug,
+        quantity: item.quantity,
+        unit_price: Math.round((lineTotal / item.quantity) * 100) / 100,
+        line_total: lineTotal,
+      };
+    });
 
     const { error: itemsError } = await supabase
       .from("order_items")
@@ -106,8 +111,8 @@ export async function saveOrderToSupabase(
   }
 }
 
-export async function getSupabaseOrderByStripeSession(
-  stripeSessionId: string
+export async function getSupabaseOrderByPaymentId(
+  paymentId: string
 ): Promise<SupabaseOrderRecord | null> {
   if (!isSupabaseAdminConfigured()) return null;
 
@@ -144,7 +149,7 @@ export async function getSupabaseOrderByStripeSession(
         )
       `
       )
-      .eq("stripe_session_id", stripeSessionId)
+      .eq("stripe_session_id", paymentId)
       .maybeSingle();
 
     if (error || !data) return null;
@@ -152,6 +157,13 @@ export async function getSupabaseOrderByStripeSession(
   } catch {
     return null;
   }
+}
+
+/** @deprecated Use getSupabaseOrderByPaymentId */
+export async function getSupabaseOrderByStripeSession(
+  stripeSessionId: string
+): Promise<SupabaseOrderRecord | null> {
+  return getSupabaseOrderByPaymentId(stripeSessionId);
 }
 
 export async function getSupabaseOrdersForUser(

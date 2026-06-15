@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
-import type { Product } from "@prisma/client";
+import type { AdminProduct } from "@/lib/admin-product-select";
 import { Minus, Plus, Save } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useToastStore } from "@/store/toastStore";
@@ -11,7 +11,7 @@ import { formatPrice, getCategoryLabel } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
 interface InventoryPageClientProps {
-  products: Product[];
+  products: AdminProduct[];
   threshold: number;
 }
 

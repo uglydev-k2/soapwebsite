@@ -1,27 +1,31 @@
 import { NextRequest } from "next/server";
-import Stripe from "stripe";
-import { getStripe } from "@/lib/stripe";
 import { jsonResponse, errorResponse } from "@/lib/api-helpers";
 import { withApiHandler } from "@/lib/api-handler";
-import { checkoutSchema } from "@/lib/validations";
+import { checkoutPaymentSchema } from "@/lib/validations";
 import {
   calculateOrderTotals,
   getCheckoutSettings,
-  getSiteUrl,
   validateCartItems,
+  calculateCheckoutShipping,
   type ShippingAddress,
 } from "@/lib/checkout";
+import { getBundleLineTotal } from "@/lib/bundle-pricing";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
-import { isUsCountry } from "@/lib/shipping";
+import { getCountryCode } from "@/lib/shipping";
+import { getSquareClient, getSquareLocationId, isSquareConfigured } from "@/lib/square";
+import { fulfillOrder } from "@/lib/fulfill-order";
+import { generateOrderNumber } from "@/lib/utils";
+
+const SUCCESS_STATUSES = new Set(["COMPLETED", "APPROVED", "PENDING"]);
 
 export const POST = withApiHandler("checkout.create", async (request: NextRequest) => {
-  if (!process.env.STRIPE_SECRET_KEY) {
-    return errorResponse("Stripe is not configured", 503);
+  if (!isSquareConfigured()) {
+    return errorResponse("Square payments are not configured", 503);
   }
 
   const body = await request.json();
-  const parsed = checkoutSchema.safeParse(body);
+  const parsed = checkoutPaymentSchema.safeParse(body);
   if (!parsed.success) {
     return errorResponse(parsed.error.errors[0]?.message || "Invalid checkout data");
   }
@@ -36,24 +40,27 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
   );
   if (cartError) return errorResponse(cartError);
 
-  if (!isUsCountry(parsed.data.country)) {
-    return errorResponse("We only ship to addresses within the United States");
-  }
-
   const subtotal = validatedItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) => sum + getBundleLineTotal(item.price, item.quantity),
     0
   );
-  const totals = calculateOrderTotals(subtotal, settings);
 
   const shippingAddress: ShippingAddress = {
     line1: parsed.data.line1,
     line2: parsed.data.line2,
     city: parsed.data.city,
-    state: parsed.data.state,
+    state: parsed.data.state ?? "",
     postalCode: parsed.data.postalCode,
     country: parsed.data.country,
   };
+
+  const shippingQuote = await calculateCheckoutShipping(
+    validatedItems,
+    shippingAddress,
+    subtotal
+  );
+
+  const totals = calculateOrderTotals(subtotal, settings, shippingQuote.shipping);
 
   let supabaseUserId: string | null = null;
   if (isSupabaseConfigured()) {
@@ -68,77 +75,85 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
     }
   }
 
-  const siteUrl = getSiteUrl();
-  const cartPayload = JSON.stringify(
-    validatedItems.map((item) => ({
-      productId: item.productId,
-      name: item.name,
-      slug: item.slug,
-      price: item.price,
-      quantity: item.quantity,
-    }))
-  );
+  const orderNumber = generateOrderNumber();
+  const amountCents = BigInt(Math.round(totals.total * 100));
 
-  const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = validatedItems.map(
-    (item) => ({
-      price_data: {
-        currency: "usd",
-        product_data: {
-          name: item.name,
-          images: item.image ? [item.image] : [],
-          metadata: { productId: item.productId },
-        },
-        unit_amount: Math.round(item.price * 100),
+  let paymentResponse;
+  try {
+    paymentResponse = await getSquareClient().payments.create({
+      sourceId: parsed.data.sourceId,
+      idempotencyKey: parsed.data.idempotencyKey,
+      amountMoney: {
+        amount: amountCents,
+        currency: "USD",
       },
-      quantity: item.quantity,
-    })
-  );
-
-  if (totals.shipping > 0) {
-    lineItems.push({
-      price_data: {
-        currency: "usd",
-        product_data: { name: "Shipping" },
-        unit_amount: Math.round(totals.shipping * 100),
+      locationId: getSquareLocationId(),
+      referenceId: orderNumber.slice(0, 40),
+      note: `MsVee Soaps order ${orderNumber}`,
+      buyerEmailAddress: parsed.data.email,
+      shippingAddress: {
+        addressLine1: parsed.data.line1,
+        addressLine2: parsed.data.line2,
+        locality: parsed.data.city,
+        administrativeDistrictLevel1: parsed.data.state ?? undefined,
+        postalCode: parsed.data.postalCode,
+        country: getCountryCode(parsed.data.country) as
+          | "US"
+          | "CA"
+          | "MX"
+          | "GB"
+          | "AU"
+          | "DE"
+          | "FR"
+          | "IE"
+          | "NL"
+          | "JP"
+          | "NZ"
+          | "SG",
+        firstName: parsed.data.firstName,
+        lastName: parsed.data.lastName,
       },
-      quantity: 1,
+      autocomplete: true,
     });
+  } catch (error) {
+    console.error("[msvee:checkout] Square payment failed:", error);
+    return errorResponse("Payment could not be processed. Please try again.", 402);
   }
 
-  if (totals.tax > 0) {
-    lineItems.push({
-      price_data: {
-        currency: "usd",
-        product_data: { name: "Tax" },
-        unit_amount: Math.round(totals.tax * 100),
-      },
-      quantity: 1,
-    });
+  const payment = paymentResponse.payment;
+  if (!payment?.id) {
+    return errorResponse("Payment could not be processed. Please try again.", 402);
   }
 
-  const session = await getStripe().checkout.sessions.create({
-    mode: "payment",
-    customer_email: parsed.data.email,
-    line_items: lineItems,
-    shipping_address_collection: {
-      allowed_countries: ["US"],
-    },
-    success_url: `${siteUrl}/order/confirmation?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${siteUrl}/checkout?cancelled=true`,
-    metadata: {
-      firstName: parsed.data.firstName,
-      lastName: parsed.data.lastName,
-      email: parsed.data.email,
-      phone: parsed.data.phone ?? "",
-      userId: supabaseUserId ?? "",
-      cartItems: cartPayload.slice(0, 500),
-      shippingAddress: JSON.stringify(shippingAddress).slice(0, 500),
-      subtotal: String(totals.subtotal),
-      shipping: String(totals.shipping),
-      tax: String(totals.tax),
-      total: String(totals.total),
-    },
+  if (!payment.status || !SUCCESS_STATUSES.has(payment.status)) {
+    return errorResponse(
+      payment.status === "FAILED"
+        ? "Your card was declined. Please try another payment method."
+        : "Payment could not be completed. Please try again.",
+      402
+    );
+  }
+
+  const result = await fulfillOrder({
+    orderNumber,
+    email: parsed.data.email,
+    firstName: parsed.data.firstName,
+    lastName: parsed.data.lastName,
+    phone: parsed.data.phone,
+    userId: supabaseUserId,
+    shippingAddress,
+    subtotal: totals.subtotal,
+    shipping: totals.shipping,
+    tax: totals.tax,
+    total: totals.total,
+    paymentId: payment.id,
+    paymentProvider: "square",
+    cartItems: validatedItems,
   });
 
-  return jsonResponse({ url: session.url, sessionId: session.id });
+  return jsonResponse({
+    paymentId: payment.id,
+    orderNumber: result.orderNumber,
+    orderId: result.orderId,
+  });
 });

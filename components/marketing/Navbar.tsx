@@ -11,6 +11,7 @@ import { useWishlistStore } from "@/store/wishlistStore";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import { EASE_OUT, fadeUp, staggerContainer } from "@/lib/motion";
+import { SHOP_CATEGORY_MENU } from "@/lib/categories";
 import type { NavbarAuthUser } from "@/lib/navbar-auth";
 
 const navLinks = [
@@ -248,7 +249,7 @@ export default function Navbar({
           </button>
         </div>
 
-        <ul className="flex flex-1 flex-col gap-1 px-6 py-8">
+        <ul className="flex flex-1 flex-col gap-1 overflow-y-auto px-6 py-6">
           {navLinks.map((link) => (
             <li key={link.href}>
               <Link
@@ -260,6 +261,33 @@ export default function Navbar({
               </Link>
             </li>
           ))}
+
+          <li className="pt-6">
+            <p className="label-caps mb-3 text-gold/80">Categories</p>
+            <ul className="space-y-0 border border-cream/10 bg-cream/5 px-4">
+              {SHOP_CATEGORY_MENU.map((category) => (
+                <li key={category.slug} className="border-b border-cream/10 last:border-b-0">
+                  <Link
+                    href={`/collections/category/${category.slug}`}
+                    className="block py-3.5 font-serif text-lg text-cream/90 transition-colors hover:text-gold"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {category.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </li>
+
+          <li className="pt-4">
+            <Link
+              href="/#reviews"
+              className="block py-3 font-serif text-lg text-cream/90 transition-colors hover:text-gold"
+              onClick={() => setMobileOpen(false)}
+            >
+              Reviews
+            </Link>
+          </li>
         </ul>
 
         <div className="border-t border-cream/10 p-6 space-y-4">
