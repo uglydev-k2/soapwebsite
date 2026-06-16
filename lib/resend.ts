@@ -1,4 +1,8 @@
 import { Resend } from "resend";
+import {
+  type EmailOrderItem,
+  renderShippingEmailHtml,
+} from "@/lib/email-templates";
 
 function getResend() {
   if (!process.env.RESEND_API_KEY) return null;
@@ -47,22 +51,22 @@ export async function sendOrderConfirmation(
 export async function sendTrackingEmail(
   email: string,
   orderNumber: string,
-  trackingInfo?: string
+  options?: {
+    trackingInfo?: string;
+    items?: EmailOrderItem[];
+  }
 ) {
   const resend = getResend();
   if (!resend) return;
+
+  const items = options?.items ?? [];
+  const trackingInfo = options?.trackingInfo;
+
   await resend.emails.send({
     from: process.env.RESEND_FROM_EMAIL || "hello@msvee.co",
     to: email,
     subject: `Your Order Has Shipped — ${orderNumber}`,
-    html: `
-      <div style="font-family: Georgia, serif; color: #1C1C1C; max-width: 560px; margin: 0 auto;">
-        <h1 style="color: #2C4A3E; font-weight: 300;">On Its Way</h1>
-        <p>Order <strong>${orderNumber}</strong> has shipped.</p>
-        ${trackingInfo ? `<p>Tracking: ${trackingInfo}</p>` : ""}
-        <p style="color: #6B5E52;">Your botanical ritual is en route.</p>
-      </div>
-    `,
+    html: renderShippingEmailHtml({ orderNumber, items, trackingInfo }),
   });
 }
 

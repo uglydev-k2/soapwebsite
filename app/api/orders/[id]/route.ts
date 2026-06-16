@@ -44,7 +44,14 @@ export async function PATCH(
   });
 
   if (parsed.data.status === "SHIPPED" && order.customer.email) {
-    await sendTrackingEmail(order.customer.email, order.orderNumber);
+    await sendTrackingEmail(order.customer.email, order.orderNumber, {
+      items: order.items.map((item) => ({
+        name: item.product.name,
+        quantity: item.quantity,
+        price: item.price,
+        image: item.product.images[0] ?? null,
+      })),
+    });
   }
 
   await logAdminAction({
@@ -75,7 +82,10 @@ export async function POST(
 
   const order = await prisma.order.findUnique({
     where: { id: params.id },
-    include: { customer: true },
+    include: {
+      customer: true,
+      items: { include: { product: { select: { name: true, images: true } } } },
+    },
   });
 
   if (!order) return errorResponse("Order not found", 404);
@@ -86,11 +96,15 @@ export async function POST(
   const trackingInfo =
     typeof body.trackingInfo === "string" ? body.trackingInfo : undefined;
 
-  await sendTrackingEmail(
-    order.customer.email,
-    order.orderNumber,
-    trackingInfo
-  );
+  await sendTrackingEmail(order.customer.email, order.orderNumber, {
+    trackingInfo,
+    items: order.items.map((item) => ({
+      name: item.product.name,
+      quantity: item.quantity,
+      price: item.price,
+      image: item.product.images[0] ?? null,
+    })),
+  });
 
   await logAdminAction({
     adminId: session!.user!.id,
