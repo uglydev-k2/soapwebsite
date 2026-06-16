@@ -71,7 +71,7 @@ export function renderShippingEmailHtml(data: {
 
   return `
     <div style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; max-width: 560px; margin: 0 auto; padding: 8px 0;">
-      <p style="margin:0 0 8px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#963f1a;">mvlusciouslather</p>
+      <p style="margin:0 0 8px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#963f1a;">MV Luscious Lather</p>
       <h1 style="color: #1f342c; font-weight: 400; font-size: 28px; margin: 0 0 8px;">On Its Way</h1>
       <p style="margin:0 0 4px;font-size:16px;line-height:1.6;">Order <strong>${escapeHtml(data.orderNumber)}</strong> has shipped.</p>
       <p style="margin:0 0 8px;font-size:15px;color:#4f4740;">Your botanical ritual is en route.</p>

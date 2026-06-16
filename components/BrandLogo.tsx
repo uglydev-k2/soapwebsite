@@ -1,41 +1,38 @@
+import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { BRAND_LOGO_ALT } from "@/lib/brand";
 
 type BrandLogoProps = {
   className?: string;
   /** Smaller text for nav / compact headers */
   size?: "sm" | "md" | "lg";
-  /** Light text on dark backgrounds (footer, splash) */
+  /** Kept for API compatibility — logo is the same on all backgrounds */
   variant?: "default" | "light" | "dark";
 };
 
-const sizeClasses = {
-  sm: "text-xl sm:text-2xl",
-  md: "text-2xl sm:text-3xl",
-  lg: "text-5xl",
-};
+const sizePx = {
+  sm: 44,
+  md: 56,
+  lg: 120,
+} as const;
 
 export function BrandLogo({
   className,
   size = "sm",
-  variant = "default",
 }: BrandLogoProps) {
-  const mainColor =
-    variant === "light"
-      ? "text-cream"
-      : variant === "dark"
-        ? "text-green-2"
-        : "text-green";
+  const px = sizePx[size];
 
   return (
-    <span
-      className={cn(
-        "inline-flex items-baseline font-serif uppercase tracking-wide",
-        sizeClasses[size],
-        className
-      )}
-    >
-      <span className="italic text-terra normal-case">MV</span>
-      <span className={cn(mainColor)}>LUSCIOUSLATHER</span>
+    <span className={cn("inline-flex shrink-0 items-center", className)}>
+      <Image
+        src="/images/mv-luscious-lather-logo.jpg"
+        alt={BRAND_LOGO_ALT}
+        width={px}
+        height={px}
+        className="h-auto w-auto"
+        style={{ width: px, height: px }}
+        priority={size === "lg"}
+      />
     </span>
   );
 }

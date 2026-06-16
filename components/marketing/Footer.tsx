@@ -147,7 +147,7 @@ export default function Footer() {
 
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-cream/10 pt-8 sm:flex-row">
           <p className="text-xs text-cream/40">
-            &copy; {year} mvlusciouslather. All rights reserved.
+            &copy; {year} MV Luscious Lather. All rights reserved.
           </p>
           <p className="label-caps text-cream/40">
             Handcrafted with botanical love
