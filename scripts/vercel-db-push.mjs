@@ -19,10 +19,17 @@ function run(cmd) {
 
 const initSql = join(process.cwd(), "scripts", "init-prisma-tables.sql");
 const weightSql = join(process.cwd(), "scripts", "add-product-weight.sql");
+const backfillWeightSql = join(process.cwd(), "scripts", "backfill-product-weights.sql");
 
 if (existsSync(weightSql)) {
   run(
     "npx prisma db execute --file scripts/add-product-weight.sql --schema prisma/schema.prisma"
+  );
+}
+
+if (existsSync(backfillWeightSql)) {
+  run(
+    "npx prisma db execute --file scripts/backfill-product-weights.sql --schema prisma/schema.prisma"
   );
 }
 

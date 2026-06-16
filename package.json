@@ -8,6 +8,7 @@
     "vercel-build": "prisma generate && node scripts/vercel-db-push.mjs && next build",
     "db:setup": "bash scripts/db-setup.sh",
     "admin:create": "tsx scripts/create-admin.ts",
+    "db:backfill-weights": "tsx scripts/backfill-product-weights.ts",
     "env:vercel-checklist": "node scripts/print-vercel-env-checklist.mjs",
     "env:push-vercel": "node scripts/push-vercel-env-api.mjs",
     "setup:uploadthing": "node scripts/setup-uploadthing.mjs",
