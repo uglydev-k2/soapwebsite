@@ -17,9 +17,9 @@ export async function generateMetadata({
   params: { slug: string };
 }) {
   const category = getShopCategoryBySlug(params.slug);
-  if (!category) return { title: "Category — MsVee Soaps" };
+  if (!category) return { title: "Category — mvlusciouslather" };
   return {
-    title: `${category.label} — MsVee Soaps`,
+    title: `${category.label} — mvlusciouslather`,
     description: category.description,
   };
 }

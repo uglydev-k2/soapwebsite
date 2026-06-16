@@ -10,7 +10,7 @@ export function generateStaticParams() {
 
 export function generateMetadata({ params }: { params: { slug: string } }) {
   const post = getJournalPost(params.slug);
-  return { title: post ? `${post.title} — MsVee Journal` : "Journal" };
+  return { title: post ? `${post.title} — mvlusciouslather Journal` : "Journal" };
 }
 
 export default function JournalArticlePage({ params }: { params: { slug: string } }) {

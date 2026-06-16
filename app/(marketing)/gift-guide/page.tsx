@@ -2,13 +2,13 @@ import Link from "next/link";
 import { MarketingPage } from "@/components/marketing/MarketingPage";
 import { GIFT_GUIDE_SECTIONS } from "@/lib/content/site-content";
 
-export const metadata = { title: "Gift Guide — MsVee Soaps" };
+export const metadata = { title: "Gift Guide — mvlusciouslather" };
 
 export default function GiftGuidePage() {
   return (
     <MarketingPage
       eyebrow="Gifting"
-      title="The MsVee Gift Guide"
+      title="The mvlusciouslather Gift Guide"
       description="Curated botanical rituals for every person and every moment."
       wide
     >

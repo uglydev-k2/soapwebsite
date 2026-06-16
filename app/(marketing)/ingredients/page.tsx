@@ -3,7 +3,7 @@ import { MarketingPage } from "@/components/marketing/MarketingPage";
 import { IngredientProductLinks } from "@/components/marketing/IngredientProductLinks";
 import { INGREDIENT_GLOSSARY } from "@/lib/content/ingredients";
 
-export const metadata = { title: "Ingredients — MsVee Soaps" };
+export const metadata = { title: "Ingredients — mvlusciouslather" };
 
 export default function IngredientsPage() {
   return (

@@ -4,7 +4,7 @@ import { AuthBrandHeader } from "@/components/auth/AuthBrandHeader";
 import { ForgotPasswordForm } from "@/components/auth/ForgotPasswordForm";
 
 export const metadata = {
-  title: "Forgot Password — MsVee Soaps",
+  title: "Forgot Password — mvlusciouslather",
 };
 
 export default function ForgotPasswordPage() {

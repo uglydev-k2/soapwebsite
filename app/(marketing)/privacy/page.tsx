@@ -1,13 +1,13 @@
 import { MarketingPage } from "@/components/marketing/MarketingPage";
 
-export const metadata = { title: "Privacy Policy — MsVee Soaps" };
+export const metadata = { title: "Privacy Policy — mvlusciouslather" };
 
 export default function PrivacyPage() {
   return (
     <MarketingPage eyebrow="Legal" title="Privacy Policy">
       <div className="space-y-6 text-sm leading-relaxed text-muted">
         <p>
-          MsVee Soaps respects your privacy. We collect only the information needed to
+          mvlusciouslather respects your privacy. We collect only the information needed to
           process orders, improve your experience, and communicate about your purchases.
         </p>
         <p>
@@ -15,7 +15,7 @@ export default function PrivacyPage() {
           our payment processor and is never stored on our servers.
         </p>
         <p>
-          You may request deletion of your account data by contacting hello@msvee.co.
+          You may request deletion of your account data by contacting hello@mvlusciouslather.com.
         </p>
       </div>
     </MarketingPage>

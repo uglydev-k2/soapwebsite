@@ -30,5 +30,5 @@ echo "→ Seeding products, orders, and admin user…"
 npm run db:seed
 
 echo ""
-echo "Done. Admin login: admin@msvee.co / msvee-admin-2024"
+echo "Done. Admin login: mvlusciouslather@gmail.com / (your admin password)"
 echo "Copy env vars to Vercel → Environment Variables, then redeploy."

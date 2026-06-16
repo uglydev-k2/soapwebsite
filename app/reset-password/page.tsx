@@ -3,7 +3,7 @@ import { AuthBrandHeader } from "@/components/auth/AuthBrandHeader";
 import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
 
 export const metadata = {
-  title: "Reset Password — MsVee Soaps",
+  title: "Reset Password — mvlusciouslather",
 };
 
 export default function ResetPasswordPage() {

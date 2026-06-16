@@ -4,7 +4,7 @@ import { LoginForm } from "@/components/auth/LoginForm";
 import { isGoogleOAuthConfigured } from "@/lib/supabase/env";
 
 export const metadata = {
-  title: "Sign In — MsVee Soaps",
+  title: "Sign In — mvlusciouslather",
 };
 
 export default function LoginPage() {

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { MarketingPage } from "@/components/marketing/MarketingPage";
 import { FRAGRANCE_PROFILES } from "@/lib/content/fragrances";
 
-export const metadata = { title: "Scent Guide — MsVee Soaps" };
+export const metadata = { title: "Scent Guide — mvlusciouslather" };
 
 export default function ScentsPage() {
   return (

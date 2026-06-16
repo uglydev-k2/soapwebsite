@@ -42,7 +42,7 @@ export const SHIPPING_SECTIONS = [
   },
   {
     title: "Returns",
-    body: "Unopened products may be returned within 30 days for a full refund. Damaged or incorrect items will be replaced at no charge — email hello@msvee.co with your order number.",
+    body: "Unopened products may be returned within 30 days for a full refund. Damaged or incorrect items will be replaced at no charge — email hello@mvlusciouslather.com with your order number.",
   },
   {
     title: "Exchanges",

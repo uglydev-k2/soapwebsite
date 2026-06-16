@@ -1,6 +1,6 @@
 self.addEventListener("push", (event) => {
   let payload = {
-    title: "MsVee Admin",
+    title: "mvlusciouslather Admin",
     body: "You have a new notification",
     url: "/admin",
     tag: "admin-alert",

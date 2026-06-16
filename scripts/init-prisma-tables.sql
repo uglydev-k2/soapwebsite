@@ -101,9 +101,9 @@ CREATE TABLE "public"."AdminUser" (
 -- CreateTable
 CREATE TABLE "public"."StoreSettings" (
     "id" TEXT NOT NULL DEFAULT 'default',
-    "name" TEXT NOT NULL DEFAULT 'MsVee Soaps',
+    "name" TEXT NOT NULL DEFAULT 'mvlusciouslather',
     "tagline" TEXT NOT NULL DEFAULT 'Where Ritual Meets Luxury',
-    "email" TEXT NOT NULL DEFAULT 'hello@msvee.co',
+    "email" TEXT NOT NULL DEFAULT 'hello@mvlusciouslather.com',
     "phone" TEXT,
     "address" TEXT,
     "flatShippingRate" DOUBLE PRECISION NOT NULL DEFAULT 8,

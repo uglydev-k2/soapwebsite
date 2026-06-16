@@ -2,7 +2,7 @@ import Link from "next/link";
 import { MarketingPage } from "@/components/marketing/MarketingPage";
 import { JOURNAL_POSTS } from "@/lib/content/journal";
 
-export const metadata = { title: "Journal — MsVee Soaps" };
+export const metadata = { title: "Journal — mvlusciouslather" };
 
 export default function JournalPage() {
   return (

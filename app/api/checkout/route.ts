@@ -89,7 +89,7 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
       },
       locationId: getSquareLocationId(),
       referenceId: orderNumber.slice(0, 40),
-      note: `MsVee Soaps order ${orderNumber}`,
+      note: `mvlusciouslather order ${orderNumber}`,
       buyerEmailAddress: parsed.data.email,
       shippingAddress: {
         addressLine1: parsed.data.line1,

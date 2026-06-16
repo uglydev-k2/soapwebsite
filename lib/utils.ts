@@ -2,6 +2,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { Category, OrderStatus } from "@prisma/client";
 import { getCategoryDisplayLabel, PRODUCT_CATEGORIES } from "@/lib/categories";
+import { ORDER_NUMBER_PREFIX } from "@/lib/brand";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -77,7 +78,7 @@ export function slugify(text: string): string {
 }
 
 export function generateOrderNumber(): string {
-  const prefix = "MSV";
+  const prefix = ORDER_NUMBER_PREFIX;
   const num = Math.floor(100000 + Math.random() * 900000);
   return `${prefix}-${num}`;
 }

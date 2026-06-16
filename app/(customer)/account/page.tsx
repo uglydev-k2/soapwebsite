@@ -7,7 +7,7 @@ import { getInitials } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Account — MsVee Soaps",
+  title: "Account — mvlusciouslather",
 };
 
 export default async function AccountPage() {
@@ -60,7 +60,7 @@ export default async function AccountPage() {
         <div className="admin-card mb-8 border border-terra/20 bg-terra/5">
           <h2 className="font-serif text-2xl text-green mb-2">Admin Access</h2>
           <p className="text-sm text-muted mb-4">
-            You have admin permissions for MsVee Soaps.
+            You have admin permissions for mvlusciouslather.
           </p>
           <Link
             href="/admin"

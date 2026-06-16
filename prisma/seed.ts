@@ -49,7 +49,7 @@ const products = [
     name: "The Full Ritual Gift Set",
     slug: "full-ritual-gift-set",
     description:
-      "Three signature bars plus body wash and lotion in a hand-wrapped gift box — everything to start (or share) a complete MsVee ritual.",
+      "Three signature bars plus body wash and lotion in a hand-wrapped gift box — everything to start (or share) a complete mvlusciouslather ritual.",
     price: 89,
     comparePrice: 110,
     category: Category.GIFT_SET,
@@ -162,7 +162,7 @@ const statuses: OrderStatus[] = [
 ];
 
 async function main() {
-  console.log("Seeding MsVee Soaps database...");
+  console.log("Seeding mvlusciouslather database...");
 
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
@@ -177,16 +177,16 @@ async function main() {
   const hashedPassword = await bcrypt.hash("msvee-admin-2024", 12);
   await prisma.adminUser.create({
     data: {
-      email: "admin@msvee.co",
+      email: "mvlusciouslather@gmail.com",
       password: hashedPassword,
-      name: "MsVee Admin",
+      name: "mvlusciouslather Admin",
       role: "SUPER_ADMIN",
     },
   });
 
   await prisma.adminUser.create({
     data: {
-      email: "moderator@msvee.co",
+      email: "moderator@mvlusciouslather.com",
       password: await bcrypt.hash("mod-2024", 12),
       name: "Moderator",
       role: "MODERATOR",
@@ -196,9 +196,9 @@ async function main() {
   await prisma.storeSettings.create({
     data: {
       id: "default",
-      name: "MsVee Soaps",
+      name: "mvlusciouslather",
       tagline: "Where Ritual Meets Luxury",
-      email: "hello@msvee.co",
+      email: "hello@mvlusciouslather.com",
       phone: "(555) 867-5309",
       address: "124 Botanical Lane, Portland, OR 97201",
       maintenanceMode: false,
@@ -208,14 +208,14 @@ async function main() {
   });
 
   const superAdmin = await prisma.adminUser.findFirst({
-    where: { email: "admin@msvee.co" },
+    where: { email: "mvlusciouslather@gmail.com" },
   });
 
   await prisma.auditLog.createMany({
     data: [
       {
         adminId: superAdmin!.id,
-        adminEmail: "admin@msvee.co",
+        adminEmail: "mvlusciouslather@gmail.com",
         adminRole: "SUPER_ADMIN",
         action: "CREATE",
         entity: "StoreSettings",
@@ -224,7 +224,7 @@ async function main() {
       },
       {
         adminId: superAdmin!.id,
-        adminEmail: "admin@msvee.co",
+        adminEmail: "mvlusciouslather@gmail.com",
         adminRole: "SUPER_ADMIN",
         action: "UPDATE",
         entity: "AdminUser",
@@ -268,7 +268,7 @@ async function main() {
 
     await prisma.order.create({
       data: {
-        orderNumber: `MSV-${100000 + i}`,
+        orderNumber: `MLL-${100000 + i}`,
         status,
         customerId: customer.id,
         subtotal,

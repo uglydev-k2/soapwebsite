@@ -28,6 +28,7 @@ import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import type { ApiResponse, AdminSession } from "@/types";
 import type { LucideIcon } from "lucide-react";
+import { BrandLogo } from "@/components/BrandLogo";
 
 interface NavItem {
   label: string;
@@ -173,10 +174,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
     <aside className="admin-sidebar flex h-full w-[min(320px,92vw)] max-w-[320px] shrink-0 flex-col lg:w-[260px] lg:max-w-[260px]">
       <div className="border-b border-white/10 px-5 py-6">
         <Link href="/admin" className="block" onClick={onClose}>
-          <p className="font-serif text-2xl leading-none text-cream">
-            <span className="italic text-gold">Ms</span>
-            <span className="text-cream">Vee</span>
-          </p>
+          <BrandLogo size="md" variant="light" />
           <p className="label-caps mt-1 text-[0.65rem] tracking-[0.22em] text-cream/50">
             Command Center
           </p>

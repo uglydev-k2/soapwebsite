@@ -1,7 +1,7 @@
 import { MarketingPage } from "@/components/marketing/MarketingPage";
 import { ContactForm } from "@/components/marketing/ContactForm";
 
-export const metadata = { title: "Contact — MsVee Soaps" };
+export const metadata = { title: "Contact — mvlusciouslather" };
 
 export default function ContactPage() {
   return (
@@ -15,10 +15,10 @@ export default function ContactPage() {
           <div className="border border-green/10 bg-white p-6" style={{ borderRadius: "2px" }}>
             <p className="label-caps text-muted">Email</p>
             <a
-              href="mailto:hello@msvee.co"
+              href="mailto:hello@mvlusciouslather.com"
               className="mt-2 block font-serif text-xl text-green hover:text-terra"
             >
-              hello@msvee.co
+              hello@mvlusciouslather.com
             </a>
           </div>
           <p className="text-sm text-muted">

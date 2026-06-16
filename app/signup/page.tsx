@@ -3,7 +3,7 @@ import { AuthBrandHeader, AuthFooterLink } from "@/components/auth/AuthBrandHead
 import { SignupForm } from "@/components/auth/SignupForm";
 
 export const metadata = {
-  title: "Create Account — MsVee Soaps",
+  title: "Create Account — mvlusciouslather",
 };
 
 export default function SignupPage() {

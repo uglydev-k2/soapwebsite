@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { BrandLogo } from "@/components/BrandLogo";
 import { SHOP_CATEGORY_MENU } from "@/lib/categories";
 
 const shopLinks = [
@@ -55,9 +56,9 @@ function TikTokIcon() {
 }
 
 const socialLinks = [
-  { label: "Instagram", href: "https://instagram.com/msveesoaps", icon: InstagramIcon },
-  { label: "Pinterest", href: "https://pinterest.com/msveesoaps", icon: PinterestIcon },
-  { label: "TikTok", href: "https://tiktok.com/@msveesoaps", icon: TikTokIcon },
+  { label: "Instagram", href: "https://instagram.com/mvlusciouslather", icon: InstagramIcon },
+  { label: "Pinterest", href: "https://pinterest.com/mvlusciouslather", icon: PinterestIcon },
+  { label: "TikTok", href: "https://tiktok.com/@mvlusciouslather", icon: TikTokIcon },
 ];
 
 export default function Footer() {
@@ -69,10 +70,8 @@ export default function Footer() {
         <div className="grid grid-cols-2 gap-8 sm:gap-12 lg:grid-cols-4">
           {/* Brand column */}
           <div className="col-span-2 lg:col-span-1">
-            <Link href="/" className="inline-flex items-baseline">
-              <span className="font-serif text-2xl italic text-terra">Ms</span>
-              <span className="font-serif text-2xl text-green-2">Vee</span>
-              <span className="font-serif text-2xl text-green-2"> Soaps</span>
+            <Link href="/" className="inline-block">
+              <BrandLogo size="md" variant="light" />
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-cream/90">
               Premium botanical bath products handcrafted with intention. Where
@@ -148,7 +147,7 @@ export default function Footer() {
 
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-cream/10 pt-8 sm:flex-row">
           <p className="text-xs text-cream/40">
-            &copy; {year} MsVee Soaps. All rights reserved.
+            &copy; {year} mvlusciouslather. All rights reserved.
           </p>
           <p className="label-caps text-cream/40">
             Handcrafted with botanical love

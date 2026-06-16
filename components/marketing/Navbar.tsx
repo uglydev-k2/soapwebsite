@@ -13,6 +13,7 @@ import { useCartStore } from "@/store/cartStore";
 import { EASE_OUT, fadeUp, staggerContainer } from "@/lib/motion";
 import { SHOP_CATEGORY_MENU } from "@/lib/categories";
 import type { NavbarAuthUser } from "@/lib/navbar-auth";
+import { BrandLogo } from "@/components/BrandLogo";
 
 const navLinks = [
   { label: "Collections", href: "/collections" },
@@ -22,20 +23,7 @@ const navLinks = [
 ];
 
 function Logo({ dark = false }: { dark?: boolean }) {
-  return (
-    <span className="inline-flex items-baseline">
-      <span className="font-serif text-xl italic text-terra sm:text-2xl">Ms</span>
-      <span
-        className={cn("font-serif text-xl text-green sm:text-2xl", dark && "text-green-2")}
-      >
-        Vee
-      </span>
-      <span className={cn("font-serif text-xl text-green sm:text-2xl", dark && "text-cream")}>
-        {" "}
-        Soaps
-      </span>
-    </span>
-  );
+  return <BrandLogo size="sm" variant={dark ? "light" : "default"} />;
 }
 
 export default function Navbar({

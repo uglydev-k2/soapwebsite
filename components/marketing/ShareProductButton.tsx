@@ -10,7 +10,7 @@ export function ShareProductButton({ name }: { name: string }) {
     const url = typeof window !== "undefined" ? window.location.href : "";
     try {
       if (navigator.share) {
-        await navigator.share({ title: name, text: `Check out ${name} from MsVee Soaps`, url });
+        await navigator.share({ title: name, text: `Check out ${name} from mvlusciouslather`, url });
         return;
       }
       await navigator.clipboard.writeText(url);

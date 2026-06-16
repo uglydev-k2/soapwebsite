@@ -95,9 +95,9 @@ model AdminUser {
 
 model StoreSettings {
   id                    String   @id @default("default")
-  name                  String   @default("MsVee Soaps")
+  name                  String   @default("mvlusciouslather")
   tagline               String   @default("Where Ritual Meets Luxury")
-  email                 String   @default("hello@msvee.co")
+  email                 String   @default("hello@mvlusciouslather.com")
   phone                 String?
   address               String?
   flatShippingRate      Float    @default(8)

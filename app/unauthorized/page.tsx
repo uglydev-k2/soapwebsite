@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 
 export const metadata = {
-  title: "Unauthorized — MsVee Soaps",
+  title: "Unauthorized — mvlusciouslather",
 };
 
 export default function UnauthorizedPage() {

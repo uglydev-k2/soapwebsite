@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export function SplashScreen() {
   const reduced = useReducedMotion();
@@ -34,10 +35,7 @@ export function SplashScreen() {
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="text-center"
           >
-            <p className="font-serif text-5xl text-cream">
-              <span className="italic text-gold">Ms</span>Vee
-            </p>
-            <p className="label-caps mt-3 text-cream/50">Soaps</p>
+            <BrandLogo size="lg" variant="light" />
           </motion.div>
           <motion.div
             className="absolute inset-x-0 bottom-0 h-1/2 bg-cream"

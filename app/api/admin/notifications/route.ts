@@ -63,7 +63,7 @@ export const POST = withApiHandler(
       for (const email of recipients.slice(0, 100)) {
         try {
           await client.emails.send({
-            from: process.env.RESEND_FROM_EMAIL || "hello@msvee.co",
+            from: process.env.RESEND_FROM_EMAIL || "hello@mvlusciouslather.com",
             to: email,
             subject: title,
             html: `<div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;"><h1 style="color:#2C4A3E;font-weight:300;">${title}</h1><p>${message}</p></div>`,

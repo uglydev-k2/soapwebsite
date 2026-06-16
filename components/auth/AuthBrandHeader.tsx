@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/BrandLogo";
 import { CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 
 export function AuthBrandHeader({
@@ -9,9 +10,7 @@ export function AuthBrandHeader({
   return (
     <CardHeader>
       <CardTitle>
-        <span className="italic text-terra">Ms</span>
-        <span>Vee</span>
-        <span className="text-2xl"> Soaps</span>
+        <BrandLogo size="md" />
       </CardTitle>
       <CardDescription>{subtitle}</CardDescription>
     </CardHeader>

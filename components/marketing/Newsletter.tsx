@@ -68,7 +68,7 @@ export default function Newsletter() {
             style={{ borderRadius: "2px" }}
           >
             <p className="font-serif text-xl text-cream">
-              Welcome to the MsVee family.
+              Welcome to the mvlusciouslather family.
             </p>
             <p className="mt-2 text-sm text-cream/70">
               Check your inbox for a warm welcome from us.

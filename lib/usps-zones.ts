@@ -1,5 +1,5 @@
 /**
- * USPS domestic zones from Texas (MsVee ships from TX).
+ * USPS domestic zones from Texas (mvlusciouslather ships from TX).
  * Zone 2 = in-state; higher zones = farther destinations.
  * Based on USPS Ground Advantage zone charts for Texas origin.
  */

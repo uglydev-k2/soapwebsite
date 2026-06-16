@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { z } from "zod";
 import Link from "next/link";
 import { Shield } from "lucide-react";
+import { BrandLogo } from "@/components/BrandLogo";
 
 type LoginForm = z.infer<typeof loginSchema>;
 
@@ -54,8 +55,7 @@ export default function AdminLoginPage() {
             <Shield size={22} />
           </div>
           <h1 className="font-serif text-3xl text-green">
-            <span className="italic text-terra">Ms</span>
-            <span>Vee</span>
+            <BrandLogo size="md" />
           </h1>
           <p className="label-caps mt-2 text-muted">Admin Command Center</p>
         </div>

@@ -75,7 +75,7 @@ export function MaintenanceOverlay({
         >
           <X size={24} strokeWidth={1.5} />
         </button>
-        <p className="label-caps text-terra">MsVee Soaps</p>
+        <p className="label-caps text-terra">mvlusciouslather</p>
         <h1
           id="maintenance-title"
           className="mt-4 font-serif text-4xl leading-tight text-green sm:text-5xl lg:text-6xl"
@@ -93,7 +93,7 @@ export function MaintenanceOverlay({
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
           <a
-            href="mailto:hello@msvee.co"
+            href="mailto:hello@mvlusciouslather.com"
             className="inline-flex min-h-[3rem] items-center justify-center bg-terra px-10 py-3.5 text-sm label-caps text-white transition-colors hover:bg-terra-2"
             style={{ borderRadius: 0 }}
           >

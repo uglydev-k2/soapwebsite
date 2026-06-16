@@ -2,7 +2,7 @@ import { MarketingPage } from "@/components/marketing/MarketingPage";
 import { FAQAccordion } from "@/components/marketing/FAQAccordion";
 import { FAQ_ITEMS } from "@/lib/content/site-content";
 
-export const metadata = { title: "FAQ — MsVee Soaps" };
+export const metadata = { title: "FAQ — mvlusciouslather" };
 
 export default function FAQPage() {
   return (

@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import CheckoutPageClient from "@/components/marketing/CheckoutPageClient";
 
 export const metadata = {
-  title: "Checkout — MsVee Soaps",
+  title: "Checkout — mvlusciouslather",
 };
 
 export default function CheckoutPage() {

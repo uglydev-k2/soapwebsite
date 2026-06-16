@@ -55,7 +55,7 @@ export default function RitualSection() {
             <AnimatedSectionHeader
               align="left"
               theme="light"
-              eyebrow="The MsVee Ritual"
+              eyebrow="The mvlusciouslather Ritual"
               title={
                 <>
                   More Than a Bath —

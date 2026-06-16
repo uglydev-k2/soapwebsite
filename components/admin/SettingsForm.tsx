@@ -295,7 +295,7 @@ export function SettingsForm({
             <textarea
               {...registerStore("allowedEmailDomains")}
               rows={2}
-              placeholder="msvee.co, yourcompany.com"
+              placeholder="mvlusciouslather.com, yourcompany.com"
               className="admin-input w-full resize-y text-sm"
             />
             <p className="mt-1 text-xs text-muted">

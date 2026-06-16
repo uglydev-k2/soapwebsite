@@ -23,7 +23,7 @@ export async function generateMetadata({
   params: { slug: string };
 }) {
   const product = await getProductBySlug(params.slug);
-  return { title: product ? `${product.name} — MsVee Soaps` : "Product" };
+  return { title: product ? `${product.name} — mvlusciouslather` : "Product" };
 }
 
 export default async function ProductDetailPage({

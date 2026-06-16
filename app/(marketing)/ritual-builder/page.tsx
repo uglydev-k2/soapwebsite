@@ -1,6 +1,6 @@
 import RitualBuilder from "@/components/marketing/RitualBuilder";
 
-export const metadata = { title: "Ritual Builder — MsVee Soaps" };
+export const metadata = { title: "Ritual Builder — mvlusciouslather" };
 
 export default function RitualBuilderPage() {
   return (

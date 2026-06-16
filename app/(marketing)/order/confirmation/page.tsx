@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import OrderConfirmationPage from "@/components/marketing/OrderConfirmationPage";
 
 export const metadata = {
-  title: "Order Confirmed — MsVee Soaps",
+  title: "Order Confirmed — mvlusciouslather",
 };
 
 export default function OrderConfirmationRoute() {

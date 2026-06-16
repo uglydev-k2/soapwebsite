@@ -1,7 +1,7 @@
 import { MarketingPage } from "@/components/marketing/MarketingPage";
 import { SHIPPING_SECTIONS } from "@/lib/content/site-content";
 
-export const metadata = { title: "Shipping & Returns — MsVee Soaps" };
+export const metadata = { title: "Shipping & Returns — mvlusciouslather" };
 
 export default function ShippingPage() {
   return (

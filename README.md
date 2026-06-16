@@ -1,4 +1,4 @@
-# MsVee Soaps
+# mvlusciouslather
 
 Premium botanical bath and body brand — production-ready Next.js 14 App Router site with a full admin dashboard backed by PostgreSQL.
 
@@ -37,7 +37,7 @@ Open [http://localhost:3000](http://localhost:3000) for the marketing site.
 
 | Email | Password |
 |-------|----------|
-| `admin@msvee.co` | `msvee-admin-2024` |
+| `mvlusciouslather@gmail.com` | `msvee-admin-2024` |
 
 ## Project Structure
 
@@ -76,7 +76,7 @@ npm run db:seed      # Seed products, orders, admin user
 npm run db:studio    # Prisma Studio GUI
 ```
 
-Seed includes 6 products, 20 orders, 5 customers, and admin `admin@msvee.co`.
+Seed includes 6 products, 20 orders, 5 customers, and admin `mvlusciouslather@gmail.com`.
 
 ## Stripe Webhooks (local)
 

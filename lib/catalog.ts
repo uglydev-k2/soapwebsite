@@ -72,7 +72,7 @@ export const STATIC_PRODUCTS: ProductWithMeta[] = [
     name: "The Full Ritual Gift Set",
     slug: "full-ritual-gift-set",
     description:
-      "Three signature bars plus body wash and lotion in a hand-wrapped gift box — everything to start (or share) a complete MsVee ritual.",
+      "Three signature bars plus body wash and lotion in a hand-wrapped gift box — everything to start (or share) a complete mvlusciouslather ritual.",
     price: 89,
     comparePrice: 110,
     category: "GIFT_SET",

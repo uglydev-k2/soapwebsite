@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       update: {},
     });
     await sendWelcomeEmail(parsed.data.email);
-    return jsonResponse({ success: true, message: "Welcome to MsVee Soaps" });
+    return jsonResponse({ success: true, message: "Welcome to mvlusciouslather" });
   } catch {
     return errorResponse("Could not subscribe. Please try again.");
   }

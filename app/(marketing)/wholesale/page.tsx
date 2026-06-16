@@ -1,7 +1,7 @@
 import { MarketingPage } from "@/components/marketing/MarketingPage";
 import { WholesaleForm } from "@/components/marketing/WholesaleForm";
 
-export const metadata = { title: "Wholesale — MsVee Soaps" };
+export const metadata = { title: "Wholesale — mvlusciouslather" };
 
 export default function WholesalePage() {
   return (

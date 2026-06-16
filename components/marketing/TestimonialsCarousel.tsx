@@ -21,7 +21,7 @@ const testimonials = [
   },
   {
     quote:
-      "I've tried countless 'natural' soaps, but MsVee is in a league of its own. The Citrus Bloom bars are bright, creamy, and last forever.",
+      "I've tried countless 'natural' soaps, but mvlusciouslather is in a league of its own. The Citrus Bloom bars are bright, creamy, and last forever.",
     name: "James R.",
     location: "Austin, TX",
     product: "Citrus Bloom Bar Soap",

@@ -17,7 +17,7 @@ import { RecentlyViewedSection } from "@/components/marketing/RecentlyViewedSect
 import { Breadcrumbs } from "@/components/marketing/Breadcrumbs";
 
 export const metadata = {
-  title: "Collections — MsVee Soaps",
+  title: "Collections — mvlusciouslather",
 };
 
 const sortOptions = [

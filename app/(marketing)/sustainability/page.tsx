@@ -1,7 +1,7 @@
 import { MarketingPage } from "@/components/marketing/MarketingPage";
 import { SUSTAINABILITY_POINTS } from "@/lib/content/ingredients";
 
-export const metadata = { title: "Sustainability — MsVee Soaps" };
+export const metadata = { title: "Sustainability — mvlusciouslather" };
 
 export default function SustainabilityPage() {
   return (

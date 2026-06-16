@@ -8,7 +8,7 @@ import { formatDate, formatPrice } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Dashboard — MsVee Soaps",
+  title: "Dashboard — mvlusciouslather",
 };
 
 export default async function DashboardPage() {
@@ -35,7 +35,7 @@ export default async function DashboardPage() {
         Welcome, {name}
       </h1>
       <p className="text-muted mb-10">
-        Your personal MsVee Soaps dashboard.
+        Your personal mvlusciouslather dashboard.
       </p>
 
       <div className="grid gap-6 sm:grid-cols-2">

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { MarketingPage } from "@/components/marketing/MarketingPage";
 
-export const metadata = { title: "About — MsVee Soaps" };
+export const metadata = { title: "About — mvlusciouslather" };
 
 const milestones = [
   { year: "2024", label: "Founded in small-batch apothecary tradition" },
@@ -14,7 +14,7 @@ export default function AboutPage() {
     <MarketingPage
       eyebrow="Our Story"
       title="Crafted with Intention"
-      description="MsVee Soaps was born from a simple belief: daily rituals deserve the same care as special occasions."
+      description="mvlusciouslather was born from a simple belief: daily rituals deserve the same care as special occasions."
     >
       <div className="space-y-6 text-muted leading-relaxed">
         <p>

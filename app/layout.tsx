@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Jost } from "next/font/google";
 import "./globals.css";
 import { ToastContainer } from "@/components/ui/Toast";
 import { Providers } from "@/components/Providers";
+import { brandTitle } from "@/lib/brand";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -20,7 +21,7 @@ const jost = Jost({
 });
 
 export const metadata: Metadata = {
-  title: "MsVee Soaps — Premium Botanical Bath & Body",
+  title: brandTitle(),
   description:
     "Artisanal botanical bath and body care. Where ritual meets luxury.",
 };
