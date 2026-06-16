@@ -27,9 +27,15 @@ export function BrandLogo({
         : "text-green";
 
   return (
-    <span className={cn("inline-flex items-baseline font-serif", sizeClasses[size], className)}>
-      <span className="italic text-terra">mv</span>
-      <span className={cn(mainColor)}>lusciouslather</span>
+    <span
+      className={cn(
+        "inline-flex items-baseline font-serif uppercase tracking-wide",
+        sizeClasses[size],
+        className
+      )}
+    >
+      <span className="italic text-terra normal-case">MV</span>
+      <span className={cn(mainColor)}>LUSCIOUSLATHER</span>
     </span>
   );
 }
