@@ -9,9 +9,9 @@ type BrandLogoProps = {
 };
 
 const config = {
-  sm: { icon: 40, text: "text-lg sm:text-xl", gap: "gap-2.5" },
-  md: { icon: 52, text: "text-xl sm:text-2xl", gap: "gap-3" },
-  lg: { icon: 96, text: "text-4xl sm:text-5xl", gap: "gap-4" },
+  sm: { icon: 56, text: "text-lg sm:text-xl", gap: "gap-3" },
+  md: { icon: 68, text: "text-xl sm:text-2xl", gap: "gap-3.5" },
+  lg: { icon: 128, text: "text-4xl sm:text-5xl", gap: "gap-5" },
 } as const;
 
 export function BrandLogo({
