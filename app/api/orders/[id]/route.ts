@@ -5,6 +5,8 @@ import { orderUpdateSchema } from "@/lib/validations";
 import { sendTrackingEmail } from "@/lib/resend";
 import { logAdminAction } from "@/lib/audit";
 import { getClientIp } from "@/lib/rate-limit";
+import { buildShippingEmailPayload } from "@/lib/shipping-email";
+import { mergeOrderNotes } from "@/lib/order-notes";
 
 export async function GET(
   _request: NextRequest,
@@ -37,21 +39,43 @@ export async function PATCH(
     return errorResponse(parsed.error.errors[0]?.message || "Invalid data");
   }
 
-  const order = await prisma.order.update({
+  const trackingInfo =
+    typeof body.trackingInfo === "string" ? body.trackingInfo : undefined;
+
+  const existing = await prisma.order.findUnique({
     where: { id: params.id },
-    data: parsed.data,
+    select: { notes: true },
+  });
+
+  const updateData: { status?: typeof parsed.data.status; notes?: string } = {};
+  if (parsed.data.status) updateData.status = parsed.data.status;
+  if (parsed.data.notes !== undefined) {
+    updateData.notes = mergeOrderNotes(existing?.notes, {
+      internalNotes: parsed.data.notes || undefined,
+    });
+  }
+
+  let order = await prisma.order.update({
+    where: { id: params.id },
+    data: updateData,
     include: { customer: true, items: { include: { product: true } } },
   });
 
-  if (parsed.data.status === "SHIPPED" && order.customer.email) {
-    await sendTrackingEmail(order.customer.email, order.orderNumber, {
-      items: order.items.map((item) => ({
-        name: item.product.name,
-        quantity: item.quantity,
-        price: item.price,
-        image: item.product.images[0] ?? null,
-      })),
+  if (trackingInfo) {
+    order = await prisma.order.update({
+      where: { id: params.id },
+      data: {
+        notes: mergeOrderNotes(order.notes, { trackingNumber: trackingInfo }),
+      },
+      include: { customer: true, items: { include: { product: true } } },
     });
+  }
+
+  if (parsed.data.status === "SHIPPED" && order.customer.email) {
+    await sendTrackingEmail(
+      order.customer.email,
+      buildShippingEmailPayload(order, { trackingInfo })
+    );
   }
 
   await logAdminAction({
@@ -84,7 +108,7 @@ export async function POST(
     where: { id: params.id },
     include: {
       customer: true,
-      items: { include: { product: { select: { name: true, images: true } } } },
+      items: { include: { product: { select: { name: true, images: true, slug: true } } } },
     },
   });
 
@@ -96,15 +120,19 @@ export async function POST(
   const trackingInfo =
     typeof body.trackingInfo === "string" ? body.trackingInfo : undefined;
 
-  await sendTrackingEmail(order.customer.email, order.orderNumber, {
-    trackingInfo,
-    items: order.items.map((item) => ({
-      name: item.product.name,
-      quantity: item.quantity,
-      price: item.price,
-      image: item.product.images[0] ?? null,
-    })),
-  });
+  if (trackingInfo) {
+    await prisma.order.update({
+      where: { id: params.id },
+      data: {
+        notes: mergeOrderNotes(order.notes, { trackingNumber: trackingInfo }),
+      },
+    });
+  }
+
+  await sendTrackingEmail(
+    order.customer.email,
+    buildShippingEmailPayload(order, { trackingInfo })
+  );
 
   await logAdminAction({
     adminId: session!.user!.id,

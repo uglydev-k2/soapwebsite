@@ -65,7 +65,7 @@ export default function ProductReviews({ slug }: { slug: string }) {
           <p className="label-caps text-terra">Customer Reviews</p>
           <h2 className="mt-2 font-serif text-3xl text-green">What Ritualists Say</h2>
         </div>
-        <p className="text-sm text-muted">Based on verified purchases</p>
+        <p className="text-sm text-muted">Customer favorites</p>
       </div>
       <div className="mt-8 grid gap-4 lg:grid-cols-3">
         {reviews.map((review, index) => (

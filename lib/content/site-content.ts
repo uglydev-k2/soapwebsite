@@ -1,54 +1,72 @@
-export const FAQ_ITEMS = [
-  {
-    question: "Are your products truly natural?",
-    answer:
-      "Yes. We formulate without parabens, sulfates, phthalates, or synthetic dyes. Every ingredient is chosen for skin benefit and scent integrity.",
-  },
-  {
-    question: "How long do bar soaps last?",
-    answer:
-      "With proper drainage, a single bar typically lasts 3–4 weeks of daily use. Keep your soap dry between uses to maximize longevity.",
-  },
-  {
-    question: "Do you offer free shipping?",
-    answer:
-      "Orders over $60 qualify for free standard shipping within the continental United States. A flat $8 rate applies to smaller orders.",
-  },
-  {
-    question: "Can I return or exchange a product?",
-    answer:
-      "Unopened items may be returned within 30 days of delivery. Opened bath products cannot be resold for hygiene reasons — contact us if something arrives damaged.",
-  },
-  {
-    question: "Are your products safe for sensitive skin?",
-    answer:
-      "Many customers with sensitive skin love our Lavender Mist and gentle milk-based formulas. We recommend patch testing any new product before full use.",
-  },
-  {
-    question: "Do you ship internationally?",
-    answer:
-      "No. We ship to United States addresses only, including Alaska, Hawaii, and U.S. territories where carriers deliver.",
-  },
-] as const;
+import type { PublicStoreSettings } from "@/lib/store-settings";
+import { formatPrice } from "@/lib/utils";
 
-export const SHIPPING_SECTIONS = [
-  {
-    title: "Processing",
-    body: "Orders are handcrafted and packed within 1–3 business days. You will receive a confirmation email when your order ships.",
-  },
-  {
-    title: "Rates",
-    body: "Standard shipping is $8 flat rate. Orders over $60 ship free within the continental United States.",
-  },
-  {
-    title: "Returns",
-    body: "Unopened products may be returned within 30 days for a full refund. Damaged or incorrect items will be replaced at no charge — email hello@mvlusciouslather.com with your order number.",
-  },
-  {
-    title: "Exchanges",
-    body: "We are happy to help with scent or product exchanges on unopened items. Reach out within 14 days of delivery and we will guide you through the process.",
-  },
-] as const;
+export function getFaqItems(settings: PublicStoreSettings) {
+  return [
+    {
+      question: "Are your products truly natural?",
+      answer:
+        "Yes. We formulate without parabens, sulfates, phthalates, or synthetic dyes. Every ingredient is chosen for skin benefit and scent integrity.",
+    },
+    {
+      question: "How long do bar soaps last?",
+      answer:
+        "With proper drainage, a single bar typically lasts 3–4 weeks of daily use. Keep your soap dry between uses to maximize longevity.",
+    },
+    {
+      question: "Do you offer free shipping?",
+      answer: `U.S. orders over ${formatPrice(settings.freeShippingThreshold)} qualify for free standard shipping. A flat ${formatPrice(settings.flatShippingRate)} rate applies to smaller domestic orders.`,
+    },
+    {
+      question: "Can I return or exchange a product?",
+      answer:
+        "Unopened items may be returned within 30 days of delivery. Opened bath products cannot be resold for hygiene reasons — contact us if something arrives damaged.",
+    },
+    {
+      question: "Are your products safe for sensitive skin?",
+      answer:
+        "Many customers with sensitive skin love our Lavender Mist and gentle milk-based formulas. We recommend patch testing any new product before full use.",
+    },
+    {
+      question: "Do you ship internationally?",
+      answer:
+        "Yes. We ship to select countries via USPS international rates calculated at checkout based on weight and destination. Free shipping applies to qualifying U.S. orders only.",
+    },
+  ] as const;
+}
+
+export function getShippingSections(settings: PublicStoreSettings) {
+  return [
+    {
+      title: "Processing",
+      body: "Orders are handcrafted and packed within 1–3 business days. You will receive a confirmation email when your order ships.",
+    },
+    {
+      title: "Rates",
+      body: `U.S. standard shipping is ${formatPrice(settings.flatShippingRate)} flat rate. Orders over ${formatPrice(settings.freeShippingThreshold)} ship free within the United States. International rates are calculated at checkout.`,
+    },
+    {
+      title: "Returns",
+      body: "Unopened products may be returned within 30 days for a full refund. Damaged or incorrect items will be replaced at no charge — email hello@mvlusciouslather.com with your order number.",
+    },
+    {
+      title: "Exchanges",
+      body: "We are happy to help with scent or product exchanges on unopened items. Reach out within 14 days of delivery and we will guide you through the process.",
+    },
+  ] as const;
+}
+
+/** @deprecated Use getFaqItems(settings) for accurate shipping copy. */
+export const FAQ_ITEMS = getFaqItems({
+  freeShippingThreshold: 60,
+  flatShippingRate: 8,
+});
+
+/** @deprecated Use getShippingSections(settings) for accurate shipping copy. */
+export const SHIPPING_SECTIONS = getShippingSections({
+  freeShippingThreshold: 60,
+  flatShippingRate: 8,
+});
 
 export const GIFT_GUIDE_SECTIONS = [
   {

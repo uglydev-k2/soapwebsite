@@ -1,6 +1,5 @@
 import { Resend } from "resend";
 import {
-  type EmailOrderItem,
   renderShippingEmailHtml,
 } from "@/lib/email-templates";
 
@@ -50,23 +49,16 @@ export async function sendOrderConfirmation(
 
 export async function sendTrackingEmail(
   email: string,
-  orderNumber: string,
-  options?: {
-    trackingInfo?: string;
-    items?: EmailOrderItem[];
-  }
+  payload: Parameters<typeof renderShippingEmailHtml>[0]
 ) {
   const resend = getResend();
   if (!resend) return;
 
-  const items = options?.items ?? [];
-  const trackingInfo = options?.trackingInfo;
-
   await resend.emails.send({
     from: process.env.RESEND_FROM_EMAIL || "hello@mvlusciouslather.com",
     to: email,
-    subject: `Your Order Has Shipped — ${orderNumber}`,
-    html: renderShippingEmailHtml({ orderNumber, items, trackingInfo }),
+    subject: `Your Order Has Shipped — ${payload.orderNumber}`,
+    html: renderShippingEmailHtml(payload),
   });
 }
 

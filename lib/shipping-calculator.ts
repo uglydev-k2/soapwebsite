@@ -30,6 +30,7 @@ export type ShippingQuoteInput = {
   state?: string;
   postalCode?: string;
   subtotal?: number;
+  freeShippingThreshold?: number;
 };
 
 export type ShippingQuote = {
@@ -85,7 +86,9 @@ export function calculateShippingQuote(input: ShippingQuoteInput): ShippingQuote
   let shipping = getGroundAdvantageRetailRate(billingOz, billingLb, zone);
 
   const inTexas = isTexas(state);
-  const freeShippingApplied = subtotal >= FREE_SHIPPING_THRESHOLD;
+  const freeShippingThreshold =
+    input.freeShippingThreshold ?? FREE_SHIPPING_THRESHOLD;
+  const freeShippingApplied = subtotal >= freeShippingThreshold;
 
   if (freeShippingApplied) {
     shipping = 0;

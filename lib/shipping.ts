@@ -94,11 +94,14 @@ export function getCountryCode(country: string): string {
   return match?.code ?? country.toUpperCase();
 }
 
-export function getFreeShippingProgress(subtotal: number) {
-  const progress = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
-  const amountRemaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
-  const qualifies = subtotal >= FREE_SHIPPING_THRESHOLD;
-  return { progress, amountRemaining, qualifies };
+export function getFreeShippingProgress(
+  subtotal: number,
+  threshold = FREE_SHIPPING_THRESHOLD
+) {
+  const progress = Math.min(100, (subtotal / threshold) * 100);
+  const amountRemaining = Math.max(0, threshold - subtotal);
+  const qualifies = subtotal >= threshold;
+  return { progress, amountRemaining, qualifies, threshold };
 }
 
 export function calculateCartTotals(subtotal: number, shipping?: number) {

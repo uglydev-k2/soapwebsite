@@ -197,6 +197,28 @@ export async function getProductsBySlugs(slugs: string[]): Promise<Product[]> {
   return results;
 }
 
+export async function getActiveProductSlugs(): Promise<
+  { slug: string; updatedAt: Date }[]
+> {
+  const rows = await safeDbQuery(
+    "getActiveProductSlugs",
+    () =>
+      prisma.product.findMany({
+        where: { active: true },
+        select: { slug: true, updatedAt: true },
+        orderBy: { updatedAt: "desc" },
+      }),
+    [] as { slug: string; updatedAt: Date }[]
+  );
+
+  if (rows.length > 0) return rows;
+
+  return STATIC_PRODUCTS.filter((p) => p.active).map((p) => ({
+    slug: p.slug,
+    updatedAt: p.updatedAt ?? new Date(),
+  }));
+}
+
 export async function getProductsByIngredientKeywords(
   keywords: readonly string[],
   limit = 3

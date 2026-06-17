@@ -7,6 +7,7 @@ import { isDatabaseConfigured } from "@/lib/env";
 import { calculateShippingQuote } from "@/lib/shipping-calculator";
 import { getBundleLineTotal } from "@/lib/bundle-pricing";
 import { getCountryCode, isUsCountry } from "@/lib/shipping";
+import { getCheckoutSettings } from "@/lib/checkout";
 import type { Category } from "@prisma/client";
 
 const quoteSchema = z.object({
@@ -81,6 +82,7 @@ export const POST = withApiHandler("shipping.quote", async (request: NextRequest
     state,
     postalCode,
     subtotal,
+    freeShippingThreshold: (await getCheckoutSettings()).freeShippingThreshold,
   });
 
   return jsonResponse(quote);

@@ -1,19 +1,21 @@
 "use client";
 
 import { formatPrice } from "@/lib/utils";
-import {
-  FREE_SHIPPING_THRESHOLD,
-  getFreeShippingProgress,
-} from "@/lib/shipping";
+import { getFreeShippingProgress } from "@/lib/shipping";
+import { useStoreSettings } from "@/components/marketing/StoreSettingsContext";
 
 export function FreeShippingProgress({ subtotal }: { subtotal: number }) {
-  const { progress, amountRemaining, qualifies } =
-    getFreeShippingProgress(subtotal);
+  const { freeShippingThreshold } = useStoreSettings();
+  const { progress, amountRemaining, qualifies } = getFreeShippingProgress(
+    subtotal,
+    freeShippingThreshold
+  );
 
   if (qualifies) {
     return (
       <p className="text-xs text-green">
-        You qualify for free shipping on orders over {formatPrice(FREE_SHIPPING_THRESHOLD)}
+        You qualify for free shipping on orders over{" "}
+        {formatPrice(freeShippingThreshold)}
       </p>
     );
   }

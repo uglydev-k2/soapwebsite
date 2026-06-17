@@ -57,6 +57,7 @@ export async function calculateCheckoutShipping(
   address: Pick<ShippingAddress, "country" | "state" | "postalCode">,
   subtotal: number
 ) {
+  const settings = await getCheckoutSettings();
   const products = await Promise.all(
     items.map(async (item) => {
       if (!isDatabaseConfigured()) {
@@ -88,6 +89,7 @@ export async function calculateCheckoutShipping(
     state: address.state,
     postalCode: address.postalCode,
     subtotal,
+    freeShippingThreshold: settings.freeShippingThreshold,
   });
 }
 

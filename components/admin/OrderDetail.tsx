@@ -13,6 +13,7 @@ import {
   statusColors,
 } from "@/lib/utils";
 import { useToastStore } from "@/store/toastStore";
+import { parseOrderNotes } from "@/lib/order-notes";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 
@@ -55,16 +56,22 @@ interface OrderDetailProps {
 
 export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderDetailProps) {
   const addToast = useToastStore((s) => s.addToast);
+  const orderMeta = parseOrderNotes(initialOrder.notes);
   const [order, setOrder] = useState(initialOrder);
   const [status, setStatus] = useState<OrderStatus>(order.status);
-  const [notes, setNotes] = useState(order.notes ?? "");
+  const [notes, setNotes] = useState(orderMeta.internalNotes ?? "");
+  const [trackingNumber, setTrackingNumber] = useState(orderMeta.trackingNumber ?? "");
   const [updating, setUpdating] = useState(false);
   const [sending, setSending] = useState(false);
 
   const timelineIndex = getTimelineIndex(order.status, !!order.paymentId);
 
   const patchOrder = useCallback(
-    async (payload: { status?: OrderStatus; notes?: string | null }) => {
+    async (payload: {
+      status?: OrderStatus;
+      notes?: string | null;
+      trackingInfo?: string;
+    }) => {
       setUpdating(true);
       try {
         const res = await fetch(`/api/orders/${order.id}`, {
@@ -93,7 +100,11 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
 
   const handleStatusChange = async (newStatus: OrderStatus) => {
     setStatus(newStatus);
-    const updated = await patchOrder({ status: newStatus, notes: notes || null });
+    const updated = await patchOrder({
+      status: newStatus,
+      notes: notes || null,
+      trackingInfo: trackingNumber.trim() || undefined,
+    });
     if (updated) {
       addToast(`Order status updated to ${newStatus.toLowerCase()}`);
     } else {
@@ -102,7 +113,8 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
   };
 
   const handleNotesBlur = async () => {
-    if (notes === (order.notes ?? "")) return;
+    const savedNotes = parseOrderNotes(order.notes).internalNotes ?? "";
+    if (notes === savedNotes) return;
     await patchOrder({ status: order.status, notes: notes || null });
     addToast("Notes saved");
   };
@@ -117,7 +129,10 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
       const res = await fetch(`/api/orders/${order.id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "send-tracking" }),
+        body: JSON.stringify({
+          action: "send-tracking",
+          trackingInfo: trackingNumber.trim() || undefined,
+        }),
       });
       const json = await res.json();
       if (!res.ok) {
@@ -340,6 +355,21 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
             );
           })}
         </ol>
+      </div>
+
+      <div className="admin-card">
+        <label className="label-caps mb-2 block text-muted">Tracking Number</label>
+        <input
+          type="text"
+          value={trackingNumber}
+          onChange={(e) => setTrackingNumber(e.target.value)}
+          placeholder="USPS tracking number (included in shipped email)"
+          className="admin-input w-full print:hidden"
+        />
+        <p className="mt-2 text-xs text-muted print:hidden">
+          Saved with the order and included when you send the shipping email or mark the order as
+          shipped.
+        </p>
       </div>
 
       <div className="admin-card">

@@ -8,8 +8,9 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 import { EASE_OUT, fadeUp, staggerContainer } from "@/lib/motion";
+import { useStoreSettings } from "@/components/marketing/StoreSettingsContext";
 
 const HERO_IMAGE = "/images/hero-soaps.jpg?v=2";
 
@@ -22,6 +23,7 @@ const headlineWords = [
 
 export default function Hero() {
   const reduced = useReducedMotion();
+  const { freeShippingThreshold } = useStoreSettings();
   const { scrollY } = useScroll();
   const panelY = useTransform(scrollY, [0, 500], [0, reduced ? 0 : 48]);
   const panelScale = useTransform(scrollY, [0, 500], [1, reduced ? 1 : 1.03]);
@@ -42,7 +44,7 @@ export default function Hero() {
 
           <motion.div className="flex flex-wrap gap-2" variants={fadeUp}>
             <span className="border border-green/15 bg-white px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-green">
-              Free shipping on $60+
+              Free shipping on {formatPrice(freeShippingThreshold)}+
             </span>
             <span className="border border-green/15 bg-white px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-green">
               Free sample every order

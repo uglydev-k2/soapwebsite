@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { X } from "lucide-react";
-import { FREE_SHIPPING_THRESHOLD } from "@/lib/shipping";
+import { useStoreSettings } from "@/components/marketing/StoreSettingsContext";
+import { formatPrice } from "@/lib/utils";
 
 const STORAGE_KEY = "msvee-promo-dismissed";
 
 export function PromoBanner() {
   const [visible, setVisible] = useState(false);
+  const { freeShippingThreshold } = useStoreSettings();
 
   useEffect(() => {
     if (localStorage.getItem(STORAGE_KEY) === "1") return;
@@ -20,7 +22,7 @@ export function PromoBanner() {
   return (
     <div className="fixed inset-x-0 top-0 z-[51] bg-terra px-10 py-2.5 text-center text-[11px] leading-snug text-white sm:text-sm md:static md:z-auto md:hidden">
       <p>
-        {`Free shipping on orders $${FREE_SHIPPING_THRESHOLD}+ · `}
+        {`Free shipping on orders ${formatPrice(freeShippingThreshold)}+ · `}
         <Link href="/gift-guide" className="underline underline-offset-2 hover:text-cream">
           Shop the gift guide
         </Link>

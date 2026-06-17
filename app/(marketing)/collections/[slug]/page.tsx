@@ -15,6 +15,8 @@ import { StockNotifyForm } from "@/components/marketing/StockNotifyForm";
 import { ProductCareAccordion } from "@/components/marketing/ProductCareAccordion";
 import { WishlistButton } from "@/components/marketing/WishlistButton";
 import { getUnitWeightOz } from "@/lib/product-weight";
+import { buildProductMetadata, buildProductJsonLd } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
 import type { Category } from "@prisma/client";
 
 export async function generateMetadata({
@@ -23,7 +25,8 @@ export async function generateMetadata({
   params: { slug: string };
 }) {
   const product = await getProductBySlug(params.slug);
-  return { title: product ? `${product.name} — mvlusciouslather` : "Product" };
+  if (!product) return { title: "Product" };
+  return buildProductMetadata(product);
 }
 
 export default async function ProductDetailPage({
@@ -44,6 +47,7 @@ export default async function ProductDetailPage({
 
   return (
     <section className="marketing-header-offset min-h-screen bg-cream px-4 pb-24 sm:px-6">
+      <JsonLd data={buildProductJsonLd(product)} />
       <TrackRecentlyViewed
         productId={product.id}
         name={product.name}

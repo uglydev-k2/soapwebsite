@@ -16,12 +16,12 @@ import { getBundleLineTotal } from "@/lib/bundle-pricing";
 import { AuthSpinner } from "@/components/auth/AuthSpinner";
 import {
   calculateCartTotals,
-  FREE_SHIPPING_THRESHOLD,
   SHIPPING_COUNTRIES,
   US_COUNTRY_CODE,
   US_STATES,
   isUsCountry,
 } from "@/lib/shipping";
+import { useStoreSettings } from "@/components/marketing/StoreSettingsContext";
 import {
   SquarePaymentForm,
   type SquarePaymentFormHandle,
@@ -32,6 +32,7 @@ export default function CheckoutPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { items, subtotal } = useCartStore();
+  const { freeShippingThreshold } = useStoreSettings();
   const addToast = useToastStore((s) => s.addToast);
   const squareRef = useRef<SquarePaymentFormHandle>(null);
   const [loading, setLoading] = useState(false);
@@ -261,7 +262,7 @@ export default function CheckoutPageClient() {
               <h2 className="font-serif text-2xl text-green mb-2">Shipping Address</h2>
               <p className="mb-6 text-sm text-muted">
                 USPS rates by weight & destination · Free U.S. shipping on orders{" "}
-                {formatPrice(FREE_SHIPPING_THRESHOLD)}+
+                {formatPrice(freeShippingThreshold)}+
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">

@@ -15,7 +15,7 @@ const goals = [
   {
     id: "moisture",
     label: "Deep moisture",
-    href: "/collections/category/lotion",
+    href: "/collections/category/bath-body",
     scent: "amber",
   },
   {
@@ -42,9 +42,7 @@ export default function RitualBuilder() {
 
   let resultHref: string | null = null;
   if (goalData && scentData) {
-    const url = new URL(goalData.href, "https://msvee.local");
-    url.searchParams.set("scent", scentData.param);
-    resultHref = `${url.pathname}${url.search}`;
+    resultHref = `${goalData.href}?scent=${encodeURIComponent(scentData.param)}`;
   } else if (goalData) {
     resultHref = goalData.href;
   }

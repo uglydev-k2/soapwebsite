@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
 import { Cormorant_Garamond, Jost } from "next/font/google";
 import "./globals.css";
 import { ToastContainer } from "@/components/ui/Toast";
 import { Providers } from "@/components/Providers";
-import { brandTitle } from "@/lib/brand";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { rootMetadata, buildOrganizationJsonLd } from "@/lib/seo";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -20,11 +20,7 @@ const jost = Jost({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: brandTitle(),
-  description:
-    "Artisanal botanical bath and body care. Where ritual meets luxury.",
-};
+export const metadata = rootMetadata;
 
 export default function RootLayout({
   children,
@@ -34,6 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${cormorant.variable} ${jost.variable}`}>
       <body className="grain">
+        <JsonLd data={buildOrganizationJsonLd()} />
         <Providers>
           {children}
           <ToastContainer />

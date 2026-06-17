@@ -101,7 +101,7 @@ model StoreSettings {
   phone                 String?
   address               String?
   flatShippingRate      Float    @default(8)
-  freeShippingThreshold Float    @default(75)
+  freeShippingThreshold Float    @default(60)
   notifyNewOrder        Boolean  @default(true)
   notifyOrderShipped    Boolean  @default(true)
   notifyLowStock        Boolean  @default(true)
