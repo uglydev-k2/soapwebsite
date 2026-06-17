@@ -1,6 +1,7 @@
-import { BRAND_DISPLAY_NAME } from "@/lib/brand";
+import { BRAND_DISPLAY_NAME, BRAND_EMAIL, BRAND_SITE_URL } from "@/lib/brand";
 import type { ShippingAddress } from "@/lib/checkout";
 import { formatShippingAddressBlock } from "@/lib/order-notes";
+import { getBundleLineTotal } from "@/lib/bundle-pricing";
 
 export type EmailOrderItem = {
   name: string;
@@ -11,10 +12,23 @@ export type EmailOrderItem = {
   itemNumber?: string;
 };
 
+export type OrderConfirmationEmailPayload = {
+  orderNumber: string;
+  firstName: string;
+  email: string;
+  items: EmailOrderItem[];
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  total: number;
+  shippingAddress: ShippingAddress;
+  recipientName?: string;
+};
+
 function getSiteUrl(): string {
   return (
     process.env.NEXTAUTH_URL?.replace(/\/$/, "") ||
-    "https://www.mvlusciouslather.com"
+    BRAND_SITE_URL
   );
 }
 
@@ -33,6 +47,104 @@ function escapeHtml(value: string): string {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+function formatUsd(amount: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(amount);
+}
+
+function renderOrderSummaryTable(items: EmailOrderItem[]): string {
+  if (items.length === 0) return "";
+
+  const rows = items
+    .map((item) => {
+      const lineTotal = getBundleLineTotal(item.price, item.quantity);
+      return `
+        <tr>
+          <td style="padding:8px 12px 8px 0;vertical-align:top;font-size:14px;color:#000;">${escapeHtml(item.name)}</td>
+          <td style="padding:8px 12px;vertical-align:top;font-size:14px;color:#000;text-align:center;">${item.quantity}</td>
+          <td style="padding:8px 0 8px 12px;vertical-align:top;font-size:14px;color:#000;text-align:right;">${formatUsd(lineTotal)}</td>
+        </tr>
+      `;
+    })
+    .join("");
+
+  return `
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;margin:16px 0;">
+      <thead>
+        <tr>
+          <th align="left" style="padding:8px 12px 8px 0;border-bottom:1px solid #000;font-size:14px;font-weight:bold;color:#000;">Item</th>
+          <th align="center" style="padding:8px 12px;border-bottom:1px solid #000;font-size:14px;font-weight:bold;color:#000;">Qty</th>
+          <th align="right" style="padding:8px 0 8px 12px;border-bottom:1px solid #000;font-size:14px;font-weight:bold;color:#000;">Total</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+export function renderOrderConfirmationEmailHtml(
+  data: OrderConfirmationEmailPayload
+): string {
+  const brand = escapeHtml(BRAND_DISPLAY_NAME);
+  const orderNumber = escapeHtml(data.orderNumber);
+  const firstName = escapeHtml(data.firstName);
+  const siteUrl = getSiteUrl();
+
+  const addressLines = formatShippingAddressBlock(
+    data.shippingAddress,
+    data.recipientName
+  );
+
+  return `
+    <div style="font-family:Arial,Helvetica,sans-serif;color:#000;max-width:640px;margin:0 auto;padding:16px 0;">
+      <p style="margin:0 0 8px;font-size:14px;font-weight:bold;color:#000;">Thanks for your order</p>
+      <p style="margin:0 0 16px;font-size:14px;line-height:1.5;color:#000;">
+        Thank you for your order from <strong>${brand}</strong>!
+      </p>
+      <p style="margin:0 0 16px;font-size:14px;line-height:1.5;color:#000;">
+        Hi ${firstName}, we've received order <strong>#${orderNumber}</strong> and are preparing it for shipment.
+        You'll get another email when your order ships.
+      </p>
+      ${renderOrderSummaryTable(data.items)}
+      <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:0 0 16px;font-size:14px;color:#000;">
+        <tr>
+          <td style="padding:4px 0;">Subtotal</td>
+          <td style="padding:4px 0;text-align:right;">${formatUsd(data.subtotal)}</td>
+        </tr>
+        <tr>
+          <td style="padding:4px 0;">Shipping</td>
+          <td style="padding:4px 0;text-align:right;">${formatUsd(data.shipping)}</td>
+        </tr>
+        <tr>
+          <td style="padding:4px 0;">Tax</td>
+          <td style="padding:4px 0;text-align:right;">${formatUsd(data.tax)}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0 4px;font-weight:bold;border-top:1px solid #000;">Total</td>
+          <td style="padding:8px 0 4px;text-align:right;font-weight:bold;border-top:1px solid #000;">${formatUsd(data.total)}</td>
+        </tr>
+      </table>
+      <p style="margin:0 0 4px;font-size:14px;font-weight:bold;color:#000;">Shipping to:</p>
+      <p style="margin:0 0 16px;font-size:14px;line-height:1.5;color:#000;">
+        ${addressLines.map((line) => escapeHtml(line)).join("<br />")}
+      </p>
+      <p style="margin:0 0 8px;font-size:14px;line-height:1.5;color:#000;">
+        Questions about your order? Reply to this email or contact us at
+        <a href="mailto:${escapeHtml(BRAND_EMAIL)}" style="color:#0000EE;text-decoration:underline;">${escapeHtml(BRAND_EMAIL)}</a>.
+      </p>
+      <p style="margin:16px 0 8px;font-size:14px;font-weight:bold;color:#000;">
+        Thank you for your business and we look forward to serving you in the future!
+      </p>
+      <p style="margin:0;font-size:14px;color:#000;">------------------------------------</p>
+      <p style="margin:12px 0 0;font-size:12px;color:#666;">
+        <a href="${siteUrl}" style="color:#0000EE;text-decoration:underline;">${escapeHtml(BRAND_SITE_URL.replace(/^https?:\/\//, ""))}</a>
+      </p>
+    </div>
+  `;
 }
 
 function formatShipDate(date: Date): string {

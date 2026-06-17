@@ -1,18 +1,13 @@
-import { Resend } from "resend";
 import {
+  renderOrderConfirmationEmailHtml,
   renderShippingEmailHtml,
+  type OrderConfirmationEmailPayload,
 } from "@/lib/email-templates";
+import { sendEmail, type SendEmailResult } from "@/lib/email-send";
+import { BRAND_EMAIL } from "@/lib/brand";
 
-function getResend() {
-  if (!process.env.RESEND_API_KEY) return null;
-  return new Resend(process.env.RESEND_API_KEY);
-}
-
-export async function sendWelcomeEmail(email: string) {
-  const resend = getResend();
-  if (!resend) return;
-  await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL || "hello@mvlusciouslather.com",
+export async function sendWelcomeEmail(email: string): Promise<SendEmailResult> {
+  return sendEmail({
     to: email,
     subject: "Welcome to mvlusciouslather",
     html: `
@@ -26,39 +21,25 @@ export async function sendWelcomeEmail(email: string) {
 }
 
 export async function sendOrderConfirmation(
-  email: string,
-  orderNumber: string,
-  total: number
-) {
-  const resend = getResend();
-  if (!resend) return;
-  await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL || "hello@mvlusciouslather.com",
-    to: email,
-    subject: `Order Confirmed — ${orderNumber}`,
-    html: `
-      <div style="font-family: Georgia, serif; color: #1C1C1C; max-width: 560px; margin: 0 auto;">
-        <h1 style="color: #2C4A3E; font-weight: 300;">Your Ritual Awaits</h1>
-        <p>Order <strong>${orderNumber}</strong> has been confirmed.</p>
-        <p>Total: <strong>$${total.toFixed(2)}</strong></p>
-        <p style="color: #6B5E52;">We'll notify you when your order ships.</p>
-      </div>
-    `,
+  payload: OrderConfirmationEmailPayload
+): Promise<SendEmailResult> {
+  return sendEmail({
+    to: payload.email,
+    subject: `Thanks for your order — ${payload.orderNumber}`,
+    html: renderOrderConfirmationEmailHtml(payload),
+    replyTo: BRAND_EMAIL,
   });
 }
 
 export async function sendTrackingEmail(
   email: string,
   payload: Parameters<typeof renderShippingEmailHtml>[0]
-) {
-  const resend = getResend();
-  if (!resend) return;
-
-  await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL || "hello@mvlusciouslather.com",
+): Promise<SendEmailResult> {
+  return sendEmail({
     to: email,
     subject: `Your Order Has Shipped — ${payload.orderNumber}`,
     html: renderShippingEmailHtml(payload),
+    replyTo: BRAND_EMAIL,
   });
 }
 
@@ -68,14 +49,8 @@ export async function sendContactEmail(data: {
   subject: string;
   message: string;
 }) {
-  const resend = getResend();
-  const to = process.env.STORE_CONTACT_EMAIL || process.env.RESEND_FROM_EMAIL || "hello@mvlusciouslather.com";
-  if (!resend) {
-    console.info("[msvee:contact]", data);
-    return;
-  }
-  await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL || "hello@mvlusciouslather.com",
+  const to = process.env.STORE_CONTACT_EMAIL || process.env.RESEND_FROM_EMAIL || BRAND_EMAIL;
+  const result = await sendEmail({
     to,
     replyTo: data.email,
     subject: `[mvlusciouslather Contact] ${data.subject}`,
@@ -87,6 +62,8 @@ export async function sendContactEmail(data: {
       </div>
     `,
   });
+  if (!result.ok) console.info("[msvee:contact]", data);
+  return result;
 }
 
 export async function sendStockNotifyRequest(data: {
@@ -94,18 +71,14 @@ export async function sendStockNotifyRequest(data: {
   productName: string;
   productSlug: string;
 }) {
-  const resend = getResend();
-  const to = process.env.STORE_CONTACT_EMAIL || process.env.RESEND_FROM_EMAIL || "hello@mvlusciouslather.com";
-  if (!resend) {
-    console.info("[msvee:stock-notify]", data);
-    return;
-  }
-  await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL || "hello@mvlusciouslather.com",
+  const to = process.env.STORE_CONTACT_EMAIL || process.env.RESEND_FROM_EMAIL || BRAND_EMAIL;
+  const result = await sendEmail({
     to,
     subject: `[Back in stock] ${data.productName}`,
     html: `<p><strong>${data.email}</strong> wants to know when <strong>${data.productName}</strong> (${data.productSlug}) is back in stock.</p>`,
   });
+  if (!result.ok) console.info("[msvee:stock-notify]", data);
+  return result;
 }
 
 export async function sendWholesaleInquiry(data: {
@@ -115,14 +88,8 @@ export async function sendWholesaleInquiry(data: {
   website?: string;
   message: string;
 }) {
-  const resend = getResend();
-  const to = process.env.STORE_CONTACT_EMAIL || process.env.RESEND_FROM_EMAIL || "hello@mvlusciouslather.com";
-  if (!resend) {
-    console.info("[msvee:wholesale]", data);
-    return;
-  }
-  await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL || "hello@mvlusciouslather.com",
+  const to = process.env.STORE_CONTACT_EMAIL || process.env.RESEND_FROM_EMAIL || BRAND_EMAIL;
+  const result = await sendEmail({
     to,
     replyTo: data.email,
     subject: `[Wholesale] ${data.businessName}`,
@@ -133,13 +100,12 @@ export async function sendWholesaleInquiry(data: {
       <p style="white-space: pre-wrap;">${data.message}</p>
     `,
   });
+  if (!result.ok) console.info("[msvee:wholesale]", data);
+  return result;
 }
 
 export async function sendAdminInvite(email: string, name: string) {
-  const resend = getResend();
-  if (!resend) return;
-  await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL || "hello@mvlusciouslather.com",
+  return sendEmail({
     to: email,
     subject: "You've been invited to mvlusciouslather Admin",
     html: `
@@ -161,10 +127,9 @@ export async function sendAdminNewOrderAlert(data: {
   itemCount: number;
   orderUrl: string;
 }) {
-  const resend = getResend();
-  if (!resend || data.recipients.length === 0) {
+  if (data.recipients.length === 0) {
     console.info("[msvee:new-order-alert]", data);
-    return;
+    return { ok: false as const, error: "No recipients" };
   }
 
   const siteUrl = process.env.NEXTAUTH_URL ?? "";
@@ -172,8 +137,7 @@ export async function sendAdminNewOrderAlert(data: {
     ? data.orderUrl
     : `${siteUrl}${data.orderUrl}`;
 
-  await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL || "hello@mvlusciouslather.com",
+  return sendEmail({
     to: data.recipients,
     subject: `[New Order] ${data.orderNumber} — $${data.total.toFixed(2)}`,
     html: `
@@ -195,10 +159,9 @@ export async function sendAdminLowStockAlert(data: {
   recipients: string[];
   products: { name: string; stock: number; slug: string }[];
 }) {
-  const resend = getResend();
-  if (!resend || data.recipients.length === 0) {
+  if (data.recipients.length === 0) {
     console.info("[msvee:low-stock-alert]", data);
-    return;
+    return { ok: false as const, error: "No recipients" };
   }
 
   const siteUrl = process.env.NEXTAUTH_URL ?? "";
@@ -206,8 +169,7 @@ export async function sendAdminLowStockAlert(data: {
     .map((p) => `<li>${p.name} — ${p.stock} left</li>`)
     .join("");
 
-  await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL || "hello@mvlusciouslather.com",
+  return sendEmail({
     to: data.recipients,
     subject: `[Low Stock] ${data.products.length} product${data.products.length > 1 ? "s" : ""} need attention`,
     html: `
