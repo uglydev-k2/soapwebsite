@@ -168,11 +168,10 @@ export async function fulfillOrder(
   try {
     await notifyAdminsOfNewOrder({
       orderId: createdOrderId,
-      orderNumber,
-      total: input.total,
-      customerEmail: input.email,
+      ...confirmationPayload,
       customerName: `${input.firstName} ${input.lastName}`.trim() || input.email,
-      itemCount: input.cartItems.reduce((sum, item) => sum + item.quantity, 0),
+      phone: input.phone,
+      paymentProvider,
     });
   } catch (error) {
     console.error("[msvee:fulfill-order] Admin notification failed:", error);

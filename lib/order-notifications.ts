@@ -6,13 +6,13 @@ import {
 } from "@/lib/resend";
 import { sendPushToAllAdmins, type PushPayload } from "@/lib/push-notifications";
 
-export type NewOrderNotificationInput = {
+import type { OrderConfirmationEmailPayload } from "@/lib/email-templates";
+
+export type NewOrderNotificationInput = OrderConfirmationEmailPayload & {
   orderId?: string;
-  orderNumber: string;
-  total: number;
-  customerEmail: string;
   customerName: string;
-  itemCount: number;
+  phone?: string;
+  paymentProvider?: string;
 };
 
 async function getNotificationSettings() {
@@ -73,10 +73,18 @@ export async function notifyAdminsOfNewOrder(
   await sendAdminNewOrderAlert({
     recipients,
     orderNumber: input.orderNumber,
+    firstName: input.firstName,
+    email: input.email,
+    items: input.items,
+    subtotal: input.subtotal,
+    shipping: input.shipping,
+    tax: input.tax,
     total: input.total,
-    customerEmail: input.customerEmail,
+    shippingAddress: input.shippingAddress,
+    recipientName: input.recipientName,
     customerName: input.customerName,
-    itemCount: input.itemCount,
+    phone: input.phone,
+    paymentProvider: input.paymentProvider,
     orderUrl: `${process.env.NEXTAUTH_URL ?? ""}${orderUrl}`,
   });
 }

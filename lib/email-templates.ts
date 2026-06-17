@@ -175,6 +175,109 @@ export function renderDeliveredEmailHtml(data: DeliveredEmailPayload): string {
   `;
 }
 
+function renderOrderTotalsTable(data: {
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  total: number;
+}): string {
+  return `
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:0 0 16px;font-size:14px;color:#000;">
+      <tr>
+        <td style="padding:4px 0;">Subtotal</td>
+        <td style="padding:4px 0;text-align:right;">${formatUsd(data.subtotal)}</td>
+      </tr>
+      <tr>
+        <td style="padding:4px 0;">Shipping</td>
+        <td style="padding:4px 0;text-align:right;">${formatUsd(data.shipping)}</td>
+      </tr>
+      <tr>
+        <td style="padding:4px 0;">Tax</td>
+        <td style="padding:4px 0;text-align:right;">${formatUsd(data.tax)}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0 4px;font-weight:bold;border-top:1px solid #000;">Total</td>
+        <td style="padding:8px 0 4px;text-align:right;font-weight:bold;border-top:1px solid #000;">${formatUsd(data.total)}</td>
+      </tr>
+    </table>
+  `;
+}
+
+export type AdminNewOrderEmailPayload = OrderConfirmationEmailPayload & {
+  customerName: string;
+  phone?: string;
+  orderUrl: string;
+  placedAt?: Date;
+  paymentProvider?: string;
+};
+
+export function renderAdminNewOrderEmailHtml(
+  data: AdminNewOrderEmailPayload
+): string {
+  const brand = escapeHtml(BRAND_DISPLAY_NAME);
+  const orderNumber = escapeHtml(data.orderNumber);
+  const customerName = escapeHtml(data.customerName);
+  const customerEmail = escapeHtml(data.email);
+  const phone = data.phone?.trim() ? escapeHtml(data.phone.trim()) : "";
+  const paymentLabel = escapeHtml(
+    data.paymentProvider === "stripe" ? "Stripe" : "Square"
+  );
+  const placedAt = new Intl.DateTimeFormat("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(data.placedAt ?? new Date());
+
+  const addressLines = formatShippingAddressBlock(
+    data.shippingAddress,
+    data.recipientName
+  );
+
+  const phoneLine = phone
+    ? `<p style="margin:0 0 4px;font-size:14px;color:#000;"><strong>Phone:</strong> ${phone}</p>`
+    : "";
+
+  return `
+    <div style="font-family:Arial,Helvetica,sans-serif;color:#000;max-width:640px;margin:0 auto;padding:16px 0;">
+      <p style="margin:0 0 4px;font-size:12px;font-weight:bold;letter-spacing:0.08em;text-transform:uppercase;color:#3D6454;">${brand}</p>
+      <p style="margin:0 0 8px;font-size:20px;font-weight:bold;color:#000;">New order received</p>
+      <p style="margin:0 0 16px;font-size:14px;line-height:1.5;color:#000;">
+        Order <strong>#${orderNumber}</strong> · <strong>${formatUsd(data.total)}</strong> · ${escapeHtml(placedAt)}
+      </p>
+      <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:0 0 20px;border:1px solid #e8e2d9;background:#faf8f5;">
+        <tr>
+          <td style="padding:16px;">
+            <p style="margin:0 0 8px;font-size:14px;font-weight:bold;color:#000;">Customer</p>
+            <p style="margin:0 0 4px;font-size:14px;color:#000;"><strong>${customerName}</strong></p>
+            <p style="margin:0 0 4px;font-size:14px;color:#000;">
+              <a href="mailto:${customerEmail}" style="color:#0000EE;text-decoration:underline;">${customerEmail}</a>
+            </p>
+            ${phoneLine}
+            <p style="margin:8px 0 0;font-size:13px;color:#555;">Paid via ${paymentLabel}</p>
+          </td>
+        </tr>
+      </table>
+      ${renderEmailProductItems(data.items, "Items ordered")}
+      ${renderOrderTotalsTable(data)}
+      <p style="margin:0 0 4px;font-size:14px;font-weight:bold;color:#000;">Ship to:</p>
+      <p style="margin:0 0 20px;font-size:14px;line-height:1.5;color:#000;">
+        ${addressLines.map((line) => escapeHtml(line)).join("<br />")}
+      </p>
+      <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 16px;">
+        <tr>
+          <td style="background:#2C4A3E;border-radius:4px;">
+            <a href="${escapeHtml(data.orderUrl)}" style="display:inline-block;padding:12px 24px;font-size:14px;font-weight:bold;color:#ffffff;text-decoration:none;">View order in admin →</a>
+          </td>
+        </tr>
+      </table>
+      <p style="margin:0;font-size:12px;color:#666;">Payment confirmed — ready to pack and ship.</p>
+    </div>
+  `;
+}
+
 export function renderOrderConfirmationEmailHtml(
   data: OrderConfirmationEmailPayload
 ): string {
@@ -199,24 +302,7 @@ export function renderOrderConfirmationEmailHtml(
         You'll get another email when your order ships.
       </p>
       ${renderOrderConfirmationItems(data.items)}
-      <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:0 0 16px;font-size:14px;color:#000;">
-        <tr>
-          <td style="padding:4px 0;">Subtotal</td>
-          <td style="padding:4px 0;text-align:right;">${formatUsd(data.subtotal)}</td>
-        </tr>
-        <tr>
-          <td style="padding:4px 0;">Shipping</td>
-          <td style="padding:4px 0;text-align:right;">${formatUsd(data.shipping)}</td>
-        </tr>
-        <tr>
-          <td style="padding:4px 0;">Tax</td>
-          <td style="padding:4px 0;text-align:right;">${formatUsd(data.tax)}</td>
-        </tr>
-        <tr>
-          <td style="padding:8px 0 4px;font-weight:bold;border-top:1px solid #000;">Total</td>
-          <td style="padding:8px 0 4px;text-align:right;font-weight:bold;border-top:1px solid #000;">${formatUsd(data.total)}</td>
-        </tr>
-      </table>
+      ${renderOrderTotalsTable(data)}
       <p style="margin:0 0 4px;font-size:14px;font-weight:bold;color:#000;">Shipping to:</p>
       <p style="margin:0 0 16px;font-size:14px;line-height:1.5;color:#000;">
         ${addressLines.map((line) => escapeHtml(line)).join("<br />")}
