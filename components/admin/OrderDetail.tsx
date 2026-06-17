@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useState } from "react";
-import { Mail, Printer } from "lucide-react";
+import { Mail, PackageCheck, Printer } from "lucide-react";
 import type { Customer, Order, OrderItem, OrderStatus, Product } from "@prisma/client";
 import {
   cn,
@@ -62,7 +62,9 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
   const [notes, setNotes] = useState(orderMeta.internalNotes ?? "");
   const [trackingNumber, setTrackingNumber] = useState(orderMeta.trackingNumber ?? "");
   const [updating, setUpdating] = useState(false);
-  const [sending, setSending] = useState(false);
+  const [emailSending, setEmailSending] = useState<"tracking" | "delivered" | null>(
+    null
+  );
 
   const timelineIndex = getTimelineIndex(order.status, !!order.paymentId);
 
@@ -124,7 +126,7 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
   };
 
   const handleSendTracking = async () => {
-    setSending(true);
+    setEmailSending("tracking");
     try {
       const res = await fetch(`/api/orders/${order.id}`, {
         method: "POST",
@@ -143,7 +145,28 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
     } catch {
       addToast("Failed to send tracking email", "error");
     } finally {
-      setSending(false);
+      setEmailSending(null);
+    }
+  };
+
+  const handleSendDelivered = async () => {
+    setEmailSending("delivered");
+    try {
+      const res = await fetch(`/api/orders/${order.id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "send-delivered" }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        addToast(json.error ?? "Failed to send email", "error");
+        return;
+      }
+      addToast("Delivered email sent");
+    } catch {
+      addToast("Failed to send delivered email", "error");
+    } finally {
+      setEmailSending(null);
     }
   };
 
@@ -392,11 +415,21 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
         <Button
           type="button"
           onClick={handleSendTracking}
-          disabled={sending}
+          disabled={emailSending !== null}
           className="w-full gap-2 sm:w-auto"
         >
           <Mail size={16} />
-          {sending ? "Sending…" : "Send Tracking Email"}
+          {emailSending === "tracking" ? "Sending…" : "Send Tracking Email"}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleSendDelivered}
+          disabled={emailSending !== null}
+          className="w-full gap-2 sm:w-auto"
+        >
+          <PackageCheck size={16} />
+          {emailSending === "delivered" ? "Sending…" : "Send Delivered Email"}
         </Button>
       </div>
     </div>

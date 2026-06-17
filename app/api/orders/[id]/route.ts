@@ -2,10 +2,13 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, jsonResponse, errorResponse } from "@/lib/api-helpers";
 import { orderUpdateSchema } from "@/lib/validations";
-import { sendTrackingEmail } from "@/lib/resend";
+import { sendDeliveredEmail, sendTrackingEmail } from "@/lib/resend";
 import { logAdminAction } from "@/lib/audit";
 import { getClientIp } from "@/lib/rate-limit";
-import { buildShippingEmailPayload } from "@/lib/shipping-email";
+import {
+  buildDeliveredEmailPayload,
+  buildShippingEmailPayload,
+} from "@/lib/shipping-email";
 import { mergeOrderNotes } from "@/lib/order-notes";
 
 export async function GET(
@@ -78,6 +81,10 @@ export async function PATCH(
     );
   }
 
+  if (parsed.data.status === "DELIVERED" && order.customer.email) {
+    await sendDeliveredEmail(buildDeliveredEmailPayload(order));
+  }
+
   await logAdminAction({
     adminId: session!.user!.id,
     adminEmail: session!.user!.email ?? "",
@@ -100,7 +107,8 @@ export async function POST(
   if (error) return error;
 
   const body = await request.json().catch(() => ({}));
-  if (body.action !== "send-tracking") {
+  const action = body.action;
+  if (action !== "send-tracking" && action !== "send-delivered") {
     return errorResponse("Invalid action", 400);
   }
 
@@ -108,7 +116,19 @@ export async function POST(
     where: { id: params.id },
     include: {
       customer: true,
-      items: { include: { product: { select: { name: true, images: true, slug: true } } } },
+      items: {
+        include: {
+          product: {
+            select: {
+              name: true,
+              images: true,
+              slug: true,
+              fragrance: true,
+              category: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -117,22 +137,39 @@ export async function POST(
     return errorResponse("Customer has no email address", 400);
   }
 
-  const trackingInfo =
-    typeof body.trackingInfo === "string" ? body.trackingInfo : undefined;
+  if (action === "send-tracking") {
+    const trackingInfo =
+      typeof body.trackingInfo === "string" ? body.trackingInfo : undefined;
 
-  if (trackingInfo) {
-    await prisma.order.update({
-      where: { id: params.id },
-      data: {
-        notes: mergeOrderNotes(order.notes, { trackingNumber: trackingInfo }),
-      },
+    if (trackingInfo) {
+      await prisma.order.update({
+        where: { id: params.id },
+        data: {
+          notes: mergeOrderNotes(order.notes, { trackingNumber: trackingInfo }),
+        },
+      });
+    }
+
+    await sendTrackingEmail(
+      order.customer.email,
+      buildShippingEmailPayload(order, { trackingInfo })
+    );
+
+    await logAdminAction({
+      adminId: session!.user!.id,
+      adminEmail: session!.user!.email ?? "",
+      adminRole: (session!.user as { role?: string }).role ?? "",
+      action: "NOTIFY",
+      entity: "Order",
+      entityId: params.id,
+      metadata: { orderNumber: order.orderNumber, trackingInfo, type: "tracking" },
+      ipAddress: getClientIp(request),
     });
+
+    return jsonResponse({ success: true });
   }
 
-  await sendTrackingEmail(
-    order.customer.email,
-    buildShippingEmailPayload(order, { trackingInfo })
-  );
+  await sendDeliveredEmail(buildDeliveredEmailPayload(order));
 
   await logAdminAction({
     adminId: session!.user!.id,
@@ -141,7 +178,7 @@ export async function POST(
     action: "NOTIFY",
     entity: "Order",
     entityId: params.id,
-    metadata: { orderNumber: order.orderNumber, trackingInfo },
+    metadata: { orderNumber: order.orderNumber, type: "delivered" },
     ipAddress: getClientIp(request),
   });
 

@@ -59,7 +59,10 @@ function formatUsd(amount: number): string {
   }).format(amount);
 }
 
-function renderOrderConfirmationItems(items: EmailOrderItem[]): string {
+function renderEmailProductItems(
+  items: EmailOrderItem[],
+  heading = "Order summary"
+): string {
   if (items.length === 0) return "";
 
   const siteUrl = getSiteUrl();
@@ -101,13 +104,76 @@ function renderOrderConfirmationItems(items: EmailOrderItem[]): string {
     .join("");
 
   return `
-    <p style="margin:0 0 8px;font-size:14px;font-weight:bold;color:#000;">Order summary</p>
+    <p style="margin:0 0 8px;font-size:14px;font-weight:bold;color:#000;">${escapeHtml(heading)}</p>
     <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;margin:0 0 16px;">
       <tbody>${rows}</tbody>
     </table>
   `;
 }
 
+function renderOrderConfirmationItems(items: EmailOrderItem[]): string {
+  return renderEmailProductItems(items, "Order summary");
+}
+
+export type DeliveredEmailPayload = {
+  orderNumber: string;
+  firstName: string;
+  email: string;
+  items: EmailOrderItem[];
+  deliveredAt?: Date;
+  shippingAddress?: ShippingAddress;
+  recipientName?: string;
+};
+
+export function renderDeliveredEmailHtml(data: DeliveredEmailPayload): string {
+  const brand = escapeHtml(BRAND_DISPLAY_NAME);
+  const orderNumber = escapeHtml(data.orderNumber);
+  const firstName = escapeHtml(data.firstName);
+  const siteUrl = getSiteUrl();
+  const deliveredDate = new Intl.DateTimeFormat("en-US", {
+    month: "numeric",
+    day: "numeric",
+    year: "numeric",
+  }).format(data.deliveredAt ?? new Date());
+
+  let addressBlock = "";
+  if (data.shippingAddress) {
+    const lines = formatShippingAddressBlock(
+      data.shippingAddress,
+      data.recipientName
+    );
+    addressBlock = `
+      <p style="margin:0 0 4px;font-size:14px;font-weight:bold;color:#000;">Delivered to:</p>
+      <p style="margin:0 0 16px;font-size:14px;line-height:1.5;color:#000;">
+        ${lines.map((line) => escapeHtml(line)).join("<br />")}
+      </p>
+    `;
+  }
+
+  return `
+    <div style="font-family:Arial,Helvetica,sans-serif;color:#000;max-width:640px;margin:0 auto;padding:16px 0;">
+      <p style="margin:0 0 8px;font-size:14px;font-weight:bold;color:#000;">Your order has been delivered</p>
+      <p style="margin:0 0 16px;font-size:14px;line-height:1.5;color:#000;">
+        Hi ${firstName}, your order <strong>#${orderNumber}</strong> from <strong>${brand}</strong> was delivered on ${deliveredDate}.
+        We hope you enjoy your botanical ritual!
+      </p>
+      ${addressBlock}
+      ${renderEmailProductItems(data.items, "Items in this delivery")}
+      <p style="margin:0 0 16px;font-size:14px;line-height:1.5;color:#000;">
+        <a href="${siteUrl}/collections" style="color:#0000EE;text-decoration:underline;">Shop our collections</a>
+        for your next ritual.
+      </p>
+      <p style="margin:0 0 8px;font-size:14px;line-height:1.5;color:#000;">
+        Questions about your order? Reply to this email or contact us at
+        <a href="mailto:${escapeHtml(BRAND_EMAIL)}" style="color:#0000EE;text-decoration:underline;">${escapeHtml(BRAND_EMAIL)}</a>.
+      </p>
+      <p style="margin:16px 0 8px;font-size:14px;font-weight:bold;color:#000;">
+        Thank you for your business and we look forward to serving you in the future!
+      </p>
+      <p style="margin:0;font-size:14px;color:#000;">------------------------------------</p>
+    </div>
+  `;
+}
 
 export function renderOrderConfirmationEmailHtml(
   data: OrderConfirmationEmailPayload

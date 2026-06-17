@@ -1,4 +1,5 @@
 import {
+  renderDeliveredEmailHtml,
   renderOrderConfirmationEmailHtml,
   renderShippingEmailHtml,
   type OrderConfirmationEmailPayload,
@@ -39,6 +40,17 @@ export async function sendTrackingEmail(
     to: email,
     subject: `Your Order Has Shipped — ${payload.orderNumber}`,
     html: renderShippingEmailHtml(payload),
+    replyTo: BRAND_EMAIL,
+  });
+}
+
+export async function sendDeliveredEmail(
+  payload: Parameters<typeof renderDeliveredEmailHtml>[0]
+): Promise<SendEmailResult> {
+  return sendEmail({
+    to: payload.email,
+    subject: `Your Order Has Been Delivered — ${payload.orderNumber}`,
+    html: renderDeliveredEmailHtml(payload),
     replyTo: BRAND_EMAIL,
   });
 }
