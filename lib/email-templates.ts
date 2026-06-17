@@ -37,11 +37,19 @@ function getSiteUrl(): string {
 
 export function toAbsoluteImageUrl(image?: string | null): string | null {
   if (!image?.trim()) return null;
-  if (image.startsWith("http://") || image.startsWith("https://")) {
-    return image;
+  const trimmed = image.trim();
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
   }
   const base = getSiteUrl();
-  return `${base}${image.startsWith("/") ? image : `/${image}`}`;
+  return `${base}${trimmed.startsWith("/") ? trimmed : `/${trimmed}`}`;
+}
+
+/** Use the same primary image URL stored on the product record (site + cart). */
+export function pickProductImage(images?: string[] | null): string | null {
+  if (!images?.length) return null;
+  const found = images.find((url) => url?.trim());
+  return found?.trim() ?? null;
 }
 
 function escapeHtml(value: string): string {
@@ -74,29 +82,26 @@ function renderEmailProductItems(
       const productUrl = item.slug
         ? `${siteUrl}/collections/${encodeURIComponent(item.slug)}`
         : siteUrl;
+      const sku = escapeHtml(
+        (item.itemNumber || item.slug?.toUpperCase() || "—").trim()
+      );
 
       const imageCell = imageUrl
-        ? `<a href="${escapeHtml(productUrl)}" style="text-decoration:none;"><img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(item.name)}" width="80" height="80" style="display:block;width:80px;height:80px;object-fit:cover;border:1px solid #e8e2d9;background:#f5f0e8;" /></a>`
-        : `<div style="width:80px;height:80px;background:linear-gradient(135deg,#3D6454,#2C4A3E);border:1px solid #e8e2d9;"></div>`;
-
-      const metaParts: string[] = [];
-      if (item.categoryLabel) metaParts.push(escapeHtml(item.categoryLabel));
-      if (item.fragrance) metaParts.push(escapeHtml(item.fragrance));
-      const metaLine = metaParts.length
-        ? `<p style="margin:4px 0 0;font-size:12px;color:#555;">${metaParts.join(" · ")}</p>`
-        : "";
+        ? `<a href="${escapeHtml(productUrl)}" style="text-decoration:none;"><img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(item.name)}" width="64" height="64" style="display:block;width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid #e8e2d9;background:#f5f0e8;" /></a>`
+        : `<div style="width:64px;height:64px;border-radius:8px;background:linear-gradient(135deg,#3D6454,#2C4A3E);border:1px solid #e8e2d9;"></div>`;
 
       return `
         <tr>
-          <td style="padding:16px 0;border-bottom:1px solid #e8e2d9;vertical-align:top;width:92px;">${imageCell}</td>
-          <td style="padding:16px 0 16px 16px;border-bottom:1px solid #e8e2d9;vertical-align:top;">
-            <p style="margin:0;font-size:15px;font-weight:bold;color:#000;">
-              <a href="${escapeHtml(productUrl)}" style="color:#000;text-decoration:none;">${escapeHtml(item.name)}</a>
+          <td style="padding:16px 0;border-bottom:1px solid #e8e2d9;vertical-align:top;width:76px;">${imageCell}</td>
+          <td style="padding:16px 12px;border-bottom:1px solid #e8e2d9;vertical-align:top;">
+            <p style="margin:0;font-size:14px;font-weight:600;color:#000;text-transform:uppercase;line-height:1.35;">
+              <a href="${escapeHtml(productUrl)}" style="color:#000;text-decoration:none;">${escapeHtml(item.name.trim())}</a>
             </p>
-            ${metaLine}
-            <p style="margin:8px 0 0;font-size:13px;color:#000;">
-              Qty ${item.quantity} · ${unitPrice} each · <strong>${formatUsd(lineTotal)}</strong>
-            </p>
+            <p style="margin:6px 0 0;font-size:14px;color:#000;">${unitPrice} × ${item.quantity}</p>
+            <p style="margin:4px 0 0;font-size:12px;color:#666;">SKU: ${sku}</p>
+          </td>
+          <td style="padding:16px 0;border-bottom:1px solid #e8e2d9;vertical-align:top;text-align:right;font-size:14px;color:#000;white-space:nowrap;">
+            ${formatUsd(lineTotal)}
           </td>
         </tr>
       `;
@@ -104,7 +109,7 @@ function renderEmailProductItems(
     .join("");
 
   return `
-    <p style="margin:0 0 8px;font-size:14px;font-weight:bold;color:#000;">${escapeHtml(heading)}</p>
+    <p style="margin:0 0 12px;font-size:14px;font-weight:bold;color:#000;">${escapeHtml(heading)}</p>
     <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;margin:0 0 16px;">
       <tbody>${rows}</tbody>
     </table>
@@ -419,7 +424,7 @@ export function renderShippingEmailHtml(data: {
     `;
   }
 
-  const itemsTable = renderShipmentItemsTable(data.items);
+  const itemsTable = renderEmailProductItems(data.items, "Order summary");
 
   const footer = `
     <p style="margin:24px 0 8px;font-size:14px;font-weight:bold;color:#000;">

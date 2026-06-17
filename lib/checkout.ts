@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { isDatabaseConfigured } from "@/lib/env";
 import { calculateShippingQuote } from "@/lib/shipping-calculator";
 import { getCountryCode } from "@/lib/shipping";
+import { pickProductImage } from "@/lib/email-templates";
 import { getCategoryLabel } from "@/lib/utils";
 
 const TAX_RATE = 0.08;
@@ -155,7 +156,7 @@ export async function validateCartItems(
       slug: product.slug,
       price: product.price,
       quantity: item.quantity,
-      image: product.images[0],
+      image: pickProductImage(product.images) ?? undefined,
       fragrance: product.fragrance,
       categoryLabel: getCategoryLabel(product.category),
     });

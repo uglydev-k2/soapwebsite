@@ -1,5 +1,6 @@
 import type { Customer, Order, OrderItem, Product } from "@prisma/client";
 import type { DeliveredEmailPayload, EmailOrderItem } from "@/lib/email-templates";
+import { pickProductImage } from "@/lib/email-templates";
 import { parseOrderNotes } from "@/lib/order-notes";
 import { parseTrackingInput } from "@/lib/tracking";
 import { getCategoryLabel } from "@/lib/utils";
@@ -19,7 +20,7 @@ function mapOrderItems(items: OrderWithRelations["items"]): EmailOrderItem[] {
     name: item.product.name,
     quantity: item.quantity,
     price: item.price,
-    image: item.product.images[0] ?? null,
+    image: pickProductImage(item.product.images),
     slug: item.product.slug,
     fragrance: item.product.fragrance,
     categoryLabel: getCategoryLabel(item.product.category),

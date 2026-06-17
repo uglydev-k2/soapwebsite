@@ -3,6 +3,28 @@ import type {
   EmailOrderItem,
   OrderConfirmationEmailPayload,
 } from "@/lib/email-templates";
+import { pickProductImage } from "@/lib/email-templates";
+import { prisma } from "@/lib/prisma";
+import { isDatabaseConfigured } from "@/lib/env";
+
+export async function refreshCartItemImages(
+  cartItems: ValidatedCartItem[]
+): Promise<ValidatedCartItem[]> {
+  if (!isDatabaseConfigured() || cartItems.length === 0) return cartItems;
+
+  const products = await prisma.product.findMany({
+    where: { id: { in: cartItems.map((item) => item.productId) } },
+    select: { id: true, images: true },
+  });
+  const imageById = new Map(
+    products.map((product) => [product.id, pickProductImage(product.images)])
+  );
+
+  return cartItems.map((item) => ({
+    ...item,
+    image: imageById.get(item.productId) ?? item.image,
+  }));
+}
 
 export function buildOrderConfirmationPayload(input: {
   orderNumber: string;

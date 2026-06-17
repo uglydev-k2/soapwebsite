@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { generateOrderNumber } from "@/lib/utils";
 import { sendOrderConfirmation } from "@/lib/resend";
 import { notifyAdminsOfNewOrder, notifyAdminsOfLowStock } from "@/lib/order-notifications";
-import { buildOrderConfirmationPayload } from "@/lib/order-email";
+import { buildOrderConfirmationPayload, refreshCartItemImages } from "@/lib/order-email";
 import { LOW_STOCK_THRESHOLD } from "@/lib/admin-inventory";
 import { saveOrderToSupabase } from "@/lib/supabase/orders";
 import type { ShippingAddress, ValidatedCartItem } from "@/lib/checkout";
@@ -52,6 +52,7 @@ export async function fulfillOrder(
   }
 
   const orderNumber = input.orderNumber ?? generateOrderNumber();
+  const cartItems = await refreshCartItemImages(input.cartItems);
 
   await saveOrderToSupabase({
     orderNumber,
@@ -67,7 +68,7 @@ export async function fulfillOrder(
     paymentExternalId: input.paymentId,
     paymentProvider,
     shippingAddress: input.shippingAddress,
-    items: input.cartItems,
+    items: cartItems,
   });
 
   let createdOrderId: string | undefined;
@@ -154,7 +155,7 @@ export async function fulfillOrder(
     shipping: input.shipping,
     tax: input.tax,
     total: input.total,
-    cartItems: input.cartItems,
+    cartItems,
   });
 
   const emailResult = await sendOrderConfirmation(confirmationPayload);
