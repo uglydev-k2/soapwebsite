@@ -8,6 +8,9 @@ export type EmailOrderItem = {
   quantity: number;
   price: number;
   image?: string | null;
+  slug?: string;
+  fragrance?: string | null;
+  categoryLabel?: string;
   /** Product slug or SKU shown in the Item # column. */
   itemNumber?: string;
 };
@@ -56,35 +59,55 @@ function formatUsd(amount: number): string {
   }).format(amount);
 }
 
-function renderOrderSummaryTable(items: EmailOrderItem[]): string {
+function renderOrderConfirmationItems(items: EmailOrderItem[]): string {
   if (items.length === 0) return "";
 
+  const siteUrl = getSiteUrl();
   const rows = items
     .map((item) => {
       const lineTotal = getBundleLineTotal(item.price, item.quantity);
+      const unitPrice = formatUsd(item.price);
+      const imageUrl = toAbsoluteImageUrl(item.image);
+      const productUrl = item.slug
+        ? `${siteUrl}/collections/${encodeURIComponent(item.slug)}`
+        : siteUrl;
+
+      const imageCell = imageUrl
+        ? `<a href="${escapeHtml(productUrl)}" style="text-decoration:none;"><img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(item.name)}" width="80" height="80" style="display:block;width:80px;height:80px;object-fit:cover;border:1px solid #e8e2d9;background:#f5f0e8;" /></a>`
+        : `<div style="width:80px;height:80px;background:linear-gradient(135deg,#3D6454,#2C4A3E);border:1px solid #e8e2d9;"></div>`;
+
+      const metaParts: string[] = [];
+      if (item.categoryLabel) metaParts.push(escapeHtml(item.categoryLabel));
+      if (item.fragrance) metaParts.push(escapeHtml(item.fragrance));
+      const metaLine = metaParts.length
+        ? `<p style="margin:4px 0 0;font-size:12px;color:#555;">${metaParts.join(" · ")}</p>`
+        : "";
+
       return `
         <tr>
-          <td style="padding:8px 12px 8px 0;vertical-align:top;font-size:14px;color:#000;">${escapeHtml(item.name)}</td>
-          <td style="padding:8px 12px;vertical-align:top;font-size:14px;color:#000;text-align:center;">${item.quantity}</td>
-          <td style="padding:8px 0 8px 12px;vertical-align:top;font-size:14px;color:#000;text-align:right;">${formatUsd(lineTotal)}</td>
+          <td style="padding:16px 0;border-bottom:1px solid #e8e2d9;vertical-align:top;width:92px;">${imageCell}</td>
+          <td style="padding:16px 0 16px 16px;border-bottom:1px solid #e8e2d9;vertical-align:top;">
+            <p style="margin:0;font-size:15px;font-weight:bold;color:#000;">
+              <a href="${escapeHtml(productUrl)}" style="color:#000;text-decoration:none;">${escapeHtml(item.name)}</a>
+            </p>
+            ${metaLine}
+            <p style="margin:8px 0 0;font-size:13px;color:#000;">
+              Qty ${item.quantity} · ${unitPrice} each · <strong>${formatUsd(lineTotal)}</strong>
+            </p>
+          </td>
         </tr>
       `;
     })
     .join("");
 
   return `
-    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;margin:16px 0;">
-      <thead>
-        <tr>
-          <th align="left" style="padding:8px 12px 8px 0;border-bottom:1px solid #000;font-size:14px;font-weight:bold;color:#000;">Item</th>
-          <th align="center" style="padding:8px 12px;border-bottom:1px solid #000;font-size:14px;font-weight:bold;color:#000;">Qty</th>
-          <th align="right" style="padding:8px 0 8px 12px;border-bottom:1px solid #000;font-size:14px;font-weight:bold;color:#000;">Total</th>
-        </tr>
-      </thead>
+    <p style="margin:0 0 8px;font-size:14px;font-weight:bold;color:#000;">Order summary</p>
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;margin:0 0 16px;">
       <tbody>${rows}</tbody>
     </table>
   `;
 }
+
 
 export function renderOrderConfirmationEmailHtml(
   data: OrderConfirmationEmailPayload
@@ -109,7 +132,7 @@ export function renderOrderConfirmationEmailHtml(
         Hi ${firstName}, we've received order <strong>#${orderNumber}</strong> and are preparing it for shipment.
         You'll get another email when your order ships.
       </p>
-      ${renderOrderSummaryTable(data.items)}
+      ${renderOrderConfirmationItems(data.items)}
       <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:0 0 16px;font-size:14px;color:#000;">
         <tr>
           <td style="padding:4px 0;">Subtotal</td>

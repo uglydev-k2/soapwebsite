@@ -20,6 +20,10 @@ export function buildOrderConfirmationPayload(input: {
     name: item.name,
     quantity: item.quantity,
     price: item.price,
+    image: item.image,
+    slug: item.slug,
+    fragrance: item.fragrance,
+    categoryLabel: item.categoryLabel,
     itemNumber: item.slug.toUpperCase(),
   }));
 
