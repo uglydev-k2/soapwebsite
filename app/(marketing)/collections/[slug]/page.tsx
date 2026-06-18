@@ -2,10 +2,9 @@ export const dynamic = "force-dynamic";
 
 import { getProductBySlug, getProductScentVariants } from "@/lib/products";
 import { notFound } from "next/navigation";
-import { formatPrice, getCategoryLabel } from "@/lib/utils";
+import { formatPrice } from "@/lib/utils";
 import ProductBundleSelector from "@/components/marketing/ProductBundleSelector";
-import { ScentVariantSelector } from "@/components/marketing/ScentVariantSelector";
-import ProductGallery from "@/components/marketing/ProductGallery";
+import { ProductDetailGrid } from "@/components/marketing/ProductDetailGrid";
 import ProductReviews from "@/components/marketing/ProductReviews";
 import { TrackRecentlyViewed } from "@/components/marketing/TrackRecentlyViewed";
 import { RecentlyViewedStrip } from "@/components/marketing/RecentlyViewedStrip";
@@ -71,82 +70,73 @@ export default async function ProductDetailPage({
             { label: product.name },
           ]}
         />
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
-          <ProductGallery
-            name={product.name}
-            images={product.images}
-            fallbackGradient={gradient}
-          />
-          <div>
-            <p className="label-caps text-terra mb-2">
-              {getCategoryLabel(product.category)}
-            </p>
-            <h1 className="mb-2 font-serif text-3xl font-semibold text-green sm:text-4xl">
-              {product.name}
-            </h1>
-            {scentVariants.length > 0 ? (
-              <p className="mb-4 text-muted">
-                <span className="label-caps">Scent · </span>
-                <span className="text-green">{selectedScentLabel}</span>
-              </p>
-            ) : null}
-            <div className="flex items-baseline gap-3 mb-6">
-              <span className="font-serif text-2xl text-green">
-                {formatPrice(product.price)}
-              </span>
-              {product.comparePrice && (
-                <span className="text-muted line-through text-lg">
-                  {formatPrice(product.comparePrice)}
+        <ProductDetailGrid
+          product={product}
+          scentVariants={scentVariants}
+          gradient={gradient}
+          selectedScentLabel={selectedScentLabel}
+          detailsBeforeScents={
+            <>
+              <div className="flex items-baseline gap-3 mb-6">
+                <span className="font-serif text-2xl text-green">
+                  {formatPrice(product.price)}
                 </span>
+                {product.comparePrice && (
+                  <span className="text-muted line-through text-lg">
+                    {formatPrice(product.comparePrice)}
+                  </span>
+                )}
+              </div>
+              <p className="text-muted leading-relaxed mb-8">{product.description}</p>
+            </>
+          }
+          detailsAfterScents={
+            <>
+              {product.fragrance && scentVariants.length === 0 && (
+                <p className="mb-4">
+                  <span className="label-caps text-muted">Fragrance · </span>
+                  <span className="text-green">{product.fragrance}</span>
+                </p>
               )}
-            </div>
-            <p className="text-muted leading-relaxed mb-8">{product.description}</p>
-            <ScentVariantSelector
-              variants={scentVariants}
-              currentSlug={product.slug}
-            />
-            {product.fragrance && scentVariants.length === 0 && (
               <p className="mb-4">
-                <span className="label-caps text-muted">Fragrance · </span>
-                <span className="text-green">{product.fragrance}</span>
+                <span className="label-caps text-muted">Weight · </span>
+                <span className="text-green">{weightOz} oz</span>
               </p>
-            )}
-            <p className="mb-4">
-              <span className="label-caps text-muted">Weight · </span>
-              <span className="text-green">{weightOz} oz</span>
-            </p>
-            {product.ingredients && (
-              <div className="mb-8">
-                <p className="label-caps text-muted mb-2">Ingredients</p>
-                <p className="text-sm text-muted leading-relaxed">{product.ingredients}</p>
+              {product.ingredients && (
+                <div className="mb-8">
+                  <p className="label-caps text-muted mb-2">Ingredients</p>
+                  <p className="text-sm text-muted leading-relaxed">
+                    {product.ingredients}
+                  </p>
+                </div>
+              )}
+              <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+                <p className="label-caps text-muted">
+                  {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
+                </p>
+                <ShareProductButton name={product.name} />
+                <WishlistButton
+                  item={{
+                    productId: product.id,
+                    name: product.name,
+                    slug: product.slug,
+                    price: product.price,
+                    image: product.images[0],
+                  }}
+                />
               </div>
-            )}
-            <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
-              <p className="label-caps text-muted">
-                {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
-              </p>
-              <ShareProductButton name={product.name} />
-              <WishlistButton
-                item={{
-                  productId: product.id,
-                  name: product.name,
-                  slug: product.slug,
-                  price: product.price,
-                  image: product.images[0],
-                }}
-              />
-            </div>
-            {product.stock === 0 ? (
-              <div className="mb-8 border border-green/10 bg-white p-6">
-                <p className="label-caps text-muted mb-3">Back in stock alert</p>
-                <StockNotifyForm productSlug={product.slug} productName={product.name} />
-              </div>
-            ) : (
-              <ProductBundleSelector product={product} disabled={false} />
-            )}
-            <ProductCareAccordion category={product.category as Category} />
-          </div>
-        </div>
+              {product.stock === 0 ? (
+                <div className="mb-8 border border-green/10 bg-white p-6">
+                  <p className="label-caps text-muted mb-3">Back in stock alert</p>
+                  <StockNotifyForm productSlug={product.slug} productName={product.name} />
+                </div>
+              ) : (
+                <ProductBundleSelector product={product} disabled={false} />
+              )}
+              <ProductCareAccordion category={product.category as Category} />
+            </>
+          }
+        />
         <CompleteYourRitual category={product.category as Category} excludeSlug={product.slug} />
         <ProductReviews slug={product.slug} />
         <RecentlyViewedStrip excludeSlug={product.slug} />

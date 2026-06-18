@@ -51,15 +51,100 @@ function ScentThumbnail({
   );
 }
 
+function ScentVariantOption({
+  variant,
+  selected,
+  compact,
+  onVariantSelect,
+}: {
+  variant: ScentVariant;
+  selected: boolean;
+  compact: boolean;
+  onVariantSelect?: (variant: ScentVariant) => void;
+}) {
+  const disabled = !variant.inStock && !selected;
+  const className = cn(
+    "flex items-center border text-sm transition-all duration-250",
+    compact
+      ? "min-w-[5.5rem] shrink-0 flex-col gap-1 p-1.5"
+      : "min-h-[3.75rem] gap-3 p-2 sm:min-w-[9.5rem]",
+    selected
+      ? "border-terra bg-terra/10 text-green"
+      : disabled
+        ? "border-green/10 bg-stone-50 text-muted"
+        : "border-green/15 bg-white text-green hover:border-green/40"
+  );
+
+  const content = (
+    <>
+      <ScentThumbnail
+        label={variant.label}
+        image={variant.image}
+        selected={selected}
+        compact={compact}
+      />
+      <span className={cn("min-w-0 text-center", compact ? "w-full px-0.5" : "flex-1")}>
+        <span
+          className={cn(
+            "label-caps block leading-snug",
+            compact && "text-[0.6rem]"
+          )}
+        >
+          {variant.label}
+        </span>
+        {!variant.inStock ? (
+          <span
+            className={cn(
+              "block text-muted",
+              compact ? "text-[0.55rem]" : "mt-0.5 text-xs"
+            )}
+          >
+            Sold out
+          </span>
+        ) : null}
+      </span>
+    </>
+  );
+
+  if (onVariantSelect) {
+    return (
+      <button
+        type="button"
+        aria-current={selected ? "true" : undefined}
+        aria-label={`${variant.label}${variant.inStock ? "" : ", sold out"}`}
+        className={className}
+        style={{ borderRadius: "2px" }}
+        onClick={() => onVariantSelect(variant)}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <Link
+      href={`/collections/${variant.slug}`}
+      aria-current={selected ? "true" : undefined}
+      aria-label={`${variant.label}${variant.inStock ? "" : ", sold out"}`}
+      className={className}
+      style={{ borderRadius: "2px" }}
+    >
+      {content}
+    </Link>
+  );
+}
+
 export function ScentVariantSelector({
   variants,
   currentSlug,
   compact = false,
+  onVariantSelect,
 }: {
   variants: ScentVariant[];
   currentSlug: string;
   baseName?: string;
   compact?: boolean;
+  onVariantSelect?: (variant: ScentVariant) => void;
 }) {
   if (variants.length <= 1) return null;
 
@@ -79,53 +164,15 @@ export function ScentVariantSelector({
             : "grid grid-cols-2 gap-2 sm:flex sm:flex-wrap"
         }
       >
-        {variants.map((variant) => {
-          const selected = variant.slug === currentSlug;
-          const disabled = !variant.inStock && !selected;
-
-          return (
-            <Link
-              key={variant.id}
-              href={`/collections/${variant.slug}`}
-              aria-current={selected ? "true" : undefined}
-              aria-label={`${variant.label}${variant.inStock ? "" : ", sold out"}`}
-              className={cn(
-                "flex items-center border text-sm transition-all duration-250",
-                compact
-                  ? "min-w-[5.5rem] shrink-0 flex-col gap-1 p-1.5"
-                  : "min-h-[3.75rem] gap-3 p-2 sm:min-w-[9.5rem]",
-                selected
-                  ? "border-terra bg-terra/10 text-green"
-                  : disabled
-                    ? "border-green/10 bg-stone-50 text-muted"
-                    : "border-green/15 bg-white text-green hover:border-green/40"
-              )}
-              style={{ borderRadius: "2px" }}
-            >
-              <ScentThumbnail
-                label={variant.label}
-                image={variant.image}
-                selected={selected}
-                compact={compact}
-              />
-              <span className={cn("min-w-0 text-center", compact ? "w-full px-0.5" : "flex-1")}>
-                <span
-                  className={cn(
-                    "label-caps block leading-snug",
-                    compact && "text-[0.6rem]"
-                  )}
-                >
-                  {variant.label}
-                </span>
-                {!variant.inStock ? (
-                  <span className={cn("block text-muted", compact ? "text-[0.55rem]" : "mt-0.5 text-xs")}>
-                    Sold out
-                  </span>
-                ) : null}
-              </span>
-            </Link>
-          );
-        })}
+        {variants.map((variant) => (
+          <ScentVariantOption
+            key={variant.id}
+            variant={variant}
+            selected={variant.slug === currentSlug}
+            compact={compact}
+            onVariantSelect={onVariantSelect}
+          />
+        ))}
       </div>
     </div>
   );

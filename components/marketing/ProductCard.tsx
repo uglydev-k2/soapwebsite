@@ -37,7 +37,12 @@ export default function ProductCard({
   const addToast = useToastStore((s) => s.addToast);
 
   const hasScentOptions = scentVariants.length > 1;
-  const productUrl = `/collections/${product.slug}`;
+  const [previewVariant, setPreviewVariant] = useState<ScentVariant | null>(null);
+  const heroImage =
+    previewVariant?.image ??
+    previewVariant?.images?.[0] ??
+    product.images[0];
+  const productUrl = `/collections/${previewVariant?.slug ?? product.slug}`;
   const isOutOfStock = hasScentOptions
     ? scentVariants.every((variant) => !variant.inStock)
     : product.stock <= 0;
@@ -76,9 +81,9 @@ export default function ProductCard({
         }
       >
         <Link href={productUrl} className="relative block aspect-[3/4] overflow-hidden">
-          {product.images[0] ? (
+          {heroImage ? (
             <Image
-              src={product.images[0]}
+              src={heroImage}
               alt={product.name}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -183,7 +188,8 @@ export default function ProductCard({
           {hasScentOptions ? (
             <ScentVariantSelector
               variants={scentVariants}
-              currentSlug={product.slug}
+              currentSlug={previewVariant?.slug ?? product.slug}
+              onVariantSelect={setPreviewVariant}
               compact
             />
           ) : (
