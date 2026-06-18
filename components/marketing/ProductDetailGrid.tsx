@@ -1,9 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import ProductGallery from "@/components/marketing/ProductGallery";
 import { ScentVariantSelector } from "@/components/marketing/ScentVariantSelector";
+import { ProductScentProvider } from "@/components/marketing/ProductScentContext";
 import { getCategoryLabel } from "@/lib/utils";
 import type { ScentVariant } from "@/lib/product-variants";
 import type { Category, Product } from "@prisma/client";
@@ -18,6 +18,18 @@ function resolveGalleryImages(
   return fallbackImages;
 }
 
+function getInitialVariantId(
+  product: Pick<Product, "slug">,
+  scentVariants: ScentVariant[]
+): string {
+  const legacyMatch = scentVariants.find(
+    (variant) => variant.kind === "legacy" && variant.slug === product.slug
+  );
+  if (legacyMatch) return legacyMatch.id;
+  if (scentVariants[0]) return scentVariants[0].id;
+  return product.slug;
+}
+
 export function ProductDetailGrid({
   product,
   scentVariants,
@@ -26,37 +38,32 @@ export function ProductDetailGrid({
   detailsBeforeScents,
   detailsAfterScents,
 }: {
-  product: Pick<Product, "name" | "slug" | "images" | "category">;
+  product: Product;
   scentVariants: ScentVariant[];
   gradient: string;
   selectedScentLabel: string;
   detailsBeforeScents: ReactNode;
   detailsAfterScents: ReactNode;
 }) {
-  const router = useRouter();
-  const [activeSlug, setActiveSlug] = useState(product.slug);
-
-  useEffect(() => {
-    setActiveSlug(product.slug);
-  }, [product.slug]);
-
-  const activeVariant = useMemo(
-    () => scentVariants.find((variant) => variant.slug === activeSlug),
-    [activeSlug, scentVariants]
+  const [activeVariantId, setActiveVariantId] = useState(() =>
+    getInitialVariantId(product, scentVariants)
   );
 
-  const galleryImages = resolveGalleryImages(activeVariant, product.images);
-  const activeScentLabel = activeVariant?.label ?? selectedScentLabel;
+  useEffect(() => {
+    setActiveVariantId(getInitialVariantId(product, scentVariants));
+  }, [product.id, product.slug, scentVariants]);
 
-  const handleVariantSelect = (variant: ScentVariant) => {
-    setActiveSlug(variant.slug);
-    router.replace(`/collections/${variant.slug}`, { scroll: false });
-  };
+  const activeVariant = useMemo(
+    () => scentVariants.find((variant) => variant.id === activeVariantId) ?? null,
+    [activeVariantId, scentVariants]
+  );
+
+  const galleryImages = resolveGalleryImages(activeVariant ?? undefined, product.images);
 
   return (
     <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
       <ProductGallery
-        key={activeSlug}
+        key={activeVariantId}
         name={product.name}
         images={galleryImages}
         fallbackGradient={gradient}
@@ -68,21 +75,22 @@ export function ProductDetailGrid({
         <h1 className="mb-2 font-serif text-3xl font-semibold text-green sm:text-4xl">
           {product.name}
         </h1>
-        {scentVariants.length > 0 ? (
-          <p className="mb-4 text-muted">
-            <span className="label-caps">Scent · </span>
-            <span className="text-green">{activeScentLabel}</span>
-          </p>
-        ) : null}
         {detailsBeforeScents}
         {scentVariants.length > 0 ? (
           <ScentVariantSelector
             variants={scentVariants}
-            currentSlug={activeSlug}
-            onVariantSelect={handleVariantSelect}
+            currentVariantId={activeVariantId}
+            onVariantSelect={(variant) => setActiveVariantId(variant.id)}
           />
+        ) : selectedScentLabel ? (
+          <p className="mb-4 text-muted">
+            <span className="label-caps">Scent · </span>
+            <span className="text-green">{selectedScentLabel}</span>
+          </p>
         ) : null}
-        {detailsAfterScents}
+        <ProductScentProvider product={product} activeVariant={activeVariant}>
+          {detailsAfterScents}
+        </ProductScentProvider>
       </div>
     </div>
   );

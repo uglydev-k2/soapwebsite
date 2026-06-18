@@ -34,6 +34,23 @@ export const productSchema = z.object({
   active: z.boolean().default(true),
 });
 
+export const productScentOptionSchema = z.object({
+  id: z.string().optional(),
+  label: z.string().min(1, "Scent name is required"),
+  fragrance: z.string().optional().nullable(),
+  stock: z.coerce.number().int().min(0),
+  images: z
+    .array(z.union([z.string().url(), z.string().startsWith("/")]))
+    .max(4)
+    .default([]),
+  sortOrder: z.coerce.number().int().min(0).default(0),
+  active: z.boolean().default(true),
+});
+
+export const productWithScentOptionsSchema = productSchema.extend({
+  scentOptions: z.array(productScentOptionSchema).default([]),
+});
+
 export const orderUpdateSchema = z.object({
   status: z.enum([
     "PENDING",
@@ -199,6 +216,7 @@ export const checkoutSchema = checkoutAddressBase
     .array(
       z.object({
         productId: z.string().min(1),
+        scentOptionId: z.string().optional(),
         quantity: z.number().int().min(1),
         price: z.number().positive(),
         name: z.string().optional(),
@@ -215,13 +233,14 @@ export const checkoutPaymentSchema = checkoutAddressBase
     items: z
       .array(
         z.object({
-          productId: z.string().min(1),
-          quantity: z.number().int().min(1),
-          price: z.number().positive(),
-          name: z.string().optional(),
-          slug: z.string().optional(),
-          image: z.string().optional(),
-        })
+        productId: z.string().min(1),
+        scentOptionId: z.string().optional(),
+        quantity: z.number().int().min(1),
+        price: z.number().positive(),
+        name: z.string().optional(),
+        slug: z.string().optional(),
+        image: z.string().optional(),
+      })
       )
       .min(1, "Cart is empty"),
     sourceId: z.string().min(1, "Payment token is required"),
@@ -236,6 +255,8 @@ export type CheckoutFormData = z.infer<typeof checkoutFormSchema>;
 export type CheckoutPayload = z.infer<typeof checkoutSchema>;
 
 export type ProductFormData = z.infer<typeof productSchema>;
+export type ProductScentOptionFormData = z.infer<typeof productScentOptionSchema>;
+export type ProductWithScentOptionsData = z.infer<typeof productWithScentOptionsSchema>;
 export type OrderUpdateData = z.infer<typeof orderUpdateSchema>;
 export type CustomerUpdateData = z.infer<typeof customerUpdateSchema>;
 export type AdminInviteData = z.infer<typeof adminInviteSchema>;

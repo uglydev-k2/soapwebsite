@@ -6,7 +6,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { AdminProduct } from "@/lib/admin-product-select";
 import { ProductImageUploader } from "@/components/admin/ProductImageUploader";
-import { productSchema, type ProductFormData } from "@/lib/validations";
+import { ProductScentOptionsEditor } from "@/components/admin/ProductScentOptionsEditor";
+import {
+  productSchema,
+  type ProductFormData,
+  type ProductScentOptionFormData,
+} from "@/lib/validations";
 import { cn, slugify } from "@/lib/utils";
 import { PRODUCT_CATEGORIES } from "@/lib/categories";
 import { getCategoryDefaultWeightOz } from "@/lib/product-weight";
@@ -24,6 +29,18 @@ export function ProductForm({ product, className }: ProductFormProps) {
   const addToast = useToastStore((s) => s.addToast);
   const [saving, setSaving] = useState(false);
   const [slugManual, setSlugManual] = useState(!!product);
+  const [scentOptions, setScentOptions] = useState<ProductScentOptionFormData[]>(
+    () =>
+      product?.scentOptions?.map((option) => ({
+        id: option.id,
+        label: option.label,
+        fragrance: option.fragrance,
+        stock: option.stock,
+        images: option.images,
+        sortOrder: option.sortOrder,
+        active: option.active,
+      })) ?? []
+  );
   const {
     register,
     handleSubmit,
@@ -44,8 +61,6 @@ export function ProductForm({ product, className }: ProductFormProps) {
           images: product.images,
           ingredients: product.ingredients,
           fragrance: product.fragrance,
-          variantGroup: product.variantGroup,
-          variantLabel: product.variantLabel,
           weightOz: product.weightOz,
           featured: product.featured,
           active: product.active,
@@ -61,8 +76,6 @@ export function ProductForm({ product, className }: ProductFormProps) {
           images: [],
           ingredients: "",
           fragrance: "",
-          variantGroup: "",
-          variantLabel: "",
           weightOz: null,
           featured: false,
           active: true,
@@ -87,7 +100,7 @@ export function ProductForm({ product, className }: ProductFormProps) {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, scentOptions }),
       });
       const json = await res.json();
       if (!res.ok) {
@@ -215,24 +228,13 @@ export function ProductForm({ product, className }: ProductFormProps) {
           <h2 className="font-serif text-xl font-semibold text-green">Attributes</h2>
           <Input
             label="Fragrance"
+            placeholder="For single-scent products only"
             {...register("fragrance")}
             error={errors.fragrance?.message}
           />
-          <Input
-            label="Scent variant group"
-            placeholder="e.g. solid-lotion"
-            {...register("variantGroup")}
-            error={errors.variantGroup?.message}
-          />
-          <Input
-            label="Scent variant label"
-            placeholder="e.g. Sweetpea"
-            {...register("variantLabel")}
-            error={errors.variantLabel?.message}
-          />
           <p className="text-xs text-muted leading-relaxed">
-            Products with the same variant group appear together as scent options on the
-            product page. Leave blank to auto-detect from the product name.
+            For products with multiple scents, add fragrance notes on each scent option
+            below instead.
           </p>
           <div>
             <label className="label-caps mb-2 block text-muted">Ingredients</label>
@@ -243,11 +245,21 @@ export function ProductForm({ product, className }: ProductFormProps) {
             />
           </div>
         </div>
+
+        <ProductScentOptionsEditor
+          options={scentOptions}
+          onChange={setScentOptions}
+        />
       </div>
 
       <div className="space-y-8 sm:space-y-6">
         <div className="admin-card space-y-5 sm:space-y-4">
           <h2 className="font-serif text-xl font-semibold text-green">Images</h2>
+          <p className="text-xs text-muted leading-relaxed">
+            Default product photos. When scent options are added below, each scent uses
+            its own photos — the first image per scent becomes the swatch on the
+            storefront.
+          </p>
           <ProductImageUploader
             images={images}
             onChange={(next) => setValue("images", next, { shouldValidate: true })}

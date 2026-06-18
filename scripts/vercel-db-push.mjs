@@ -28,6 +28,14 @@ const backfillVariantScript = join(
   "backfill-product-variants.ts"
 );
 
+const scentOptionsSql = join(process.cwd(), "scripts", "add-product-scent-options.sql");
+
+if (existsSync(scentOptionsSql)) {
+  run(
+    "npx prisma db execute --file scripts/add-product-scent-options.sql --schema prisma/schema.prisma"
+  );
+}
+
 if (existsSync(variantSql)) {
   run(
     "npx prisma db execute --file scripts/add-product-variants.sql --schema prisma/schema.prisma"

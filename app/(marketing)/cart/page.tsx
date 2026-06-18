@@ -33,7 +33,10 @@ export default function CartPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 space-y-6">
             {items.map((item) => (
-              <div key={item.productId} className="flex gap-6 card-border p-4 bg-white">
+              <div
+                key={`${item.productId}:${item.scentOptionId ?? ""}`}
+                className="flex gap-6 card-border p-4 bg-white"
+              >
                 <div
                   className="w-20 h-20 flex-shrink-0 overflow-hidden"
                   style={{
@@ -70,7 +73,13 @@ export default function CartPage() {
                   <div className="flex items-center gap-3 mt-3">
                     <button
                       type="button"
-                      onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                      onClick={() =>
+                        updateQuantity(
+                          item.productId,
+                          item.quantity - 1,
+                          item.scentOptionId
+                        )
+                      }
                       className="text-muted hover:text-green"
                       aria-label="Decrease quantity"
                     >
@@ -79,7 +88,13 @@ export default function CartPage() {
                     <span className="text-sm">{item.quantity}</span>
                     <button
                       type="button"
-                      onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                      onClick={() =>
+                        updateQuantity(
+                          item.productId,
+                          item.quantity + 1,
+                          item.scentOptionId
+                        )
+                      }
                       className="text-muted hover:text-green"
                       aria-label="Increase quantity"
                     >
@@ -87,7 +102,7 @@ export default function CartPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => removeItem(item.productId)}
+                      onClick={() => removeItem(item.productId, item.scentOptionId)}
                       className="ml-auto text-muted hover:text-terra"
                       aria-label="Remove item"
                     >

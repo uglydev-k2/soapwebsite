@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, jsonResponse, errorResponse } from "@/lib/api-helpers";
 import { withApiHandler } from "@/lib/api-handler";
-import { productSchema } from "@/lib/validations";
+import { productWithScentOptionsSchema } from "@/lib/validations";
+import { syncProductScentOptions } from "@/lib/product-scent-options";
 import { logAdminAction } from "@/lib/audit";
 import { getClientIp } from "@/lib/rate-limit";
 import { isDatabaseConfigured } from "@/lib/env";
@@ -64,17 +65,20 @@ export const POST = withApiHandler("products.create", async (request: NextReques
   if (error) return error;
 
   const body = await request.json();
-  const parsed = productSchema.safeParse(body);
+  const parsed = productWithScentOptionsSchema.safeParse(body);
   if (!parsed.success) {
     return errorResponse(parsed.error.errors[0]?.message || "Invalid data");
   }
 
+  const { scentOptions, ...productData } = parsed.data;
+
   const existing = await prisma.product.findUnique({
-    where: { slug: parsed.data.slug },
+    where: { slug: productData.slug },
   });
   if (existing) return errorResponse("Slug already exists", 409);
 
-  const product = await prisma.product.create({ data: parsed.data });
+  const product = await prisma.product.create({ data: productData });
+  await syncProductScentOptions(product.id, scentOptions);
 
   await logAdminAction({
     adminId: session!.user!.id,

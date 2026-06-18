@@ -100,6 +100,8 @@ export type ShippingAddress = {
 
 export type ValidatedCartItem = {
   productId: string;
+  scentOptionId?: string;
+  scentLabel?: string;
   name: string;
   slug: string;
   price: number;
@@ -110,7 +112,7 @@ export type ValidatedCartItem = {
 };
 
 export async function validateCartItems(
-  items: { productId: string; quantity: number; price: number }[]
+  items: { productId: string; scentOptionId?: string; quantity: number; price: number }[]
 ): Promise<{ items: ValidatedCartItem[]; error?: string }> {
   if (!items.length) return { items: [], error: "Cart is empty" };
 
@@ -135,6 +137,44 @@ export async function validateCartItems(
 
     if (!product || !product.active) {
       return { items: [], error: "A product in your cart is no longer available" };
+    }
+
+    if (item.scentOptionId) {
+      const scentOption = await prisma.productScentOption.findFirst({
+        where: {
+          id: item.scentOptionId,
+          productId: product.id,
+          active: true,
+        },
+      });
+
+      if (!scentOption) {
+        return {
+          items: [],
+          error: "A selected scent is no longer available",
+        };
+      }
+
+      if (scentOption.stock < item.quantity) {
+        return {
+          items: [],
+          error: `${product.name} (${scentOption.label}) only has ${scentOption.stock} left in stock`,
+        };
+      }
+
+      validated.push({
+        productId: product.id,
+        scentOptionId: scentOption.id,
+        scentLabel: scentOption.label,
+        name: `${product.name} — ${scentOption.label}`,
+        slug: product.slug,
+        price: product.price,
+        quantity: item.quantity,
+        image: pickProductImage(scentOption.images) ?? pickProductImage(product.images) ?? undefined,
+        fragrance: scentOption.fragrance ?? product.fragrance,
+        categoryLabel: getCategoryLabel(product.category),
+      });
+      continue;
     }
 
     if (product.stock < item.quantity) {

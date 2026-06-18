@@ -10,7 +10,34 @@ export type ScentVariant = {
   inStock: boolean;
   images: string[];
   image?: string;
+  scentOptionId?: string;
+  kind: "embedded" | "legacy";
 };
+
+export function toEmbeddedScentVariant(
+  product: Pick<Product, "id" | "slug" | "price">,
+  option: {
+    id: string;
+    label: string;
+    fragrance: string | null;
+    stock: number;
+    images: string[];
+  }
+): ScentVariant {
+  return {
+    id: option.id,
+    scentOptionId: option.id,
+    slug: product.slug,
+    label: option.label,
+    fragrance: option.fragrance,
+    stock: option.stock,
+    price: product.price,
+    inStock: option.stock > 0,
+    images: option.images,
+    image: option.images[0] || undefined,
+    kind: "embedded",
+  };
+}
 
 type VariantRule = {
   group: string;
@@ -130,6 +157,7 @@ export function toScentVariant(product: Product): ScentVariant {
     inStock: product.stock > 0,
     images: product.images,
     image: product.images[0] || undefined,
+    kind: "legacy",
   };
 }
 
@@ -184,9 +212,33 @@ export type CatalogProduct = Product & {
 };
 
 export function enrichProductsWithScentVariants(
-  products: Product[]
+  products: Array<
+    Product & {
+      scentOptions?: Array<{
+        id: string;
+        label: string;
+        fragrance: string | null;
+        stock: number;
+        images: string[];
+        active: boolean;
+      }>;
+    }
+  >
 ): CatalogProduct[] {
   return products.map((product) => {
+    const activeOptions =
+      product.scentOptions?.filter((option) => option.active) ?? [];
+
+    if (activeOptions.length > 0) {
+      return {
+        ...product,
+        catalogName: product.name,
+        scentVariants: activeOptions.map((option) =>
+          toEmbeddedScentVariant(product, option)
+        ),
+      };
+    }
+
     const meta = inferProductVariantMeta(product);
     if (!meta) {
       return {

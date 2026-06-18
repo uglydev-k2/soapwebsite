@@ -1,176 +1,132 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
 import type { ScentVariant } from "@/lib/product-variants";
 
-function ScentThumbnail({
-  label,
-  image,
-  selected,
-  compact = false,
-}: {
-  label: string;
-  image?: string;
-  selected: boolean;
-  compact?: boolean;
-}) {
-  const size = compact ? "h-9 w-9" : "h-12 w-12";
-
-  return (
-    <div
-      className={cn(
-        "relative shrink-0 overflow-hidden border bg-stone-100",
-        size,
-        selected ? "border-terra" : "border-green/10"
-      )}
-      style={{ borderRadius: "2px" }}
-    >
-      {image ? (
-        <Image
-          src={image}
-          alt=""
-          fill
-          className="object-cover"
-          sizes={compact ? "36px" : "48px"}
-        />
-      ) : (
-        <div className="flex h-full w-full items-center justify-center bg-green/10">
-          <span
-            className={cn(
-              "font-serif text-green/40",
-              compact ? "text-sm" : "text-lg"
-            )}
-          >
-            {label.charAt(0)}
-          </span>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function ScentVariantOption({
+function ScentSwatch({
   variant,
   selected,
-  compact,
-  onVariantSelect,
+  size,
+  onSelect,
 }: {
   variant: ScentVariant;
   selected: boolean;
-  compact: boolean;
-  onVariantSelect?: (variant: ScentVariant) => void;
+  size: "sm" | "md";
+  onSelect: (variant: ScentVariant) => void;
 }) {
   const disabled = !variant.inStock && !selected;
-  const className = cn(
-    "flex items-center border text-sm transition-all duration-250",
-    compact
-      ? "min-w-[5.5rem] shrink-0 flex-col gap-1 p-1.5"
-      : "min-h-[3.75rem] gap-3 p-2 sm:min-w-[9.5rem]",
-    selected
-      ? "border-terra bg-terra/10 text-green"
-      : disabled
-        ? "border-green/10 bg-stone-50 text-muted"
-        : "border-green/15 bg-white text-green hover:border-green/40"
-  );
-
-  const content = (
-    <>
-      <ScentThumbnail
-        label={variant.label}
-        image={variant.image}
-        selected={selected}
-        compact={compact}
-      />
-      <span className={cn("min-w-0 text-center", compact ? "w-full px-0.5" : "flex-1")}>
-        <span
-          className={cn(
-            "label-caps block leading-snug",
-            compact && "text-[0.6rem]"
-          )}
-        >
-          {variant.label}
-        </span>
-        {!variant.inStock ? (
-          <span
-            className={cn(
-              "block text-muted",
-              compact ? "text-[0.55rem]" : "mt-0.5 text-xs"
-            )}
-          >
-            Sold out
-          </span>
-        ) : null}
-      </span>
-    </>
-  );
-
-  if (onVariantSelect) {
-    return (
-      <button
-        type="button"
-        aria-current={selected ? "true" : undefined}
-        aria-label={`${variant.label}${variant.inStock ? "" : ", sold out"}`}
-        className={className}
-        style={{ borderRadius: "2px" }}
-        onClick={() => onVariantSelect(variant)}
-      >
-        {content}
-      </button>
-    );
-  }
+  const dimension = size === "sm" ? "h-9 w-9" : "h-11 w-11";
 
   return (
-    <Link
-      href={`/collections/${variant.slug}`}
+    <button
+      type="button"
       aria-current={selected ? "true" : undefined}
       aria-label={`${variant.label}${variant.inStock ? "" : ", sold out"}`}
-      className={className}
-      style={{ borderRadius: "2px" }}
+      title={variant.label}
+      disabled={disabled}
+      onClick={() => onSelect(variant)}
+      className={cn(
+        "relative shrink-0 rounded-full p-0.5 transition-all duration-200",
+        selected
+          ? "ring-2 ring-terra ring-offset-2 ring-offset-cream"
+          : "ring-1 ring-green/15 hover:ring-green/40",
+        disabled && "cursor-not-allowed opacity-45"
+      )}
     >
-      {content}
-    </Link>
+      <span
+        className={cn(
+          "relative block overflow-hidden rounded-full bg-stone-100",
+          dimension
+        )}
+      >
+        {variant.image ? (
+          <Image
+            src={variant.image}
+            alt=""
+            fill
+            className="object-cover"
+            sizes={size === "sm" ? "36px" : "44px"}
+          />
+        ) : (
+          <span className="flex h-full w-full items-center justify-center bg-green/10 font-serif text-sm text-green/50">
+            {variant.label.charAt(0)}
+          </span>
+        )}
+        {!variant.inStock ? (
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-white/50"
+            style={{
+              background:
+                "linear-gradient(to top left, transparent calc(50% - 0.5px), rgb(107 94 82 / 0.55), transparent calc(50% + 0.5px))",
+            }}
+          />
+        ) : null}
+      </span>
+    </button>
   );
 }
 
 export function ScentVariantSelector({
   variants,
-  currentSlug,
+  currentVariantId,
   compact = false,
   onVariantSelect,
 }: {
   variants: ScentVariant[];
-  currentSlug: string;
-  baseName?: string;
+  currentVariantId: string;
   compact?: boolean;
   onVariantSelect?: (variant: ScentVariant) => void;
 }) {
   if (variants.length <= 1) return null;
 
-  return (
-    <div className={compact ? "mt-2" : "mb-8"}>
-      {!compact ? (
-        <p className="label-caps text-muted mb-3">Choose scent</p>
-      ) : (
-        <p className="label-caps mb-2 text-[0.65rem] text-muted">
-          {variants.length} scents available
+  const selected =
+    variants.find((variant) => variant.id === currentVariantId) ?? variants[0]!;
+
+  const handleSelect = (variant: ScentVariant) => {
+    onVariantSelect?.(variant);
+  };
+
+  if (compact) {
+    return (
+      <div className="mt-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {variants.map((variant) => (
+            <ScentSwatch
+              key={variant.id}
+              variant={variant}
+              selected={variant.id === currentVariantId}
+              size="sm"
+              onSelect={handleSelect}
+            />
+          ))}
+        </div>
+        <p className="mt-1.5 text-xs text-muted">
+          <span className="label-caps">Scent · </span>
+          <span className="text-green">{selected.label}</span>
         </p>
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="mb-8">
+      <p className="label-caps mb-3 text-muted">
+        Scent · <span className="text-green">{selected.label}</span>
+      </p>
       <div
-        className={
-          compact
-            ? "flex gap-1.5 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            : "grid grid-cols-2 gap-2 sm:flex sm:flex-wrap"
-        }
+        role="listbox"
+        aria-label="Choose scent"
+        className="flex flex-wrap gap-2.5"
       >
         {variants.map((variant) => (
-          <ScentVariantOption
+          <ScentSwatch
             key={variant.id}
             variant={variant}
-            selected={variant.slug === currentSlug}
-            compact={compact}
-            onVariantSelect={onVariantSelect}
+            selected={variant.id === currentVariantId}
+            size="md"
+            onSelect={handleSelect}
           />
         ))}
       </div>

@@ -33,6 +33,7 @@ export interface ApiResponse<T> {
 
 export interface CartItem {
   productId: string;
+  scentOptionId?: string;
   name: string;
   slug: string;
   price: number;

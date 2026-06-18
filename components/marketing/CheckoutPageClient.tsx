@@ -182,6 +182,7 @@ export default function CheckoutPageClient() {
           purchaseType === "subscription" ? subscriptionCadence : undefined,
         items: items.map((item) => ({
           productId: item.productId,
+          scentOptionId: item.scentOptionId,
           quantity: item.quantity,
           price: item.price,
           name: item.name,
@@ -376,7 +377,10 @@ export default function CheckoutPageClient() {
             <h2 className="label-caps text-muted mb-6">Order Summary</h2>
             <ul className="space-y-3 mb-6 text-sm">
               {items.map((item) => (
-                <li key={item.productId} className="flex justify-between gap-4">
+                <li
+                  key={`${item.productId}:${item.scentOptionId ?? ""}`}
+                  className="flex justify-between gap-4"
+                >
                   <span className="text-muted">
                     {item.name} × {item.quantity}
                   </span>

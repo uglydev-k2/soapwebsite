@@ -101,16 +101,26 @@ export async function fulfillOrder(
         const product = await prisma.product.findUnique({
           where: { id: item.productId },
         });
-        if (product) {
-          const lineTotal = getBundleLineTotal(item.price, item.quantity);
-          orderItems.push({
-            productId: product.id,
-            quantity: item.quantity,
-            price: Math.round((lineTotal / item.quantity) * 100) / 100,
+        if (!product) continue;
+
+        const lineTotal = getBundleLineTotal(item.price, item.quantity);
+        orderItems.push({
+          productId: product.id,
+          scentOptionId: item.scentOptionId,
+          scentLabel: item.scentLabel,
+          quantity: item.quantity,
+          price: Math.round((lineTotal / item.quantity) * 100) / 100,
+        });
+
+        if (item.scentOptionId) {
+          const scentOption = await prisma.productScentOption.findUnique({
+            where: { id: item.scentOptionId },
           });
-          const previousStock = product.stock;
-          const updated = await prisma.product.update({
-            where: { id: product.id },
+          if (!scentOption) continue;
+
+          const previousStock = scentOption.stock;
+          const updated = await prisma.productScentOption.update({
+            where: { id: scentOption.id },
             data: { stock: { decrement: item.quantity } },
           });
           if (
@@ -118,11 +128,28 @@ export async function fulfillOrder(
             updated.stock <= LOW_STOCK_THRESHOLD
           ) {
             newlyLowStock.push({
-              name: updated.name,
+              name: `${product.name} (${scentOption.label})`,
               stock: updated.stock,
-              slug: updated.slug,
+              slug: product.slug,
             });
           }
+          continue;
+        }
+
+        const previousStock = product.stock;
+        const updated = await prisma.product.update({
+          where: { id: product.id },
+          data: { stock: { decrement: item.quantity } },
+        });
+        if (
+          previousStock > LOW_STOCK_THRESHOLD &&
+          updated.stock <= LOW_STOCK_THRESHOLD
+        ) {
+          newlyLowStock.push({
+            name: updated.name,
+            stock: updated.stock,
+            slug: updated.slug,
+          });
         }
       }
 

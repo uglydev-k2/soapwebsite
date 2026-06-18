@@ -3,17 +3,14 @@ export const dynamic = "force-dynamic";
 import { getProductBySlug, getProductScentVariants } from "@/lib/products";
 import { notFound } from "next/navigation";
 import { formatPrice } from "@/lib/utils";
-import ProductBundleSelector from "@/components/marketing/ProductBundleSelector";
 import { ProductDetailGrid } from "@/components/marketing/ProductDetailGrid";
+import { ProductDetailPurchaseActions } from "@/components/marketing/ProductDetailPurchaseActions";
 import ProductReviews from "@/components/marketing/ProductReviews";
 import { TrackRecentlyViewed } from "@/components/marketing/TrackRecentlyViewed";
 import { RecentlyViewedStrip } from "@/components/marketing/RecentlyViewedStrip";
 import { CompleteYourRitual } from "@/components/marketing/CompleteYourRitual";
 import { Breadcrumbs } from "@/components/marketing/Breadcrumbs";
-import { ShareProductButton } from "@/components/marketing/ShareProductButton";
-import { StockNotifyForm } from "@/components/marketing/StockNotifyForm";
 import { ProductCareAccordion } from "@/components/marketing/ProductCareAccordion";
-import { WishlistButton } from "@/components/marketing/WishlistButton";
 import { getUnitWeightOz } from "@/lib/product-weight";
 import { inferProductVariantMeta } from "@/lib/product-variants";
 import { buildProductMetadata, buildProductJsonLd } from "@/lib/seo";
@@ -110,29 +107,7 @@ export default async function ProductDetailPage({
                   </p>
                 </div>
               )}
-              <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
-                <p className="label-caps text-muted">
-                  {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
-                </p>
-                <ShareProductButton name={product.name} />
-                <WishlistButton
-                  item={{
-                    productId: product.id,
-                    name: product.name,
-                    slug: product.slug,
-                    price: product.price,
-                    image: product.images[0],
-                  }}
-                />
-              </div>
-              {product.stock === 0 ? (
-                <div className="mb-8 border border-green/10 bg-white p-6">
-                  <p className="label-caps text-muted mb-3">Back in stock alert</p>
-                  <StockNotifyForm productSlug={product.slug} productName={product.name} />
-                </div>
-              ) : (
-                <ProductBundleSelector product={product} disabled={false} />
-              )}
+              <ProductDetailPurchaseActions />
               <ProductCareAccordion category={product.category as Category} />
             </>
           }

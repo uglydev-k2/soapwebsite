@@ -16,13 +16,29 @@ export async function refreshCartItemImages(
     where: { id: { in: cartItems.map((item) => item.productId) } },
     select: { id: true, images: true },
   });
+  const scentOptions = await prisma.productScentOption.findMany({
+    where: {
+      id: {
+        in: cartItems
+          .map((item) => item.scentOptionId)
+          .filter((id): id is string => Boolean(id)),
+      },
+    },
+    select: { id: true, images: true },
+  });
   const imageById = new Map(
     products.map((product) => [product.id, pickProductImage(product.images)])
+  );
+  const imageByScentId = new Map(
+    scentOptions.map((option) => [option.id, pickProductImage(option.images)])
   );
 
   return cartItems.map((item) => ({
     ...item,
-    image: imageById.get(item.productId) ?? item.image,
+    image:
+      (item.scentOptionId
+        ? imageByScentId.get(item.scentOptionId)
+        : imageById.get(item.productId)) ?? item.image,
   }));
 }
 

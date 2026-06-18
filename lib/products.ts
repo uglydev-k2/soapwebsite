@@ -5,6 +5,7 @@ import {
   enrichProductsWithScentVariants,
   getScentVariantsForProduct,
   inferProductVariantMeta,
+  toEmbeddedScentVariant,
   toScentVariant,
   type CatalogProduct,
   type ScentVariant,
@@ -154,6 +155,17 @@ export async function getActiveProducts(
                 OR: [
                   { name: { contains: scent, mode: "insensitive" } },
                   { fragrance: { contains: scent, mode: "insensitive" } },
+                  {
+                    scentOptions: {
+                      some: {
+                        active: true,
+                        OR: [
+                          { label: { contains: scent, mode: "insensitive" } },
+                          { fragrance: { contains: scent, mode: "insensitive" } },
+                        ],
+                      },
+                    },
+                  },
                 ],
               }
             : {}),
@@ -164,9 +176,26 @@ export async function getActiveProducts(
                   { description: { contains: q, mode: "insensitive" } },
                   { fragrance: { contains: q, mode: "insensitive" } },
                   { ingredients: { contains: q, mode: "insensitive" } },
+                  {
+                    scentOptions: {
+                      some: {
+                        active: true,
+                        OR: [
+                          { label: { contains: q, mode: "insensitive" } },
+                          { fragrance: { contains: q, mode: "insensitive" } },
+                        ],
+                      },
+                    },
+                  },
                 ],
               }
             : {}),
+        },
+        include: {
+          scentOptions: {
+            where: { active: true },
+            orderBy: { sortOrder: "asc" },
+          },
         },
         orderBy: getOrderBy(sort),
       }),
@@ -216,6 +245,24 @@ export async function getProductScentVariants(
   product: Product
 ): Promise<{ baseName: string; variants: ScentVariant[] }> {
   const meta = inferProductVariantMeta(product);
+
+  const embedded = await safeDbQuery(
+    "getProductScentOptions",
+    () =>
+      prisma.productScentOption.findMany({
+        where: { productId: product.id, active: true },
+        orderBy: [{ sortOrder: "asc" }, { label: "asc" }],
+      }),
+    []
+  );
+
+  if (embedded.length > 0) {
+    return {
+      baseName: product.name,
+      variants: embedded.map((option) => toEmbeddedScentVariant(product, option)),
+    };
+  }
+
   if (!meta) {
     return { baseName: product.name, variants: [] };
   }

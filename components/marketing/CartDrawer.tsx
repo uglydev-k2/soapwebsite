@@ -58,7 +58,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
             <ul className="space-y-4">
               {items.map((item) => (
                 <li
-                  key={item.productId}
+                  key={`${item.productId}:${item.scentOptionId ?? ""}`}
                   className="flex gap-4 border-b border-green/10 pb-4"
                 >
                   <div className="flex-1">
@@ -75,7 +75,13 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                     <div className="mt-2 flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                        onClick={() =>
+                          updateQuantity(
+                            item.productId,
+                            item.quantity - 1,
+                            item.scentOptionId
+                          )
+                        }
                         className="text-muted hover:text-green"
                       >
                         <Minus size={14} />
@@ -83,14 +89,20 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                       <span className="text-sm">{item.quantity}</span>
                       <button
                         type="button"
-                        onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                        onClick={() =>
+                          updateQuantity(
+                            item.productId,
+                            item.quantity + 1,
+                            item.scentOptionId
+                          )
+                        }
                         className="text-muted hover:text-green"
                       >
                         <Plus size={14} />
                       </button>
                       <button
                         type="button"
-                        onClick={() => removeItem(item.productId)}
+                        onClick={() => removeItem(item.productId, item.scentOptionId)}
                         className="ml-2 text-xs text-terra hover:underline"
                       >
                         Remove

@@ -20,6 +20,18 @@ export const adminProductSelect = {
   active: true,
   createdAt: true,
   updatedAt: true,
+  scentOptions: {
+    select: {
+      id: true,
+      label: true,
+      fragrance: true,
+      stock: true,
+      images: true,
+      sortOrder: true,
+      active: true,
+    },
+    orderBy: { sortOrder: "asc" as const },
+  },
 } satisfies Prisma.ProductSelect;
 
 export type AdminProduct = Prisma.ProductGetPayload<{

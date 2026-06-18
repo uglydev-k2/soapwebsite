@@ -1,7 +1,8 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, jsonResponse, errorResponse } from "@/lib/api-helpers";
-import { productSchema } from "@/lib/validations";
+import { productWithScentOptionsSchema } from "@/lib/validations";
+import { syncProductScentOptions } from "@/lib/product-scent-options";
 import { logAdminAction } from "@/lib/audit";
 import { getClientIp } from "@/lib/rate-limit";
 
@@ -41,15 +42,18 @@ export async function PUT(
   if (error) return error;
 
   const body = await request.json();
-  const parsed = productSchema.safeParse(body);
+  const parsed = productWithScentOptionsSchema.safeParse(body);
   if (!parsed.success) {
     return errorResponse(parsed.error.errors[0]?.message || "Invalid data");
   }
 
+  const { scentOptions, ...productData } = parsed.data;
+
   const product = await prisma.product.update({
     where: { id: params.id },
-    data: parsed.data,
+    data: productData,
   });
+  await syncProductScentOptions(params.id, scentOptions);
 
   await logAdminAction({
     adminId: session!.user!.id,

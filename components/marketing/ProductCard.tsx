@@ -37,21 +37,47 @@ export default function ProductCard({
   const addToast = useToastStore((s) => s.addToast);
 
   const hasScentOptions = scentVariants.length > 1;
-  const [previewVariant, setPreviewVariant] = useState<ScentVariant | null>(null);
+  const [previewVariant, setPreviewVariant] = useState<ScentVariant | null>(
+    () => scentVariants[0] ?? null
+  );
+  const selectedVariant = previewVariant ?? scentVariants[0] ?? null;
   const heroImage =
-    previewVariant?.image ??
-    previewVariant?.images?.[0] ??
+    selectedVariant?.image ??
+    selectedVariant?.images?.[0] ??
     product.images[0];
-  const productUrl = `/collections/${previewVariant?.slug ?? product.slug}`;
+  const productUrl = `/collections/${product.slug}`;
+  const activeVariantId = selectedVariant?.id ?? product.id;
   const isOutOfStock = hasScentOptions
-    ? scentVariants.every((variant) => !variant.inStock)
+    ? !selectedVariant?.inStock
     : product.stock <= 0;
   const hasDiscount =
     product.comparePrice != null && product.comparePrice > product.price;
   const gradient = getCategoryGradient(product.category);
 
   const handleAddToCart = () => {
-    if (hasScentOptions) return;
+    if (hasScentOptions && selectedVariant) {
+      if (!selectedVariant.inStock) {
+        addToast("This scent is currently out of stock", "error");
+        return;
+      }
+      const isLegacy = selectedVariant.kind === "legacy";
+      const cartName = isLegacy
+        ? product.name
+        : `${product.name} — ${selectedVariant.label}`;
+      addItem({
+        productId: isLegacy ? selectedVariant.id : product.id,
+        scentOptionId: selectedVariant.scentOptionId,
+        name: cartName,
+        slug: isLegacy ? selectedVariant.slug : product.slug,
+        price: product.price,
+        image:
+          selectedVariant.images[0] ??
+          selectedVariant.image ??
+          product.images[0],
+      });
+      addToast(`${cartName} added to cart`);
+      return;
+    }
     if (isOutOfStock) {
       addToast("This item is currently out of stock", "error");
       return;
@@ -188,7 +214,7 @@ export default function ProductCard({
           {hasScentOptions ? (
             <ScentVariantSelector
               variants={scentVariants}
-              currentSlug={previewVariant?.slug ?? product.slug}
+              currentVariantId={activeVariantId}
               onVariantSelect={setPreviewVariant}
               compact
             />
@@ -215,16 +241,20 @@ export default function ProductCard({
               )}
             </motion.div>
             {hasScentOptions ? (
-              <Link
-                href={productUrl}
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                disabled={isOutOfStock}
                 className={cn(
-                  "flex h-9 items-center justify-center border border-green/20 px-3 text-green",
-                  "label-caps text-[0.65rem] transition-colors duration-250 hover:border-terra hover:bg-terra hover:text-white"
+                  "flex h-9 w-9 items-center justify-center border border-green/20 text-green",
+                  "transition-colors duration-250 hover:border-terra hover:bg-terra hover:text-white",
+                  "disabled:cursor-not-allowed disabled:opacity-40"
                 )}
                 style={{ borderRadius: "2px" }}
+                aria-label={`Add ${product.name} to cart`}
               >
-                Choose
-              </Link>
+                <ShoppingBag size={16} strokeWidth={1.5} />
+              </button>
             ) : (
               <button
                 type="button"
