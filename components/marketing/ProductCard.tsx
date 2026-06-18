@@ -13,6 +13,8 @@ import { useCartStore } from "@/store/cartStore";
 import { useToastStore } from "@/store/toastStore";
 import { EASE_OUT } from "@/lib/motion";
 import { WishlistButton } from "@/components/marketing/WishlistButton";
+import { ScentVariantSelector } from "@/components/marketing/ScentVariantSelector";
+import type { ScentVariant } from "@/lib/product-variants";
 import type { ProductWithMeta } from "@/types";
 import type { Category } from "@prisma/client";
 
@@ -20,24 +22,34 @@ interface ProductCardProps {
   product: ProductWithMeta;
   className?: string;
   index?: number;
+  displayName?: string;
+  scentVariants?: ScentVariant[];
 }
 
 export default function ProductCard({
   product,
   className,
   index = 0,
+  displayName,
+  scentVariants = [],
 }: ProductCardProps) {
   const reduced = useReducedMotion();
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
   const addToast = useToastStore((s) => s.addToast);
 
-  const isOutOfStock = product.stock <= 0;
+  const hasScentOptions = scentVariants.length > 1;
+  const cardTitle = displayName || product.name;
+  const productUrl = `/collections/${product.slug}`;
+  const isOutOfStock = hasScentOptions
+    ? scentVariants.every((variant) => !variant.inStock)
+    : product.stock <= 0;
   const hasDiscount =
     product.comparePrice != null && product.comparePrice > product.price;
   const gradient = getCategoryGradient(product.category);
 
   const handleAddToCart = () => {
+    if (hasScentOptions) return;
     if (isOutOfStock) {
       addToast("This item is currently out of stock", "error");
       return;
@@ -66,14 +78,11 @@ export default function ProductCard({
             : { y: -4, scale: 1.02, transition: { duration: 0.35, ease: EASE_OUT } }
         }
       >
-        <Link
-          href={`/collections/${product.slug}`}
-          className="relative block aspect-[3/4] overflow-hidden"
-        >
+        <Link href={productUrl} className="relative block aspect-[3/4] overflow-hidden">
           {product.images[0] ? (
             <Image
               src={product.images[0]}
-              alt={product.name}
+              alt={cardTitle}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-110"
               sizes="(max-width: 1024px) 50vw, 25vw"
@@ -86,40 +95,42 @@ export default function ProductCard({
               )}
             >
               <span className="font-serif text-xl text-green/30 sm:text-2xl">
-                {product.name.split(" ")[0]}
+                {cardTitle.split(" ")[0]}
               </span>
             </div>
           )}
 
-          <div className="absolute inset-0 hidden flex-col items-center justify-end gap-2 bg-green-3/0 p-4 transition-all duration-300 group-hover:bg-green-3/40 sm:flex">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setQuickViewOpen(true);
-              }}
-              className="flex w-full max-w-[200px] translate-y-6 items-center justify-center gap-2 bg-white px-4 py-2 text-sm text-green opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100"
-              style={{ borderRadius: "2px" }}
-            >
-              <Eye size={16} />
-              Quick View
-            </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleAddToCart();
-              }}
-              disabled={isOutOfStock}
-              className="flex w-full max-w-[200px] translate-y-8 items-center justify-center gap-2 bg-terra px-4 py-2 text-sm label-caps text-white opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
-              style={{ borderRadius: "2px" }}
-            >
-              <ShoppingBag size={16} />
-              Add to Cart
-            </button>
-          </div>
+          {!hasScentOptions && (
+            <div className="absolute inset-0 hidden flex-col items-center justify-end gap-2 bg-green-3/0 p-4 transition-all duration-300 group-hover:bg-green-3/40 sm:flex">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setQuickViewOpen(true);
+                }}
+                className="flex w-full max-w-[200px] translate-y-6 items-center justify-center gap-2 bg-white px-4 py-2 text-sm text-green opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100"
+                style={{ borderRadius: "2px" }}
+              >
+                <Eye size={16} />
+                Quick View
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleAddToCart();
+                }}
+                disabled={isOutOfStock}
+                className="flex w-full max-w-[200px] translate-y-8 items-center justify-center gap-2 bg-terra px-4 py-2 text-sm label-caps text-white opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
+                style={{ borderRadius: "2px" }}
+              >
+                <ShoppingBag size={16} />
+                Add to Cart
+              </button>
+            </div>
+          )}
 
           <div className="absolute right-2 top-2 z-10 sm:right-3 sm:top-3">
             <WishlistButton
@@ -136,6 +147,9 @@ export default function ProductCard({
           <div className="absolute left-2 top-2 flex flex-col gap-1.5 sm:left-3 sm:top-3 sm:gap-2">
             {product.featured && (
               <Badge status="Featured" className="bg-terra text-white" />
+            )}
+            {hasScentOptions && (
+              <Badge status={`${scentVariants.length} Scents`} className="bg-green text-white" />
             )}
             {hasDiscount && (
               <Badge status="Sale" className="bg-terra text-white" />
@@ -162,14 +176,24 @@ export default function ProductCard({
             transition={{ duration: 0.45, delay: reduced ? 0 : 0.28 + index * 0.06 }}
           >
             <Link
-              href={`/collections/${product.slug}`}
+              href={productUrl}
               className="transition-colors duration-250 hover:text-terra"
             >
-              {product.name}
+              {cardTitle}
             </Link>
           </motion.h3>
-          {product.fragrance && (
-            <p className="mt-1 text-xs text-muted sm:text-sm">{product.fragrance}</p>
+
+          {hasScentOptions ? (
+            <ScentVariantSelector
+              variants={scentVariants}
+              currentSlug={product.slug}
+              baseName={cardTitle}
+              compact
+            />
+          ) : (
+            product.fragrance && (
+              <p className="mt-1 text-xs text-muted sm:text-sm">{product.fragrance}</p>
+            )
           )}
 
           <div className="mt-auto flex items-center justify-between pt-3 sm:pt-4">
@@ -188,75 +212,90 @@ export default function ProductCard({
                 </span>
               )}
             </motion.div>
-            <button
-              type="button"
-              onClick={handleAddToCart}
-              disabled={isOutOfStock}
-              className={cn(
-                "flex h-9 w-9 items-center justify-center border border-green/20 text-green",
-                "transition-colors duration-250 hover:border-terra hover:bg-terra hover:text-white",
-                "disabled:cursor-not-allowed disabled:opacity-40"
-              )}
-              style={{ borderRadius: "2px" }}
-              aria-label={`Add ${product.name} to cart`}
-            >
-              <ShoppingBag size={16} strokeWidth={1.5} />
-            </button>
+            {hasScentOptions ? (
+              <Link
+                href={productUrl}
+                className={cn(
+                  "flex h-9 items-center justify-center border border-green/20 px-3 text-green",
+                  "label-caps text-[0.65rem] transition-colors duration-250 hover:border-terra hover:bg-terra hover:text-white"
+                )}
+                style={{ borderRadius: "2px" }}
+              >
+                Choose
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                disabled={isOutOfStock}
+                className={cn(
+                  "flex h-9 w-9 items-center justify-center border border-green/20 text-green",
+                  "transition-colors duration-250 hover:border-terra hover:bg-terra hover:text-white",
+                  "disabled:cursor-not-allowed disabled:opacity-40"
+                )}
+                style={{ borderRadius: "2px" }}
+                aria-label={`Add ${product.name} to cart`}
+              >
+                <ShoppingBag size={16} strokeWidth={1.5} />
+              </button>
+            )}
           </div>
         </div>
       </motion.article>
 
-      <Modal
-        open={quickViewOpen}
-        onClose={() => setQuickViewOpen(false)}
-        title={product.name}
-      >
-        <div className="space-y-4">
-          <div
-            className={cn(
-              "relative aspect-square overflow-hidden bg-gradient-to-br",
-              gradient
-            )}
-          >
-            {product.images[0] ? (
-              <Image
-                src={product.images[0]}
-                alt={product.name}
-                fill
-                className="object-cover"
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center">
-                <span className="font-serif text-3xl text-green/30">
-                  {product.name.split(" ")[0]}
-                </span>
-              </div>
-            )}
-          </div>
-          <p className="text-sm leading-relaxed text-muted">{product.description}</p>
-          {product.fragrance && (
-            <p className="text-sm">
-              <span className="label-caps text-muted">Scent: </span>
-              <span className="text-green">{product.fragrance}</span>
-            </p>
-          )}
-          <div className="flex items-center justify-between pt-2">
-            <span className="font-serif text-2xl text-terra">
-              {formatPrice(product.price)}
-            </span>
-            <Button
-              variant="primary"
-              onClick={() => {
-                handleAddToCart();
-                setQuickViewOpen(false);
-              }}
-              disabled={isOutOfStock}
+      {!hasScentOptions && (
+        <Modal
+          open={quickViewOpen}
+          onClose={() => setQuickViewOpen(false)}
+          title={product.name}
+        >
+          <div className="space-y-4">
+            <div
+              className={cn(
+                "relative aspect-square overflow-hidden bg-gradient-to-br",
+                gradient
+              )}
             >
-              Add to Cart
-            </Button>
+              {product.images[0] ? (
+                <Image
+                  src={product.images[0]}
+                  alt={product.name}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <span className="font-serif text-3xl text-green/30">
+                    {product.name.split(" ")[0]}
+                  </span>
+                </div>
+              )}
+            </div>
+            <p className="text-sm leading-relaxed text-muted">{product.description}</p>
+            {product.fragrance && (
+              <p className="text-sm">
+                <span className="label-caps text-muted">Scent: </span>
+                <span className="text-green">{product.fragrance}</span>
+              </p>
+            )}
+            <div className="flex items-center justify-between pt-2">
+              <span className="font-serif text-2xl text-terra">
+                {formatPrice(product.price)}
+              </span>
+              <Button
+                variant="primary"
+                onClick={() => {
+                  handleAddToCart();
+                  setQuickViewOpen(false);
+                }}
+                disabled={isOutOfStock}
+              >
+                Add to Cart
+              </Button>
+            </div>
           </div>
-        </div>
-      </Modal>
+        </Modal>
+      )}
     </>
   );
 }

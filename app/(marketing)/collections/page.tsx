@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { getActiveProducts } from "@/lib/products";
+import { getCatalogProducts } from "@/lib/products";
 import ProductCard from "@/components/marketing/ProductCard";
 import { Suspense } from "react";
 import { CardSkeleton } from "@/components/ui/Skeleton";
@@ -48,7 +48,7 @@ async function CollectionsList({
   sort: SortValue;
   q?: string;
 }) {
-  const products = await getActiveProducts({ category, scent, sort, q });
+  const products = await getCatalogProducts({ category, scent, sort, q });
 
   if (products.length === 0) {
     return (
@@ -65,7 +65,12 @@ async function CollectionsList({
     <StaggerContainer className="grid [grid-template-columns:repeat(2,minmax(0,1fr))] gap-3 sm:gap-6 lg:[grid-template-columns:repeat(3,minmax(0,1fr))]">
       {products.map((product, index) => (
         <StaggerItem key={product.id} className="h-full min-w-0">
-          <ProductCard product={product} index={index} />
+          <ProductCard
+            product={product}
+            index={index}
+            displayName={product.catalogName}
+            scentVariants={product.scentVariants}
+          />
         </StaggerItem>
       ))}
     </StaggerContainer>

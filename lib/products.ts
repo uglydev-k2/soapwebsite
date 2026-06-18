@@ -3,8 +3,10 @@ import type { Category, Prisma, Product } from "@prisma/client";
 import { safeDbQuery } from "@/lib/db";
 import {
   getScentVariantsForProduct,
+  groupCatalogProducts,
   inferProductVariantMeta,
   toScentVariant,
+  type CatalogProduct,
   type ScentVariant,
 } from "@/lib/product-variants";
 import {
@@ -173,6 +175,13 @@ export async function getActiveProducts(
 
   if (products.length > 0) return products;
   return applyFallbackFilters(STATIC_PRODUCTS as Product[], options);
+}
+
+export async function getCatalogProducts(
+  options: ActiveProductOptions = {}
+): Promise<CatalogProduct[]> {
+  const products = await getActiveProducts(options);
+  return groupCatalogProducts(products);
 }
 
 export async function getRelatedProducts(

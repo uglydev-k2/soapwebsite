@@ -175,3 +175,45 @@ export function getScentVariantsForProduct(
 
   return siblings.map(toScentVariant);
 }
+
+export type CatalogProduct = Product & {
+  catalogName: string;
+  scentVariants: ScentVariant[];
+};
+
+export function groupCatalogProducts(products: Product[]): CatalogProduct[] {
+  const seenGroups = new Set<string>();
+  const result: CatalogProduct[] = [];
+
+  for (const product of products) {
+    const meta = inferProductVariantMeta(product);
+    if (!meta) {
+      result.push({
+        ...product,
+        catalogName: product.name,
+        scentVariants: [],
+      });
+      continue;
+    }
+
+    const groupKey = product.variantGroup ?? meta.group;
+    if (seenGroups.has(groupKey)) continue;
+    seenGroups.add(groupKey);
+
+    const siblings = products.filter((candidate) => {
+      const candidateMeta = inferProductVariantMeta(candidate);
+      if (!candidateMeta) return false;
+      const candidateGroup = candidate.variantGroup ?? candidateMeta.group;
+      return candidateGroup === groupKey;
+    });
+
+    result.push({
+      ...product,
+      catalogName: meta.baseName,
+      scentVariants:
+        siblings.length > 1 ? siblings.map(toScentVariant) : [],
+    });
+  }
+
+  return result;
+}
