@@ -35,7 +35,7 @@ export function getFaqItems(settings: PublicStoreSettings) {
   ] as const;
 }
 
-export function getShippingSections(settings: PublicStoreSettings) {
+export function getShippingSections() {
   return [
     {
       title: "Processing",
@@ -61,10 +61,8 @@ export const FAQ_ITEMS = getFaqItems({
   flatShippingRate: 8,
 });
 
-/** @deprecated Use getShippingSections(settings) for accurate shipping copy. */
-export const SHIPPING_SECTIONS = getShippingSections({
-  flatShippingRate: 8,
-});
+/** @deprecated Use getShippingSections() for accurate shipping copy. */
+export const SHIPPING_SECTIONS = getShippingSections();
 
 export const GIFT_GUIDE_SECTIONS = [
   {

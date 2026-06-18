@@ -6,8 +6,6 @@ import {
   BRAND_TAGLINE,
   brandTitle,
 } from "@/lib/brand";
-import { formatPrice } from "@/lib/utils";
-
 const DEFAULT_OG_IMAGE = `${BRAND_SITE_URL}/images/mv-luscious-lather-logo.jpg`;
 
 export function absoluteUrl(path: string): string {
@@ -114,10 +112,4 @@ export function buildOrganizationJsonLd(): Record<string, unknown> {
     logo: DEFAULT_OG_IMAGE,
     description: BRAND_TAGLINE,
   };
-}
-
-export function formatShippingCopy(settings: {
-  flatShippingRate: number;
-}): string {
-  return `U.S. shipping is calculated at checkout via USPS based on weight and destination. International rates are calculated at checkout.`;
 }

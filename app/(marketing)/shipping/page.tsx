@@ -1,12 +1,9 @@
 import { MarketingPage } from "@/components/marketing/MarketingPage";
 import { getShippingSections } from "@/lib/content/site-content";
-import { getPublicStoreSettings } from "@/lib/store-settings";
 
 export const metadata = { title: "Shipping & Returns — mvlusciouslather" };
 
-export default async function ShippingPage() {
-  const settings = await getPublicStoreSettings();
-
+export default function ShippingPage() {
   return (
     <MarketingPage
       eyebrow="Support"
@@ -14,7 +11,7 @@ export default async function ShippingPage() {
       description="Transparent policies for a calm shopping experience."
     >
       <div className="space-y-8">
-        {getShippingSections(settings).map((section) => (
+        {getShippingSections().map((section) => (
           <article
             key={section.title}
             className="border border-green/10 bg-white p-8"

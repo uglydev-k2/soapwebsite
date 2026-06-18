@@ -123,8 +123,7 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
 
   const shippingQuote = await calculateCheckoutShipping(
     validatedItems,
-    shippingAddress,
-    subtotal
+    shippingAddress
   );
 
   const totals = calculateOrderTotals(subtotal, settings, shippingQuote.shipping);

@@ -54,10 +54,8 @@ export function calculateOrderTotals(
 
 export async function calculateCheckoutShipping(
   items: ValidatedCartItem[],
-  address: Pick<ShippingAddress, "country" | "state" | "postalCode">,
-  subtotal: number
+  address: Pick<ShippingAddress, "country" | "state" | "postalCode">
 ) {
-  const settings = await getCheckoutSettings();
   const products = await Promise.all(
     items.map(async (item) => {
       if (!isDatabaseConfigured()) {
