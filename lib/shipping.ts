@@ -1,7 +1,6 @@
 /** Shared shipping constants for cart, checkout, and marketing copy */
 export const US_COUNTRY = "United States";
 export const US_COUNTRY_CODE = "US";
-export const FREE_SHIPPING_THRESHOLD = 60;
 export const FLAT_SHIPPING_RATE = 8;
 export const TAX_RATE = 0.08;
 
@@ -94,20 +93,8 @@ export function getCountryCode(country: string): string {
   return match?.code ?? country.toUpperCase();
 }
 
-export function getFreeShippingProgress(
-  subtotal: number,
-  threshold = FREE_SHIPPING_THRESHOLD
-) {
-  const progress = Math.min(100, (subtotal / threshold) * 100);
-  const amountRemaining = Math.max(0, threshold - subtotal);
-  const qualifies = subtotal >= threshold;
-  return { progress, amountRemaining, qualifies, threshold };
-}
-
 export function calculateCartTotals(subtotal: number, shipping?: number) {
-  const shippingCost =
-    shipping ??
-    (subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : FLAT_SHIPPING_RATE);
+  const shippingCost = shipping ?? FLAT_SHIPPING_RATE;
   const tax = Math.round(subtotal * TAX_RATE * 100) / 100;
   const total = Math.round((subtotal + shippingCost + tax) * 100) / 100;
   return { subtotal, shipping: shippingCost, tax, total };

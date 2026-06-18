@@ -1,5 +1,4 @@
 import type { Category } from "@prisma/client";
-import { getBundleLineTotal } from "@/lib/bundle-pricing";
 import {
   calculateCartWeightOz,
   toUspsBillingWeightOz,
@@ -11,7 +10,7 @@ import {
   getInternationalRetailRate,
 } from "@/lib/usps-rates";
 import { getUspsZoneFromTexas, isTexas } from "@/lib/usps-zones";
-import { isUsCountry, FREE_SHIPPING_THRESHOLD } from "@/lib/shipping";
+import { isUsCountry } from "@/lib/shipping";
 import { getCountryCode } from "@/lib/shipping";
 
 export type ShippingQuoteItem = {
@@ -29,8 +28,6 @@ export type ShippingQuoteInput = {
   country: string;
   state?: string;
   postalCode?: string;
-  subtotal?: number;
-  freeShippingThreshold?: number;
 };
 
 export type ShippingQuote = {
@@ -41,7 +38,6 @@ export type ShippingQuote = {
   zone: number | null;
   inTexas: boolean;
   international: boolean;
-  freeShippingApplied: boolean;
 };
 
 export function calculateShippingQuote(input: ShippingQuoteInput): ShippingQuote {
@@ -55,13 +51,6 @@ export function calculateShippingQuote(input: ShippingQuoteInput): ShippingQuote
 
   const weightOz = calculateCartWeightOz(weightItems);
   const { billingOz, billingLb, tier } = toUspsBillingWeightOz(weightOz);
-
-  const subtotal =
-    input.subtotal ??
-    input.items.reduce(
-      (sum, item) => sum + getBundleLineTotal(item.price, item.quantity),
-      0
-    );
 
   const countryCode = getCountryCode(input.country);
   const domestic = isUsCountry(countryCode);
@@ -77,22 +66,13 @@ export function calculateShippingQuote(input: ShippingQuoteInput): ShippingQuote
       zone: null,
       inTexas: false,
       international: true,
-      freeShippingApplied: false,
     };
   }
 
   const state = input.state?.trim().toUpperCase() ?? "";
   const zone = getUspsZoneFromTexas(state || "TX");
-  let shipping = getGroundAdvantageRetailRate(billingOz, billingLb, zone);
-
+  const shipping = getGroundAdvantageRetailRate(billingOz, billingLb, zone);
   const inTexas = isTexas(state);
-  const freeShippingThreshold =
-    input.freeShippingThreshold ?? FREE_SHIPPING_THRESHOLD;
-  const freeShippingApplied = subtotal >= freeShippingThreshold;
-
-  if (freeShippingApplied) {
-    shipping = 0;
-  }
 
   return {
     shipping: Math.round(shipping * 100) / 100,
@@ -104,6 +84,5 @@ export function calculateShippingQuote(input: ShippingQuoteInput): ShippingQuote
     zone,
     inTexas,
     international: false,
-    freeShippingApplied,
   };
 }

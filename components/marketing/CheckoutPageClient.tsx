@@ -21,24 +21,32 @@ import {
   US_STATES,
   isUsCountry,
 } from "@/lib/shipping";
-import { useStoreSettings } from "@/components/marketing/StoreSettingsContext";
 import {
   SquarePaymentForm,
   type SquarePaymentFormHandle,
 } from "@/components/marketing/SquarePaymentForm";
+import { PurchaseTypeSelector } from "@/components/marketing/PurchaseTypeSelector";
+import {
+  SUBSCRIPTION_DISCOUNT_RATE,
+  applySubscriptionDiscount,
+  type PurchaseType,
+  type SubscriptionCadence,
+} from "@/lib/subscriptions";
 import type { ShippingQuote } from "@/lib/shipping-calculator";
 
 export default function CheckoutPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { items, subtotal } = useCartStore();
-  const { freeShippingThreshold } = useStoreSettings();
   const addToast = useToastStore((s) => s.addToast);
   const squareRef = useRef<SquarePaymentFormHandle>(null);
   const [loading, setLoading] = useState(false);
   const [prefillEmail, setPrefillEmail] = useState("");
   const [shippingQuote, setShippingQuote] = useState<ShippingQuote | null>(null);
   const [quoteLoading, setQuoteLoading] = useState(false);
+  const [purchaseType, setPurchaseType] = useState<PurchaseType>("one_time");
+  const [subscriptionCadence, setSubscriptionCadence] =
+    useState<SubscriptionCadence>("monthly");
 
   useEffect(() => {
     if (searchParams.get("cancelled") === "true") {
@@ -56,6 +64,9 @@ export default function CheckoutPageClient() {
   }, []);
 
   const sub = subtotal();
+  const discountedSubtotal = applySubscriptionDiscount(sub, purchaseType);
+  const subscriptionSavings =
+    purchaseType === "subscription" ? sub - discountedSubtotal : 0;
 
   const {
     register,
@@ -127,8 +138,8 @@ export default function CheckoutPageClient() {
   }, [items, watchedCountry, watchedState, watchedPostal]);
 
   const totals = useMemo(
-    () => calculateCartTotals(sub, shippingQuote?.shipping),
-    [sub, shippingQuote?.shipping]
+    () => calculateCartTotals(discountedSubtotal, shippingQuote?.shipping),
+    [discountedSubtotal, shippingQuote?.shipping]
   );
 
   const onSubmit = async (data: CheckoutFormData) => {
@@ -166,6 +177,9 @@ export default function CheckoutPageClient() {
         ...data,
         sourceId,
         idempotencyKey: crypto.randomUUID(),
+        purchaseType,
+        subscriptionCadence:
+          purchaseType === "subscription" ? subscriptionCadence : undefined,
         items: items.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,
@@ -259,10 +273,18 @@ export default function CheckoutPageClient() {
             </div>
 
             <div className="card-border bg-white p-6">
+              <PurchaseTypeSelector
+                purchaseType={purchaseType}
+                cadence={subscriptionCadence}
+                onPurchaseTypeChange={setPurchaseType}
+                onCadenceChange={setSubscriptionCadence}
+              />
+            </div>
+
+            <div className="card-border bg-white p-6">
               <h2 className="font-serif text-2xl text-green mb-2">Shipping Address</h2>
               <p className="mb-6 text-sm text-muted">
-                USPS rates by weight & destination · Free U.S. shipping on orders{" "}
-                {formatPrice(freeShippingThreshold)}+
+                USPS rates calculated by weight and destination at checkout.
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
@@ -373,6 +395,12 @@ export default function CheckoutPageClient() {
                 <span className="text-muted">Subtotal</span>
                 <span>{formatPrice(totals.subtotal)}</span>
               </div>
+              {subscriptionSavings > 0 && (
+                <div className="flex justify-between text-terra">
+                  <span>Subscription savings ({Math.round(SUBSCRIPTION_DISCOUNT_RATE * 100)}%)</span>
+                  <span>-{formatPrice(subscriptionSavings)}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span className="text-muted">Shipping</span>
                 <span>
@@ -402,10 +430,16 @@ export default function CheckoutPageClient() {
               disabled={loading || quoteLoading || !shippingQuote}
             >
               {loading && <AuthSpinner />}
-              {loading ? "Processing…" : `Pay ${formatPrice(totals.total)}`}
+              {loading
+                ? "Processing…"
+                : purchaseType === "subscription"
+                  ? `Subscribe & pay ${formatPrice(totals.total)}`
+                  : `Pay ${formatPrice(totals.total)}`}
             </Button>
             <p className="mt-3 text-xs text-muted text-center">
-              Secure payment via Square · Ships via USPS
+              {purchaseType === "subscription"
+                ? "Secure payment via Square · Recurring billing on your schedule"
+                : "Secure payment via Square · Ships via USPS"}
             </p>
           </div>
         </form>

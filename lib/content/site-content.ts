@@ -14,8 +14,8 @@ export function getFaqItems(settings: PublicStoreSettings) {
         "With proper drainage, a single bar typically lasts 3–4 weeks of daily use. Keep your soap dry between uses to maximize longevity.",
     },
     {
-      question: "Do you offer free shipping?",
-      answer: `U.S. orders over ${formatPrice(settings.freeShippingThreshold)} qualify for free standard shipping. A flat ${formatPrice(settings.flatShippingRate)} rate applies to smaller domestic orders.`,
+      question: "How much is shipping?",
+      answer: `U.S. orders ship via USPS Ground Advantage. Rates are calculated at checkout based on package weight and destination. A ${formatPrice(settings.flatShippingRate)} flat rate may apply to smaller domestic orders when quoted.`,
     },
     {
       question: "Can I return or exchange a product?",
@@ -30,7 +30,7 @@ export function getFaqItems(settings: PublicStoreSettings) {
     {
       question: "Do you ship internationally?",
       answer:
-        "Yes. We ship to select countries via USPS international rates calculated at checkout based on weight and destination. Free shipping applies to qualifying U.S. orders only.",
+        "Yes. We ship to select countries via USPS international rates calculated at checkout based on weight and destination.",
     },
   ] as const;
 }
@@ -43,7 +43,7 @@ export function getShippingSections(settings: PublicStoreSettings) {
     },
     {
       title: "Rates",
-      body: `U.S. standard shipping is ${formatPrice(settings.flatShippingRate)} flat rate. Orders over ${formatPrice(settings.freeShippingThreshold)} ship free within the United States. International rates are calculated at checkout.`,
+      body: `U.S. standard shipping is calculated at checkout via USPS Ground Advantage based on weight and destination. International rates are calculated at checkout.`,
     },
     {
       title: "Returns",
@@ -58,13 +58,11 @@ export function getShippingSections(settings: PublicStoreSettings) {
 
 /** @deprecated Use getFaqItems(settings) for accurate shipping copy. */
 export const FAQ_ITEMS = getFaqItems({
-  freeShippingThreshold: 60,
   flatShippingRate: 8,
 });
 
 /** @deprecated Use getShippingSections(settings) for accurate shipping copy. */
 export const SHIPPING_SECTIONS = getShippingSections({
-  freeShippingThreshold: 60,
   flatShippingRate: 8,
 });
 

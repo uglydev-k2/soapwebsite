@@ -4,7 +4,6 @@ import { useCartStore } from "@/store/cartStore";
 import { formatPrice } from "@/lib/utils";
 import { getBundleLineTotal, getBundleDiscount } from "@/lib/bundle-pricing";
 import { TAX_RATE } from "@/lib/shipping";
-import { FreeShippingProgress } from "@/components/marketing/FreeShippingProgress";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import { Minus, Plus, Trash2 } from "lucide-react";
@@ -104,9 +103,6 @@ export default function CartPage() {
           </div>
           <div className="card-border p-6 bg-white h-fit">
             <h2 className="label-caps text-muted mb-6">Order Summary</h2>
-            <div className="mb-6">
-              <FreeShippingProgress subtotal={sub} />
-            </div>
             <div className="space-y-2 text-sm mb-6">
               <div className="flex justify-between">
                 <span className="text-muted">Subtotal</span>

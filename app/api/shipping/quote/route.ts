@@ -5,9 +5,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { isDatabaseConfigured } from "@/lib/env";
 import { calculateShippingQuote } from "@/lib/shipping-calculator";
-import { getBundleLineTotal } from "@/lib/bundle-pricing";
 import { getCountryCode, isUsCountry } from "@/lib/shipping";
-import { getCheckoutSettings } from "@/lib/checkout";
 import type { Category } from "@prisma/client";
 
 const quoteSchema = z.object({
@@ -38,11 +36,6 @@ export const POST = withApiHandler("shipping.quote", async (request: NextRequest
   if (isUsCountry(countryCode) && !state?.trim()) {
     return errorResponse("State is required for U.S. shipping quotes");
   }
-
-  const subtotal = items.reduce(
-    (sum, item) => sum + getBundleLineTotal(item.price, item.quantity),
-    0
-  );
 
   const enriched = await Promise.all(
     items.map(async (item) => {
@@ -81,8 +74,6 @@ export const POST = withApiHandler("shipping.quote", async (request: NextRequest
     country: countryCode,
     state,
     postalCode,
-    subtotal,
-    freeShippingThreshold: (await getCheckoutSettings()).freeShippingThreshold,
   });
 
   return jsonResponse(quote);

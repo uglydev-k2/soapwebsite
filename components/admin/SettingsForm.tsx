@@ -217,20 +217,13 @@ export function SettingsForm({
             className="admin-input w-full resize-y"
           />
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-1">
           <Input
             label="Flat Shipping Rate ($)"
             type="number"
             step="0.01"
             {...registerStore("flatShippingRate")}
             error={storeErrors.flatShippingRate?.message}
-          />
-          <Input
-            label="Free Shipping Threshold ($)"
-            type="number"
-            step="0.01"
-            {...registerStore("freeShippingThreshold")}
-            error={storeErrors.freeShippingThreshold?.message}
           />
         </div>
         <fieldset className="space-y-3 border-t border-green/10 pt-4">

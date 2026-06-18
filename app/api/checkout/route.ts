@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { randomUUID } from "crypto";
 import { jsonResponse, errorResponse } from "@/lib/api-helpers";
 import { withApiHandler } from "@/lib/api-handler";
 import { checkoutPaymentSchema } from "@/lib/validations";
@@ -16,8 +17,70 @@ import { getCountryCode } from "@/lib/shipping";
 import { getSquareClient, getSquareLocationId, isSquareConfigured } from "@/lib/square";
 import { fulfillOrder } from "@/lib/fulfill-order";
 import { generateOrderNumber } from "@/lib/utils";
+import {
+  applySubscriptionDiscount,
+  isSquareSubscriptionPlanConfigured,
+  type PurchaseType,
+} from "@/lib/subscriptions";
+import {
+  createSquareCardOnFile,
+  createSquareCustomer,
+  createSquareSubscription,
+} from "@/lib/square-subscription";
 
 const SUCCESS_STATUSES = new Set(["COMPLETED", "APPROVED", "PENDING"]);
+
+async function chargeSquarePayment(input: {
+  sourceId: string;
+  idempotencyKey: string;
+  amountCents: bigint;
+  orderNumber: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  state?: string;
+  postalCode: string;
+  country: string;
+}) {
+  return getSquareClient().payments.create({
+    sourceId: input.sourceId,
+    idempotencyKey: input.idempotencyKey,
+    amountMoney: {
+      amount: input.amountCents,
+      currency: "USD",
+    },
+    locationId: getSquareLocationId(),
+    referenceId: input.orderNumber.slice(0, 40),
+    note: `mvlusciouslather order ${input.orderNumber}`,
+    buyerEmailAddress: input.email,
+    shippingAddress: {
+      addressLine1: input.line1,
+      addressLine2: input.line2,
+      locality: input.city,
+      administrativeDistrictLevel1: input.state ?? undefined,
+      postalCode: input.postalCode,
+      country: getCountryCode(input.country) as
+        | "US"
+        | "CA"
+        | "MX"
+        | "GB"
+        | "AU"
+        | "DE"
+        | "FR"
+        | "IE"
+        | "NL"
+        | "JP"
+        | "NZ"
+        | "SG",
+      firstName: input.firstName,
+      lastName: input.lastName,
+    },
+    autocomplete: true,
+  });
+}
 
 export const POST = withApiHandler("checkout.create", async (request: NextRequest) => {
   if (!isSquareConfigured()) {
@@ -35,15 +98,19 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
     return errorResponse("Checkout is temporarily unavailable", 503);
   }
 
+  const purchaseType: PurchaseType = parsed.data.purchaseType;
+  const subscriptionCadence = parsed.data.subscriptionCadence;
+
   const { items: validatedItems, error: cartError } = await validateCartItems(
     parsed.data.items
   );
   if (cartError) return errorResponse(cartError);
 
-  const subtotal = validatedItems.reduce(
+  const rawSubtotal = validatedItems.reduce(
     (sum, item) => sum + getBundleLineTotal(item.price, item.quantity),
     0
   );
+  const subtotal = applySubscriptionDiscount(rawSubtotal, purchaseType);
 
   const shippingAddress: ShippingAddress = {
     line1: parsed.data.line1,
@@ -78,42 +145,56 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
   const orderNumber = generateOrderNumber();
   const amountCents = BigInt(Math.round(totals.total * 100));
 
-  let paymentResponse;
-  try {
-    paymentResponse = await getSquareClient().payments.create({
-      sourceId: parsed.data.sourceId,
-      idempotencyKey: parsed.data.idempotencyKey,
-      amountMoney: {
-        amount: amountCents,
-        currency: "USD",
-      },
-      locationId: getSquareLocationId(),
-      referenceId: orderNumber.slice(0, 40),
-      note: `mvlusciouslather order ${orderNumber}`,
-      buyerEmailAddress: parsed.data.email,
-      shippingAddress: {
-        addressLine1: parsed.data.line1,
-        addressLine2: parsed.data.line2,
-        locality: parsed.data.city,
-        administrativeDistrictLevel1: parsed.data.state ?? undefined,
-        postalCode: parsed.data.postalCode,
-        country: getCountryCode(parsed.data.country) as
-          | "US"
-          | "CA"
-          | "MX"
-          | "GB"
-          | "AU"
-          | "DE"
-          | "FR"
-          | "IE"
-          | "NL"
-          | "JP"
-          | "NZ"
-          | "SG",
+  let squareCustomerId: string | undefined;
+  let squareSubscriptionId: string | undefined;
+  let subscriptionStatus: "active" | "pending_setup" | undefined;
+  let paymentSourceId = parsed.data.sourceId;
+  let savedCardId: string | undefined;
+
+  if (purchaseType === "subscription") {
+    if (!subscriptionCadence) {
+      return errorResponse("Choose a delivery frequency for your subscription");
+    }
+
+    try {
+      squareCustomerId = await createSquareCustomer({
+        email: parsed.data.email,
         firstName: parsed.data.firstName,
         lastName: parsed.data.lastName,
-      },
-      autocomplete: true,
+        phone: parsed.data.phone,
+      });
+
+      savedCardId = await createSquareCardOnFile({
+        customerId: squareCustomerId,
+        sourceId: parsed.data.sourceId,
+        idempotencyKey: randomUUID(),
+      });
+      paymentSourceId = savedCardId;
+    } catch (error) {
+      console.error("[msvee:checkout] Subscription card setup failed:", error);
+      return errorResponse(
+        "We could not save your card for subscription billing. Please try again or choose a one-time purchase.",
+        402
+      );
+    }
+  }
+
+  let paymentResponse;
+  try {
+    paymentResponse = await chargeSquarePayment({
+      sourceId: paymentSourceId,
+      idempotencyKey: parsed.data.idempotencyKey,
+      amountCents,
+      orderNumber,
+      email: parsed.data.email,
+      firstName: parsed.data.firstName,
+      lastName: parsed.data.lastName,
+      line1: parsed.data.line1,
+      line2: parsed.data.line2,
+      city: parsed.data.city,
+      state: parsed.data.state,
+      postalCode: parsed.data.postalCode,
+      country: parsed.data.country,
     });
   } catch (error) {
     console.error("[msvee:checkout] Square payment failed:", error);
@@ -134,6 +215,28 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
     );
   }
 
+  if (purchaseType === "subscription" && subscriptionCadence && squareCustomerId && savedCardId) {
+    if (isSquareSubscriptionPlanConfigured(subscriptionCadence)) {
+      try {
+        squareSubscriptionId = await createSquareSubscription({
+          customerId: squareCustomerId,
+          cardId: savedCardId,
+          cadence: subscriptionCadence,
+          idempotencyKey: randomUUID(),
+        });
+        subscriptionStatus = "active";
+      } catch (error) {
+        subscriptionStatus = "pending_setup";
+        console.error("[msvee:checkout] Square subscription enrollment failed:", error);
+      }
+    } else {
+      subscriptionStatus = "pending_setup";
+      console.warn(
+        `[msvee:checkout] Subscription plan not configured for ${subscriptionCadence}`
+      );
+    }
+  }
+
   const result = await fulfillOrder({
     orderNumber,
     email: parsed.data.email,
@@ -148,6 +251,11 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
     total: totals.total,
     paymentId: payment.id,
     paymentProvider: "square",
+    purchaseType,
+    subscriptionCadence,
+    squareSubscriptionId,
+    squareCustomerId,
+    subscriptionStatus,
     cartItems: validatedItems,
   });
 
@@ -155,5 +263,8 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
     paymentId: payment.id,
     orderNumber: result.orderNumber,
     orderId: result.orderId,
+    purchaseType,
+    subscriptionCadence,
+    subscriptionStatus,
   });
 });

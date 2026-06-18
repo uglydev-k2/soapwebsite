@@ -14,8 +14,6 @@ import { EASE_OUT, fadeUp, staggerContainer } from "@/lib/motion";
 import { SHOP_CATEGORY_MENU } from "@/lib/categories";
 import type { NavbarAuthUser } from "@/lib/navbar-auth";
 import { BrandLogo } from "@/components/BrandLogo";
-import { useStoreSettings } from "@/components/marketing/StoreSettingsContext";
-import { formatPrice } from "@/lib/utils";
 
 const navLinks = [
   { label: "Collections", href: "/collections" },
@@ -34,8 +32,6 @@ export default function Navbar({
   initialUser?: NavbarAuthUser | null;
 }) {
   const reduced = useReducedMotion();
-  const { freeShippingThreshold } = useStoreSettings();
-  const freeShippingLabel = `Free shipping on orders ${formatPrice(freeShippingThreshold)}+`;
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -101,14 +97,14 @@ export default function Navbar({
         <div className="group hidden overflow-hidden border-b border-green/10 bg-green-3 py-2 md:block">
           <div className="flex w-max animate-marquee items-center">
             {[
-              freeShippingLabel,
               "Free sample with every order",
               "Small-batch handcrafted formulas",
+              "Botanical bath & body rituals",
             ]
               .concat([
-                freeShippingLabel,
                 "Free sample with every order",
                 "Small-batch handcrafted formulas",
+                "Botanical bath & body rituals",
               ])
               .map((item, index) => (
                 <span

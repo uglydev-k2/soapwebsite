@@ -14,6 +14,7 @@ import {
 } from "@/lib/utils";
 import { useToastStore } from "@/store/toastStore";
 import { parseOrderNotes } from "@/lib/order-notes";
+import { getCadenceLabel } from "@/lib/subscriptions";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 
@@ -185,6 +186,15 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
           >
             {order.status.toLowerCase()}
           </Badge>
+          {orderMeta.purchaseType === "subscription" && (
+            <Badge variant="default" className="mt-3 ml-2">
+              Subscription
+              {orderMeta.subscriptionCadence
+                ? ` · ${getCadenceLabel(orderMeta.subscriptionCadence)}`
+                : ""}
+              {orderMeta.subscriptionStatus === "pending_setup" ? " · setup pending" : ""}
+            </Badge>
+          )}
         </div>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:items-end print:hidden">
           <label className="label-caps text-muted">Update Status</label>

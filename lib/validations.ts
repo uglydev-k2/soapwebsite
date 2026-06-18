@@ -173,6 +173,22 @@ function refineUsState(
   }
 }
 
+const purchaseTypeSchema = z.enum(["one_time", "subscription"]);
+const subscriptionCadenceSchema = z.enum(["monthly", "bimonthly", "quarterly"]);
+
+function refinePurchaseType(
+  data: { purchaseType?: string; subscriptionCadence?: string },
+  ctx: z.RefinementCtx
+) {
+  if (data.purchaseType === "subscription" && !data.subscriptionCadence) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Choose a delivery frequency for your subscription",
+      path: ["subscriptionCadence"],
+    });
+  }
+}
+
 export const checkoutFormSchema = checkoutAddressBase.superRefine(refineUsState);
 
 export const checkoutSchema = checkoutAddressBase
@@ -208,8 +224,11 @@ export const checkoutPaymentSchema = checkoutAddressBase
       .min(1, "Cart is empty"),
     sourceId: z.string().min(1, "Payment token is required"),
     idempotencyKey: z.string().uuid("Invalid payment request"),
+    purchaseType: purchaseTypeSchema.default("one_time"),
+    subscriptionCadence: subscriptionCadenceSchema.optional(),
   })
-  .superRefine(refineUsState);
+  .superRefine(refineUsState)
+  .superRefine(refinePurchaseType);
 
 export type CheckoutFormData = z.infer<typeof checkoutFormSchema>;
 export type CheckoutPayload = z.infer<typeof checkoutSchema>;

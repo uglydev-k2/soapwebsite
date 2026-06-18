@@ -22,6 +22,11 @@ export type FulfillOrderInput = {
   total: number;
   paymentId: string;
   paymentProvider?: "square" | "stripe";
+  purchaseType?: "one_time" | "subscription";
+  subscriptionCadence?: "monthly" | "bimonthly" | "quarterly";
+  squareSubscriptionId?: string;
+  squareCustomerId?: string;
+  subscriptionStatus?: "active" | "pending_setup";
   cartItems: ValidatedCartItem[];
   orderNumber?: string;
 };
@@ -135,6 +140,11 @@ export async function fulfillOrder(
             shippingAddress: input.shippingAddress,
             supabaseUserId: input.userId,
             paymentProvider,
+            purchaseType: input.purchaseType ?? "one_time",
+            subscriptionCadence: input.subscriptionCadence,
+            squareSubscriptionId: input.squareSubscriptionId,
+            squareCustomerId: input.squareCustomerId,
+            subscriptionStatus: input.subscriptionStatus,
           }),
           items: { create: orderItems },
         },

@@ -117,8 +117,7 @@ export function buildOrganizationJsonLd(): Record<string, unknown> {
 }
 
 export function formatShippingCopy(settings: {
-  freeShippingThreshold: number;
   flatShippingRate: number;
 }): string {
-  return `Standard shipping is $${settings.flatShippingRate} flat rate. U.S. orders over ${formatPrice(settings.freeShippingThreshold)} ship free. International rates are calculated at checkout.`;
+  return `U.S. shipping is calculated at checkout via USPS based on weight and destination. International rates are calculated at checkout.`;
 }

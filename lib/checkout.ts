@@ -46,9 +46,7 @@ export function calculateOrderTotals(
   settings: CheckoutSettings,
   shippingOverride?: number
 ) {
-  const shipping =
-    shippingOverride ??
-    (subtotal >= settings.freeShippingThreshold ? 0 : settings.flatShippingRate);
+  const shipping = shippingOverride ?? settings.flatShippingRate;
   const tax = Math.round(subtotal * settings.taxRate * 100) / 100;
   const total = Math.round((subtotal + shipping + tax) * 100) / 100;
   return { subtotal, shipping, tax, total };
@@ -90,8 +88,6 @@ export async function calculateCheckoutShipping(
     country: getCountryCode(address.country),
     state: address.state,
     postalCode: address.postalCode,
-    subtotal,
-    freeShippingThreshold: settings.freeShippingThreshold,
   });
 }
 

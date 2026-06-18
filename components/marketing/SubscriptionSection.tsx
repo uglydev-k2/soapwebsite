@@ -5,7 +5,7 @@ const plans = [
   {
     title: "Monthly Ritual Box",
     cadence: "Every month",
-    perks: "10% off + free shipping",
+    perks: "10% off every box",
     href: "/collections?category=GIFT_SET&sort=featured",
   },
   {

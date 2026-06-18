@@ -6,6 +6,11 @@ export type OrderNotesMeta = {
   paymentProvider?: string;
   trackingNumber?: string;
   carrier?: string;
+  purchaseType?: "one_time" | "subscription";
+  subscriptionCadence?: "monthly" | "bimonthly" | "quarterly";
+  squareSubscriptionId?: string;
+  squareCustomerId?: string;
+  subscriptionStatus?: "active" | "pending_setup";
   /** Plain-text admin notes when stored separately from structured meta. */
   internalNotes?: string;
 };

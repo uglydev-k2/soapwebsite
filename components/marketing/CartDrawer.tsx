@@ -9,7 +9,6 @@ import {
 } from "@/lib/shipping";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
-import { FreeShippingProgress } from "@/components/marketing/FreeShippingProgress";
 
 interface CartDrawerProps {
   open: boolean;
@@ -109,7 +108,6 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
 
         {items.length > 0 && (
           <div className="border-t border-green/10 px-6 py-5 space-y-3">
-            <FreeShippingProgress subtotal={sub} />
             <div className="flex justify-between text-sm">
               <span className="text-muted">Subtotal</span>
               <span>{formatPrice(sub)}</span>
