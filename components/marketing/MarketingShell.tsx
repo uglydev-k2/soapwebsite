@@ -17,6 +17,7 @@ import { SplashScreen } from "@/components/motion/SplashScreen";
 import { ScrollProgress } from "@/components/motion/ScrollProgress";
 import { pageTransition } from "@/lib/motion";
 import type { NavbarAuthUser } from "@/lib/navbar-auth";
+import { ChatWidget } from "@/components/marketing/chat/ChatWidget";
 
 export function MarketingShell({
   children,
@@ -76,6 +77,7 @@ export function MarketingShell({
       {showMaintenance && maintenanceMessage ? (
         <MaintenanceOverlay message={maintenanceMessage} onClose={dismiss} />
       ) : null}
+      {showStorefrontChrome ? <ChatWidget /> : null}
     </>
   );
 }

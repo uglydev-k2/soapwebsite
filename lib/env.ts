@@ -55,7 +55,17 @@ export const OPTIONAL_ENV = [
   "VAPID_PRIVATE_KEY",
   "VAPID_SUBJECT",
   "NEXT_PUBLIC_VAPID_PUBLIC_KEY",
+  "OPENAI_API_KEY",
+  "OPENAI_MODEL",
 ] as const;
+
+export function isChatEnabled(): boolean {
+  return Boolean(process.env.OPENAI_API_KEY?.trim());
+}
+
+export function getOpenAIModel(): string {
+  return process.env.OPENAI_MODEL?.trim() || "gpt-4o-mini";
+}
 
 export function getMissingProductionEnv(): string[] {
   return REQUIRED_PRODUCTION_ENV.filter((key) => !process.env[key]?.trim());

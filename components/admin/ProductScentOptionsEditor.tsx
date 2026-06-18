@@ -1,10 +1,42 @@
 "use client";
 
 import { Plus, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { ProductImageUploader } from "@/components/admin/ProductImageUploader";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import type { ProductScentOptionFormData } from "@/lib/validations";
+
+function ScentStockInput({
+  value,
+  onChange,
+}: {
+  value: number;
+  onChange: (stock: number) => void;
+}) {
+  const [draft, setDraft] = useState(String(value));
+
+  useEffect(() => {
+    setDraft(String(value));
+  }, [value]);
+
+  return (
+    <Input
+      label="Stock for this scent"
+      type="number"
+      min={0}
+      inputMode="numeric"
+      value={draft}
+      onChange={(event) => setDraft(event.target.value)}
+      onBlur={() => {
+        const parsed = Number.parseInt(draft, 10);
+        const next = Number.isNaN(parsed) || parsed < 0 ? 0 : parsed;
+        setDraft(String(next));
+        onChange(next);
+      }}
+    />
+  );
+}
 
 function emptyScentOption(sortOrder: number): ProductScentOptionFormData {
   return {
@@ -97,14 +129,9 @@ export function ProductScentOptionsEditor({
               />
             </div>
 
-            <Input
-              label="Stock for this scent"
-              type="number"
-              min={0}
+            <ScentStockInput
               value={option.stock}
-              onChange={(event) =>
-                updateOption(index, { stock: Number(event.target.value) || 0 })
-              }
+              onChange={(stock) => updateOption(index, { stock })}
             />
 
             <div>
