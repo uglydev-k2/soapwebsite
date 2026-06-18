@@ -24,6 +24,8 @@ export const productSchema = z.object({
     .default([]),
   ingredients: z.string().optional().nullable(),
   fragrance: z.string().optional().nullable(),
+  variantGroup: z.string().optional().nullable(),
+  variantLabel: z.string().optional().nullable(),
   weightOz: z.preprocess(
     (val) => (val === "" || val === null || val === undefined ? null : val),
     z.coerce.number().positive("Weight must be greater than 0").nullable().optional()

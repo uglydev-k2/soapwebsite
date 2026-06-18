@@ -2,6 +2,11 @@ import { prisma } from "@/lib/prisma";
 import type { Category, Prisma, Product } from "@prisma/client";
 import { safeDbQuery } from "@/lib/db";
 import {
+  getScentVariantsForProduct,
+  inferProductVariantMeta,
+  type ScentVariant,
+} from "@/lib/product-variants";
+import {
   FEATURED_PRODUCT_SLUGS,
   STATIC_FEATURED,
   STATIC_PRODUCTS,
@@ -195,6 +200,51 @@ export async function getProductsBySlugs(slugs: string[]): Promise<Product[]> {
     if (product) results.push(product);
   }
   return results;
+}
+
+export async function getProductScentVariants(
+  product: Product
+): Promise<{ baseName: string; variants: ScentVariant[] }> {
+  const meta = inferProductVariantMeta(product);
+  if (!meta) {
+    return { baseName: product.name, variants: [] };
+  }
+
+  const groupKey = product.variantGroup ?? meta.group;
+  const siblings = await safeDbQuery(
+    "getProductScentVariants",
+    () =>
+      prisma.product.findMany({
+        where: {
+          active: true,
+          variantGroup: groupKey,
+        },
+        orderBy: [{ variantLabel: "asc" }, { name: "asc" }],
+      }),
+    [] as Product[]
+  );
+
+  if (siblings.length > 1) {
+    return {
+      baseName: meta.baseName,
+      variants: siblings.map((item) => ({
+        id: item.id,
+        slug: item.slug,
+        label: item.variantLabel ?? meta.label,
+        fragrance: item.fragrance,
+        stock: item.stock,
+        price: item.price,
+        inStock: item.stock > 0,
+      })),
+    };
+  }
+
+  const catalog = await getActiveProducts({ category: product.category });
+  const inferred = getScentVariantsForProduct(product, catalog);
+  return {
+    baseName: meta.baseName,
+    variants: inferred,
+  };
 }
 
 export async function getActiveProductSlugs(): Promise<

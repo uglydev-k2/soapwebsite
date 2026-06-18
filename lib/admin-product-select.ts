@@ -13,6 +13,8 @@ export const adminProductSelect = {
   images: true,
   ingredients: true,
   fragrance: true,
+  variantGroup: true,
+  variantLabel: true,
   weightOz: true,
   featured: true,
   active: true,

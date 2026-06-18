@@ -44,6 +44,8 @@ export function ProductForm({ product, className }: ProductFormProps) {
           images: product.images,
           ingredients: product.ingredients,
           fragrance: product.fragrance,
+          variantGroup: product.variantGroup,
+          variantLabel: product.variantLabel,
           weightOz: product.weightOz,
           featured: product.featured,
           active: product.active,
@@ -59,6 +61,8 @@ export function ProductForm({ product, className }: ProductFormProps) {
           images: [],
           ingredients: "",
           fragrance: "",
+          variantGroup: "",
+          variantLabel: "",
           weightOz: null,
           featured: false,
           active: true,
@@ -214,6 +218,22 @@ export function ProductForm({ product, className }: ProductFormProps) {
             {...register("fragrance")}
             error={errors.fragrance?.message}
           />
+          <Input
+            label="Scent variant group"
+            placeholder="e.g. solid-lotion"
+            {...register("variantGroup")}
+            error={errors.variantGroup?.message}
+          />
+          <Input
+            label="Scent variant label"
+            placeholder="e.g. Sweetpea"
+            {...register("variantLabel")}
+            error={errors.variantLabel?.message}
+          />
+          <p className="text-xs text-muted leading-relaxed">
+            Products with the same variant group appear together as scent options on the
+            product page. Leave blank to auto-detect from the product name.
+          </p>
           <div>
             <label className="label-caps mb-2 block text-muted">Ingredients</label>
             <textarea

@@ -1,9 +1,10 @@
 export const dynamic = "force-dynamic";
 
-import { getProductBySlug } from "@/lib/products";
+import { getProductBySlug, getProductScentVariants } from "@/lib/products";
 import { notFound } from "next/navigation";
 import { formatPrice, getCategoryLabel } from "@/lib/utils";
 import ProductBundleSelector from "@/components/marketing/ProductBundleSelector";
+import { ScentVariantSelector } from "@/components/marketing/ScentVariantSelector";
 import ProductGallery from "@/components/marketing/ProductGallery";
 import ProductReviews from "@/components/marketing/ProductReviews";
 import { TrackRecentlyViewed } from "@/components/marketing/TrackRecentlyViewed";
@@ -15,6 +16,7 @@ import { StockNotifyForm } from "@/components/marketing/StockNotifyForm";
 import { ProductCareAccordion } from "@/components/marketing/ProductCareAccordion";
 import { WishlistButton } from "@/components/marketing/WishlistButton";
 import { getUnitWeightOz } from "@/lib/product-weight";
+import { inferProductVariantMeta } from "@/lib/product-variants";
 import { buildProductMetadata, buildProductJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import type { Category } from "@prisma/client";
@@ -37,6 +39,14 @@ export default async function ProductDetailPage({
   const product = await getProductBySlug(params.slug);
   if (!product) notFound();
 
+  const variantMeta = inferProductVariantMeta(product);
+  const { baseName: variantBaseName, variants: scentVariants } =
+    await getProductScentVariants(product);
+  const displayName = variantMeta?.baseName ?? product.name;
+  const selectedScentLabel =
+    variantMeta?.label ??
+    product.fragrance ??
+    product.name;
   const gradient = getCategoryGradient(product.category);
   const weightOz = getUnitWeightOz(
     product.category,
@@ -60,12 +70,12 @@ export default async function ProductDetailPage({
           items={[
             { label: "Home", href: "/" },
             { label: "Collections", href: "/collections" },
-            { label: product.name },
+            { label: displayName },
           ]}
         />
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
           <ProductGallery
-            name={product.name}
+            name={displayName}
             images={product.images}
             fallbackGradient={gradient}
           />
@@ -73,9 +83,15 @@ export default async function ProductDetailPage({
             <p className="label-caps text-terra mb-2">
               {getCategoryLabel(product.category)}
             </p>
-            <h1 className="mb-4 font-serif text-3xl font-semibold text-green sm:text-4xl">
-              {product.name}
+            <h1 className="mb-2 font-serif text-3xl font-semibold text-green sm:text-4xl">
+              {displayName}
             </h1>
+            {scentVariants.length > 0 ? (
+              <p className="mb-4 text-muted">
+                <span className="label-caps">Scent · </span>
+                <span className="text-green">{selectedScentLabel}</span>
+              </p>
+            ) : null}
             <div className="flex items-baseline gap-3 mb-6">
               <span className="font-serif text-2xl text-green">
                 {formatPrice(product.price)}
@@ -87,7 +103,12 @@ export default async function ProductDetailPage({
               )}
             </div>
             <p className="text-muted leading-relaxed mb-8">{product.description}</p>
-            {product.fragrance && (
+            <ScentVariantSelector
+              variants={scentVariants}
+              currentSlug={product.slug}
+              baseName={variantBaseName}
+            />
+            {product.fragrance && scentVariants.length === 0 && (
               <p className="mb-4">
                 <span className="label-caps text-muted">Fragrance · </span>
                 <span className="text-green">{product.fragrance}</span>

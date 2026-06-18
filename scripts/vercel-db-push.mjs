@@ -21,6 +21,23 @@ const initSql = join(process.cwd(), "scripts", "init-prisma-tables.sql");
 const weightSql = join(process.cwd(), "scripts", "add-product-weight.sql");
 const backfillWeightSql = join(process.cwd(), "scripts", "backfill-product-weights.sql");
 
+const variantSql = join(process.cwd(), "scripts", "add-product-variants.sql");
+const backfillVariantScript = join(
+  process.cwd(),
+  "scripts",
+  "backfill-product-variants.ts"
+);
+
+if (existsSync(variantSql)) {
+  run(
+    "npx prisma db execute --file scripts/add-product-variants.sql --schema prisma/schema.prisma"
+  );
+}
+
+if (existsSync(backfillVariantScript)) {
+  run("npx tsx scripts/backfill-product-variants.ts");
+}
+
 if (existsSync(weightSql)) {
   run(
     "npx prisma db execute --file scripts/add-product-weight.sql --schema prisma/schema.prisma"

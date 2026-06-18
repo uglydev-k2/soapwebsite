@@ -23,6 +23,8 @@ model Product {
   ingredients      String?
   fragrance        String?
   weightOz         Float?
+  variantGroup     String?
+  variantLabel     String?
   featured         Boolean          @default(false)
   active           Boolean          @default(true)
   moderationStatus ModerationStatus @default(APPROVED)

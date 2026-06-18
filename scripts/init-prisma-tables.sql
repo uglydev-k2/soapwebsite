@@ -30,6 +30,8 @@ CREATE TABLE "public"."Product" (
     "ingredients" TEXT,
     "fragrance" TEXT,
     "weightOz" DOUBLE PRECISION,
+    "variantGroup" TEXT,
+    "variantLabel" TEXT,
     "featured" BOOLEAN NOT NULL DEFAULT false,
     "active" BOOLEAN NOT NULL DEFAULT true,
     "moderationStatus" "public"."ModerationStatus" NOT NULL DEFAULT 'APPROVED',
