@@ -13,8 +13,16 @@ import SubscriptionSection from "@/components/marketing/SubscriptionSection";
 import FragranceMap from "@/components/marketing/FragranceMap";
 import TestimonialsCarousel from "@/components/marketing/TestimonialsCarousel";
 import Newsletter from "@/components/marketing/Newsletter";
+import { getProductsBySlugs } from "@/lib/products";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const ritualProducts = await getProductsBySlugs([
+    "lavender-sage",
+    "spearmint-eucalyptus",
+    "oat-honey-comfort-bar",
+    "full-ritual-gift-set",
+  ]);
+
   return (
     <>
       <Hero />
@@ -23,6 +31,7 @@ export default function HomePage() {
       <ValuesSection />
       <CategorySection />
       <ProductGrid
+        products={ritualProducts}
         title="Start Your Ritual"
         subtitle="Signature bar soaps"
         limit={4}
