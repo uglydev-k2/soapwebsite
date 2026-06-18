@@ -202,6 +202,12 @@ export function ProductForm({ product, className }: ProductFormProps) {
               error={errors.stock?.message}
             />
           </div>
+          {scentOptions.length > 0 ? (
+            <p className="text-xs leading-relaxed text-muted">
+              This product has scent options — set stock on each scent below. That
+              controls sold-out on the storefront, not this number.
+            </p>
+          ) : null}
         </div>
 
         <div className="admin-card space-y-5 sm:space-y-4">

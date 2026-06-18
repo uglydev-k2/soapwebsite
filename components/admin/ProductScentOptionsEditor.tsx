@@ -27,10 +27,18 @@ function ScentStockInput({
       min={0}
       inputMode="numeric"
       value={draft}
-      onChange={(event) => setDraft(event.target.value)}
+      onChange={(event) => {
+        const raw = event.target.value;
+        setDraft(raw);
+        if (raw === "") return;
+        const parsed = Number.parseInt(raw, 10);
+        if (!Number.isNaN(parsed) && parsed >= 0) {
+          onChange(parsed);
+        }
+      }}
       onBlur={() => {
         const parsed = Number.parseInt(draft, 10);
-        const next = Number.isNaN(parsed) || parsed < 0 ? 0 : parsed;
+        const next = draft === "" || Number.isNaN(parsed) || parsed < 0 ? 0 : parsed;
         setDraft(String(next));
         onChange(next);
       }}
@@ -80,7 +88,8 @@ export function ProductScentOptionsEditor({
         <p className="mt-2 text-xs leading-relaxed text-muted">
           Add scent varieties the same way you would colour options — one product,
           multiple choices. The first photo on each scent is its swatch image on the
-          storefront.
+          storefront. Stock is set per scent below — the main product stock field does
+          not control whether a scent shows as sold out.
         </p>
       </div>
 

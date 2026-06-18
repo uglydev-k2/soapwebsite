@@ -26,6 +26,10 @@ function getInitialVariantId(
     (variant) => variant.kind === "legacy" && variant.slug === product.slug
   );
   if (legacyMatch) return legacyMatch.id;
+
+  const inStock = scentVariants.find((variant) => variant.inStock);
+  if (inStock) return inStock.id;
+
   if (scentVariants[0]) return scentVariants[0].id;
   return product.slug;
 }

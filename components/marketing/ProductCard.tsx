@@ -38,7 +38,7 @@ export default function ProductCard({
 
   const hasScentOptions = scentVariants.length > 1;
   const [previewVariant, setPreviewVariant] = useState<ScentVariant | null>(
-    () => scentVariants[0] ?? null
+    () => scentVariants.find((variant) => variant.inStock) ?? scentVariants[0] ?? null
   );
   const selectedVariant = previewVariant ?? scentVariants[0] ?? null;
   const heroImage =
