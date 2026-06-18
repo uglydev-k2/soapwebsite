@@ -8,6 +8,7 @@ export type ScentVariant = {
   stock: number;
   price: number;
   inStock: boolean;
+  image?: string;
 };
 
 type VariantRule = {
@@ -126,6 +127,7 @@ export function toScentVariant(product: Product): ScentVariant {
     stock: product.stock,
     price: product.price,
     inStock: product.stock > 0,
+    image: product.images[0] || undefined,
   };
 }
 

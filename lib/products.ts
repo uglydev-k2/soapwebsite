@@ -4,6 +4,7 @@ import { safeDbQuery } from "@/lib/db";
 import {
   getScentVariantsForProduct,
   inferProductVariantMeta,
+  toScentVariant,
   type ScentVariant,
 } from "@/lib/product-variants";
 import {
@@ -227,15 +228,7 @@ export async function getProductScentVariants(
   if (siblings.length > 1) {
     return {
       baseName: meta.baseName,
-      variants: siblings.map((item) => ({
-        id: item.id,
-        slug: item.slug,
-        label: item.variantLabel ?? meta.label,
-        fragrance: item.fragrance,
-        stock: item.stock,
-        price: item.price,
-        inStock: item.stock > 0,
-      })),
+      variants: siblings.map(toScentVariant),
     };
   }
 
