@@ -71,7 +71,7 @@ export const ABOUT_PROMISE = {
 };
 
 export const ABOUT_MILESTONES = [
-  { year: "2024", label: "MV Luscious Lather launches with our first signature bar soaps" },
+  { year: "2020", label: "Our first handcrafted bar soaps — where MV Luscious Lather began" },
   { year: "2025", label: "Bath & body collection expands — scrubs, lotions, butters, and gift rituals" },
   { year: "2026", label: "Growing nationwide community of customers who shop small-batch botanical care" },
 ] as const;
@@ -80,5 +80,5 @@ export const ABOUT_STATS = [
   { label: "Botanical Ingredients", value: "48+" },
   { label: "Scent Families", value: "6+" },
   { label: "Handcrafted", value: "100%" },
-  { label: "Est.", value: "2024" },
+  { label: "Est.", value: "2020" },
 ] as const;
