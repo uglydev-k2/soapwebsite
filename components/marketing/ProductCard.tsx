@@ -22,7 +22,6 @@ interface ProductCardProps {
   product: ProductWithMeta;
   className?: string;
   index?: number;
-  displayName?: string;
   scentVariants?: ScentVariant[];
 }
 
@@ -30,7 +29,6 @@ export default function ProductCard({
   product,
   className,
   index = 0,
-  displayName,
   scentVariants = [],
 }: ProductCardProps) {
   const reduced = useReducedMotion();
@@ -39,7 +37,6 @@ export default function ProductCard({
   const addToast = useToastStore((s) => s.addToast);
 
   const hasScentOptions = scentVariants.length > 1;
-  const cardTitle = displayName || product.name;
   const productUrl = `/collections/${product.slug}`;
   const isOutOfStock = hasScentOptions
     ? scentVariants.every((variant) => !variant.inStock)
@@ -82,7 +79,7 @@ export default function ProductCard({
           {product.images[0] ? (
             <Image
               src={product.images[0]}
-              alt={cardTitle}
+              alt={product.name}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-110"
               sizes="(max-width: 1024px) 50vw, 25vw"
@@ -95,7 +92,7 @@ export default function ProductCard({
               )}
             >
               <span className="font-serif text-xl text-green/30 sm:text-2xl">
-                {cardTitle.split(" ")[0]}
+                {product.name.split(" ")[0]}
               </span>
             </div>
           )}
@@ -179,7 +176,7 @@ export default function ProductCard({
               href={productUrl}
               className="transition-colors duration-250 hover:text-terra"
             >
-              {cardTitle}
+              {product.name}
             </Link>
           </motion.h3>
 
@@ -187,7 +184,6 @@ export default function ProductCard({
             <ScentVariantSelector
               variants={scentVariants}
               currentSlug={product.slug}
-              baseName={cardTitle}
               compact
             />
           ) : (

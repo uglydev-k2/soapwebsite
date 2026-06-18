@@ -2,8 +2,8 @@ import { prisma } from "@/lib/prisma";
 import type { Category, Prisma, Product } from "@prisma/client";
 import { safeDbQuery } from "@/lib/db";
 import {
+  enrichProductsWithScentVariants,
   getScentVariantsForProduct,
-  groupCatalogProducts,
   inferProductVariantMeta,
   toScentVariant,
   type CatalogProduct,
@@ -181,7 +181,7 @@ export async function getCatalogProducts(
   options: ActiveProductOptions = {}
 ): Promise<CatalogProduct[]> {
   const products = await getActiveProducts(options);
-  return groupCatalogProducts(products);
+  return enrichProductsWithScentVariants(products);
 }
 
 export async function getRelatedProducts(

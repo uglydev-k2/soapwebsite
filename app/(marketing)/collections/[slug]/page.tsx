@@ -40,9 +40,7 @@ export default async function ProductDetailPage({
   if (!product) notFound();
 
   const variantMeta = inferProductVariantMeta(product);
-  const { baseName: variantBaseName, variants: scentVariants } =
-    await getProductScentVariants(product);
-  const displayName = variantMeta?.baseName ?? product.name;
+  const { variants: scentVariants } = await getProductScentVariants(product);
   const selectedScentLabel =
     variantMeta?.label ??
     product.fragrance ??
@@ -70,12 +68,12 @@ export default async function ProductDetailPage({
           items={[
             { label: "Home", href: "/" },
             { label: "Collections", href: "/collections" },
-            { label: displayName },
+            { label: product.name },
           ]}
         />
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
           <ProductGallery
-            name={displayName}
+            name={product.name}
             images={product.images}
             fallbackGradient={gradient}
           />
@@ -84,7 +82,7 @@ export default async function ProductDetailPage({
               {getCategoryLabel(product.category)}
             </p>
             <h1 className="mb-2 font-serif text-3xl font-semibold text-green sm:text-4xl">
-              {displayName}
+              {product.name}
             </h1>
             {scentVariants.length > 0 ? (
               <p className="mb-4 text-muted">
@@ -106,7 +104,6 @@ export default async function ProductDetailPage({
             <ScentVariantSelector
               variants={scentVariants}
               currentSlug={product.slug}
-              baseName={variantBaseName}
             />
             {product.fragrance && scentVariants.length === 0 && (
               <p className="mb-4">

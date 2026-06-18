@@ -181,6 +181,36 @@ export type CatalogProduct = Product & {
   scentVariants: ScentVariant[];
 };
 
+export function enrichProductsWithScentVariants(
+  products: Product[]
+): CatalogProduct[] {
+  return products.map((product) => {
+    const meta = inferProductVariantMeta(product);
+    if (!meta) {
+      return {
+        ...product,
+        catalogName: product.name,
+        scentVariants: [],
+      };
+    }
+
+    const groupKey = product.variantGroup ?? meta.group;
+    const siblings = products.filter((candidate) => {
+      const candidateMeta = inferProductVariantMeta(candidate);
+      if (!candidateMeta) return false;
+      const candidateGroup = candidate.variantGroup ?? candidateMeta.group;
+      return candidateGroup === groupKey;
+    });
+
+    return {
+      ...product,
+      catalogName: product.name,
+      scentVariants:
+        siblings.length > 1 ? siblings.map(toScentVariant) : [],
+    };
+  });
+}
+
 export function groupCatalogProducts(products: Product[]): CatalogProduct[] {
   const seenGroups = new Set<string>();
   const result: CatalogProduct[] = [];
@@ -209,7 +239,7 @@ export function groupCatalogProducts(products: Product[]): CatalogProduct[] {
 
     result.push({
       ...product,
-      catalogName: meta.baseName,
+      catalogName: product.name,
       scentVariants:
         siblings.length > 1 ? siblings.map(toScentVariant) : [],
     });

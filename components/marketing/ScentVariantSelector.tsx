@@ -54,12 +54,11 @@ function ScentThumbnail({
 export function ScentVariantSelector({
   variants,
   currentSlug,
-  baseName,
   compact = false,
 }: {
   variants: ScentVariant[];
   currentSlug: string;
-  baseName: string;
+  baseName?: string;
   compact?: boolean;
 }) {
   if (variants.length <= 1) return null;
@@ -67,7 +66,7 @@ export function ScentVariantSelector({
   return (
     <div className={compact ? "mt-2" : "mb-8"}>
       {!compact ? (
-        <p className="label-caps text-muted mb-3">{baseName} · Choose scent</p>
+        <p className="label-caps text-muted mb-3">Choose scent</p>
       ) : (
         <p className="label-caps mb-2 text-[0.65rem] text-muted">
           {variants.length} scents available

@@ -68,7 +68,6 @@ async function CollectionsList({
           <ProductCard
             product={product}
             index={index}
-            displayName={product.catalogName}
             scentVariants={product.scentVariants}
           />
         </StaggerItem>
