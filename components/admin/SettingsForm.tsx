@@ -217,7 +217,7 @@ export function SettingsForm({
             className="admin-input w-full resize-y"
           />
         </div>
-        <div className="grid gap-4 sm:grid-cols-1">
+        <div className="grid gap-4 sm:grid-cols-2">
           <Input
             label="Flat Shipping Rate ($)"
             type="number"
@@ -225,7 +225,18 @@ export function SettingsForm({
             {...registerStore("flatShippingRate")}
             error={storeErrors.flatShippingRate?.message}
           />
+          <Input
+            label="Free Shipping Threshold ($)"
+            type="number"
+            step="0.01"
+            {...registerStore("freeShippingThreshold")}
+            error={storeErrors.freeShippingThreshold?.message}
+          />
         </div>
+        <p className="text-xs leading-relaxed text-muted">
+          U.S. orders at or above the free shipping threshold pay $0 shipping at
+          checkout. International orders always use calculated rates.
+        </p>
         <fieldset className="space-y-3 border-t border-green/10 pt-4">
           <legend className="label-caps text-muted">Email Notifications</legend>
           {(

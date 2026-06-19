@@ -3,7 +3,7 @@
 import { useCartStore } from "@/store/cartStore";
 import { formatPrice } from "@/lib/utils";
 import { getBundleLineTotal, getBundleDiscount } from "@/lib/bundle-pricing";
-import { TAX_RATE } from "@/lib/shipping";
+import { FREE_SHIPPING_THRESHOLD, FREE_SHIPPING_PROMO, TAX_RATE } from "@/lib/shipping";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import { Minus, Plus, Trash2 } from "lucide-react";
@@ -136,7 +136,9 @@ export default function CartPage() {
                 <span>{formatPrice(estTax)}</span>
               </div>
               <p className="pt-2 text-xs text-muted">
-                Shipping & final total calculated at checkout based on your state and order weight.
+                {sub >= FREE_SHIPPING_THRESHOLD
+                  ? "Your order qualifies for free U.S. shipping."
+                  : `Add ${formatPrice(FREE_SHIPPING_THRESHOLD - sub)} more for ${FREE_SHIPPING_PROMO.toLowerCase()}.`}
               </p>
             </div>
             <Link href="/checkout">

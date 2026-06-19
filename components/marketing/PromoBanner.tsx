@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { X } from "lucide-react";
+import { FREE_SHIPPING_PROMO } from "@/lib/shipping";
 
 const STORAGE_KEY = "msvee-promo-dismissed";
 
@@ -19,9 +20,9 @@ export function PromoBanner() {
   return (
     <div className="fixed inset-x-0 top-0 z-[51] bg-terra px-10 py-2.5 text-center text-[11px] leading-snug text-white sm:text-sm md:static md:z-auto md:hidden">
       <p>
-        Free sample with every order ·{" "}
-        <Link href="/gift-guide" className="underline underline-offset-2 hover:text-cream">
-          Shop the gift guide
+        {FREE_SHIPPING_PROMO} ·{" "}
+        <Link href="/collections" className="underline underline-offset-2 hover:text-cream">
+          Shop now
         </Link>
       </p>
       <button

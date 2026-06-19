@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { isDatabaseConfigured } from "@/lib/env";
 import { calculateShippingQuote } from "@/lib/shipping-calculator";
 import { getCountryCode, isUsCountry } from "@/lib/shipping";
+import { applyFreeShippingIfEligible, getCheckoutSettings } from "@/lib/checkout";
 import type { Category } from "@prisma/client";
 
 const quoteSchema = z.object({
@@ -21,6 +22,7 @@ const quoteSchema = z.object({
   country: z.string().min(1),
   state: z.string().optional(),
   postalCode: z.string().optional(),
+  subtotal: z.number().min(0).optional(),
 });
 
 export const POST = withApiHandler("shipping.quote", async (request: NextRequest) => {
@@ -30,7 +32,7 @@ export const POST = withApiHandler("shipping.quote", async (request: NextRequest
     return errorResponse(parsed.error.errors[0]?.message || "Invalid shipping quote request");
   }
 
-  const { items, country, state, postalCode } = parsed.data;
+  const { items, country, state, postalCode, subtotal: subtotalOverride } = parsed.data;
   const countryCode = getCountryCode(country);
 
   if (isUsCountry(countryCode) && !state?.trim()) {
@@ -69,12 +71,24 @@ export const POST = withApiHandler("shipping.quote", async (request: NextRequest
     })
   );
 
-  const quote = calculateShippingQuote({
+  const subtotal =
+    subtotalOverride ??
+    items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const settings = await getCheckoutSettings();
+
+  let quote = calculateShippingQuote({
     items: enriched,
     country: countryCode,
     state,
     postalCode,
   });
+
+  quote = applyFreeShippingIfEligible(
+    quote,
+    subtotal,
+    settings.freeShippingThreshold,
+    countryCode
+  );
 
   return jsonResponse(quote);
 });

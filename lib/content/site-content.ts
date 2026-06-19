@@ -15,7 +15,7 @@ export function getFaqItems(settings: PublicStoreSettings) {
     },
     {
       question: "How much is shipping?",
-      answer: `U.S. orders ship via USPS Ground Advantage. Rates are calculated at checkout based on package weight and destination. A ${formatPrice(settings.flatShippingRate)} flat rate may apply to smaller domestic orders when quoted.`,
+      answer: `U.S. orders ship via USPS Ground Advantage. Shipping is free on domestic orders of ${formatPrice(settings.freeShippingThreshold)} or more. Below that, rates are calculated at checkout based on package weight and destination.`,
     },
     {
       question: "Can I return or exchange a product?",
@@ -59,6 +59,7 @@ export function getShippingSections() {
 /** @deprecated Use getFaqItems(settings) for accurate shipping copy. */
 export const FAQ_ITEMS = getFaqItems({
   flatShippingRate: 8,
+  freeShippingThreshold: 75,
 });
 
 /** @deprecated Use getShippingSections() for accurate shipping copy. */

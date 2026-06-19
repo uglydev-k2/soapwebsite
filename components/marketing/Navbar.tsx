@@ -11,6 +11,7 @@ import { useWishlistStore } from "@/store/wishlistStore";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import { EASE_OUT, fadeUp, staggerContainer } from "@/lib/motion";
+import { FREE_SHIPPING_PROMO } from "@/lib/shipping";
 import { SHOP_CATEGORY_MENU } from "@/lib/categories";
 import type { NavbarAuthUser } from "@/lib/navbar-auth";
 import { BrandLogo } from "@/components/BrandLogo";
@@ -97,12 +98,12 @@ export default function Navbar({
         <div className="group hidden overflow-hidden border-b border-green/10 bg-green-3 py-2 md:block">
           <div className="flex w-max animate-marquee items-center">
             {[
-              "Free sample with every order",
+              FREE_SHIPPING_PROMO,
               "Small-batch handcrafted formulas",
               "Botanical bath & body rituals",
             ]
               .concat([
-                "Free sample with every order",
+                FREE_SHIPPING_PROMO,
                 "Small-batch handcrafted formulas",
                 "Botanical bath & body rituals",
               ])

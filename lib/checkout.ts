@@ -1,8 +1,8 @@
 import type { Category } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { isDatabaseConfigured } from "@/lib/env";
-import { calculateShippingQuote } from "@/lib/shipping-calculator";
-import { getCountryCode } from "@/lib/shipping";
+import { calculateShippingQuote, type ShippingQuote } from "@/lib/shipping-calculator";
+import { getCountryCode, isUsCountry } from "@/lib/shipping";
 import { pickProductImage } from "@/lib/email-templates";
 import { getCategoryLabel } from "@/lib/utils";
 
@@ -17,7 +17,7 @@ export type CheckoutSettings = {
 
 const DEFAULT_CHECKOUT_SETTINGS: CheckoutSettings = {
   flatShippingRate: 8,
-  freeShippingThreshold: 60,
+  freeShippingThreshold: 75,
   featureCheckout: true,
   taxRate: TAX_RATE,
 };
@@ -87,6 +87,23 @@ export async function calculateCheckoutShipping(
     state: address.state,
     postalCode: address.postalCode,
   });
+}
+
+export function applyFreeShippingIfEligible(
+  quote: ShippingQuote,
+  subtotal: number,
+  threshold: number,
+  country: string
+): ShippingQuote {
+  const countryCode = getCountryCode(country);
+  if (!isUsCountry(countryCode) || subtotal < threshold) {
+    return quote;
+  }
+  return {
+    ...quote,
+    shipping: 0,
+    method: `Free shipping (orders $${threshold}+)`,
+  };
 }
 
 export type ShippingAddress = {

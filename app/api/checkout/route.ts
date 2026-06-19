@@ -8,6 +8,7 @@ import {
   getCheckoutSettings,
   validateCartItems,
   calculateCheckoutShipping,
+  applyFreeShippingIfEligible,
   type ShippingAddress,
 } from "@/lib/checkout";
 import { getBundleLineTotal } from "@/lib/bundle-pricing";
@@ -121,9 +122,11 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
     country: parsed.data.country,
   };
 
-  const shippingQuote = await calculateCheckoutShipping(
-    validatedItems,
-    shippingAddress
+  const shippingQuote = applyFreeShippingIfEligible(
+    await calculateCheckoutShipping(validatedItems, shippingAddress),
+    subtotal,
+    settings.freeShippingThreshold,
+    parsed.data.country
   );
 
   const totals = calculateOrderTotals(subtotal, settings, shippingQuote.shipping);
