@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import type { Product } from "@prisma/client";
 import {
   BRAND_DISPLAY_NAME,
+  BRAND_EMAIL,
   BRAND_SITE_URL,
   BRAND_TAGLINE,
   brandTitle,
 } from "@/lib/brand";
+import { socialProfileUrls } from "@/lib/social";
 const DEFAULT_OG_IMAGE = `${BRAND_SITE_URL}/images/mv-luscious-lather-logo.jpg`;
 
 export function absoluteUrl(path: string): string {
@@ -111,5 +113,7 @@ export function buildOrganizationJsonLd(): Record<string, unknown> {
     url: BRAND_SITE_URL,
     logo: DEFAULT_OG_IMAGE,
     description: BRAND_TAGLINE,
+    email: BRAND_EMAIL,
+    sameAs: socialProfileUrls(),
   };
 }

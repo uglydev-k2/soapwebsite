@@ -15,6 +15,7 @@ import {
   STATIC_FEATURED,
   STATIC_PRODUCTS,
 } from "@/lib/catalog";
+import { matchesSkinConcern, type SkinConcernId } from "@/lib/skin-concerns";
 
 function orderFeaturedProducts<T extends { id: string; slug: string; featured: boolean }>(
   products: T[],
@@ -39,6 +40,7 @@ interface ActiveProductOptions {
   category?: Category;
   categories?: Category[];
   scent?: string;
+  concern?: SkinConcernId;
   sort?: ProductSort;
   q?: string;
 }
@@ -79,9 +81,17 @@ function matchesSearch(product: Product, query: string): boolean {
   return haystack.includes(query);
 }
 
+function applyConcernFilter<T extends Product>(
+  products: T[],
+  concern?: SkinConcernId
+): T[] {
+  if (!concern) return products;
+  return products.filter((product) => matchesSkinConcern(product, concern));
+}
+
 function applyFallbackFilters(
   products: Product[],
-  { category, categories, scent, sort = "featured", q }: ActiveProductOptions
+  { category, categories, scent, concern, sort = "featured", q }: ActiveProductOptions
 ): Product[] {
   let filtered = products.filter((p) => p.active);
 
@@ -106,6 +116,8 @@ function applyFallbackFilters(
       filtered = filtered.filter((p) => matchesSearch(p, query));
     }
   }
+
+  filtered = applyConcernFilter(filtered, concern);
 
   const sorted = [...filtered];
   switch (sort) {
@@ -136,7 +148,7 @@ function applyFallbackFilters(
 export async function getActiveProducts(
   options: ActiveProductOptions = {}
 ): Promise<Product[]> {
-  const { category, categories, scent, sort = "featured", q } = options;
+  const { category, categories, scent, concern, sort = "featured", q } = options;
   const categoryFilter = categories?.length
     ? { category: { in: categories } }
     : category
@@ -202,7 +214,9 @@ export async function getActiveProducts(
     [] as Product[]
   );
 
-  if (products.length > 0) return products;
+  if (products.length > 0) {
+    return applyConcernFilter(products, concern);
+  }
   return applyFallbackFilters(STATIC_PRODUCTS as Product[], options);
 }
 

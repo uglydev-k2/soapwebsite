@@ -75,7 +75,7 @@ export const GIFT_GUIDE_SECTIONS = [
   {
     title: "For Sensitive Skin",
     description: "Gentle lavender and chamomile profiles without harsh additives.",
-    href: "/collections?scent=lavender&sort=featured",
+    href: "/collections?concern=sensitive&sort=featured",
     cta: "Shop gentle scents",
   },
   {

@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { BrandLogo } from "@/components/BrandLogo";
 import { SHOP_CATEGORY_MENU } from "@/lib/categories";
+import { SOCIAL_HANDLE, SOCIAL_PROFILES, socialProfileLabel } from "@/lib/social";
 
 const shopLinks = [
   { label: "All Products", href: "/collections" },
@@ -31,6 +32,14 @@ const supportLinks = [
   { label: "Terms of Service", href: "/terms" },
 ];
 
+function FacebookIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden>
+      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+    </svg>
+  );
+}
+
 function InstagramIcon() {
   return (
     <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden>
@@ -55,11 +64,12 @@ function TikTokIcon() {
   );
 }
 
-const socialLinks = [
-  { label: "Instagram", href: "https://instagram.com/mvlusciouslather", icon: InstagramIcon },
-  { label: "Pinterest", href: "https://pinterest.com/mvlusciouslather", icon: PinterestIcon },
-  { label: "TikTok", href: "https://tiktok.com/@mvlusciouslather", icon: TikTokIcon },
-];
+const socialIcons = {
+  Instagram: InstagramIcon,
+  Facebook: FacebookIcon,
+  Pinterest: PinterestIcon,
+  TikTok: TikTokIcon,
+} as const;
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -77,19 +87,26 @@ export default function Footer() {
               Premium botanical bath products handcrafted with intention. Where
               ritual meets luxury.
             </p>
-            <div className="mt-6 flex gap-4">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-cream/50 transition-colors hover:text-gold"
-                  aria-label={social.label}
-                >
-                  <social.icon />
-                </a>
-              ))}
+            <div className="mt-6">
+              <p className="label-caps text-cream/60">{SOCIAL_HANDLE}</p>
+              <div className="mt-3 flex gap-4">
+                {SOCIAL_PROFILES.map((social) => {
+                  const Icon = socialIcons[social.platform];
+                  return (
+                    <a
+                      key={social.platform}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-cream/50 transition-colors hover:text-gold"
+                      aria-label={socialProfileLabel(social.platform)}
+                      title={socialProfileLabel(social.platform)}
+                    >
+                      <Icon />
+                    </a>
+                  );
+                })}
+              </div>
             </div>
           </div>
 

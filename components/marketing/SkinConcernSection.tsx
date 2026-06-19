@@ -11,7 +11,7 @@ const concerns = [
   {
     title: "Best for Sensitive Skin",
     description: "Gentle formulas with soft botanicals and no harsh additives.",
-    href: "/collections/oat-honey-comfort-bar",
+    href: "/collections?concern=sensitive&sort=featured",
   },
   {
     title: "Best for Eczema",
