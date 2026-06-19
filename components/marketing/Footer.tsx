@@ -87,9 +87,12 @@ export default function Footer() {
               Premium botanical bath products handcrafted with intention. Where
               ritual meets luxury.
             </p>
-            <div className="mt-6">
-              <p className="label-caps text-cream/60">{SOCIAL_HANDLE}</p>
-              <div className="mt-3 flex gap-4">
+            <div className="mt-6 space-y-3">
+              <p className="text-sm text-cream">
+                Follow{" "}
+                <span className="font-serif text-base text-gold">{SOCIAL_HANDLE}</span>
+              </p>
+              <div className="flex flex-wrap gap-3">
                 {SOCIAL_PROFILES.map((social) => {
                   const Icon = socialIcons[social.platform];
                   return (
@@ -98,11 +101,13 @@ export default function Footer() {
                       href={social.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-cream/50 transition-colors hover:text-gold"
+                      className="inline-flex items-center gap-2 border border-cream/15 px-3 py-2 text-xs text-cream/85 transition-colors hover:border-gold/40 hover:text-gold"
                       aria-label={socialProfileLabel(social.platform)}
                       title={socialProfileLabel(social.platform)}
+                      style={{ borderRadius: "2px" }}
                     >
                       <Icon />
+                      <span className="label-caps">{social.platform}</span>
                     </a>
                   );
                 })}
