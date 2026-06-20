@@ -3,7 +3,7 @@
 import { useCartStore } from "@/store/cartStore";
 import { formatPrice } from "@/lib/utils";
 import { getBundleLineTotal, getBundleDiscount } from "@/lib/bundle-pricing";
-import { FREE_SHIPPING_THRESHOLD, FREE_SHIPPING_PROMO, TAX_RATE } from "@/lib/shipping";
+import { FREE_SAMPLE_PROMO, FREE_SHIPPING_PROMO, FREE_SHIPPING_THRESHOLD, TAX_RATE } from "@/lib/shipping";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import { Minus, Plus, Trash2 } from "lucide-react";
@@ -140,6 +140,7 @@ export default function CartPage() {
                   ? "Your order qualifies for free U.S. shipping."
                   : `Add ${formatPrice(FREE_SHIPPING_THRESHOLD - sub)} more for ${FREE_SHIPPING_PROMO.toLowerCase()}.`}
               </p>
+              <p className="text-xs text-muted">{FREE_SAMPLE_PROMO}.</p>
             </div>
             <Link href="/checkout">
               <Button className="w-full">Proceed to Checkout</Button>

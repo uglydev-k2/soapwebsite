@@ -28,6 +28,11 @@ export function getFaqItems(settings: PublicStoreSettings) {
         "Many customers with sensitive skin love our Lavender Mist and gentle milk-based formulas. We recommend patch testing any new product before full use.",
     },
     {
+      question: "Do you make medical or health claims?",
+      answer:
+        "No. We are not medical or healthcare professionals and do not claim our products diagnose, treat, cure, or prevent any disease. Please consult your physician or healthcare provider before use if you have a skin condition or health concern. See our Product Disclaimer for full details.",
+    },
+    {
       question: "Do you ship internationally?",
       answer:
         "Yes. We ship to select countries via USPS international rates calculated at checkout based on weight and destination.",

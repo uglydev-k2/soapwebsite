@@ -11,6 +11,7 @@ import { RecentlyViewedStrip } from "@/components/marketing/RecentlyViewedStrip"
 import { CompleteYourRitual } from "@/components/marketing/CompleteYourRitual";
 import { Breadcrumbs } from "@/components/marketing/Breadcrumbs";
 import { ProductCareAccordion } from "@/components/marketing/ProductCareAccordion";
+import { ProductDisclaimer } from "@/components/marketing/ProductDisclaimer";
 import { getUnitWeightOz } from "@/lib/product-weight";
 import { inferProductVariantMeta } from "@/lib/product-variants";
 import { buildProductMetadata, buildProductJsonLd } from "@/lib/seo";
@@ -109,6 +110,7 @@ export default async function ProductDetailPage({
               )}
               <ProductDetailPurchaseActions />
               <ProductCareAccordion category={product.category as Category} />
+              <ProductDisclaimer />
             </>
           }
         />

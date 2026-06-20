@@ -11,7 +11,7 @@ import { useWishlistStore } from "@/store/wishlistStore";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import { EASE_OUT, fadeUp, staggerContainer } from "@/lib/motion";
-import { FREE_SHIPPING_PROMO } from "@/lib/shipping";
+import { FREE_SAMPLE_PROMO, FREE_SHIPPING_PROMO } from "@/lib/shipping";
 import { SHOP_CATEGORY_MENU } from "@/lib/categories";
 import type { NavbarAuthUser } from "@/lib/navbar-auth";
 import { BrandLogo } from "@/components/BrandLogo";
@@ -99,11 +99,13 @@ export default function Navbar({
           <div className="flex w-max animate-marquee items-center">
             {[
               FREE_SHIPPING_PROMO,
+              FREE_SAMPLE_PROMO,
               "Small-batch handcrafted formulas",
               "Botanical bath & body rituals",
             ]
               .concat([
                 FREE_SHIPPING_PROMO,
+                FREE_SAMPLE_PROMO,
                 "Small-batch handcrafted formulas",
                 "Botanical bath & body rituals",
               ])

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { FREE_SHIPPING_PROMO } from "@/lib/shipping";
+import { FREE_SAMPLE_PROMO, FREE_SHIPPING_PROMO } from "@/lib/shipping";
 import {
   motion,
   useReducedMotion,
@@ -44,6 +44,9 @@ export default function Hero() {
           <motion.div className="flex flex-wrap gap-2" variants={fadeUp}>
             <span className="border border-green/15 bg-white px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-green">
               {FREE_SHIPPING_PROMO}
+            </span>
+            <span className="border border-green/15 bg-white px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-green">
+              {FREE_SAMPLE_PROMO}
             </span>
           </motion.div>
 
