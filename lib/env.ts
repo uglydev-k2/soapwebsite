@@ -55,29 +55,14 @@ export const OPTIONAL_ENV = [
   "VAPID_PRIVATE_KEY",
   "VAPID_SUBJECT",
   "NEXT_PUBLIC_VAPID_PUBLIC_KEY",
-  "OPENAI_API_KEY",
-  "OPENAI_MODEL",
-  "NEXT_PUBLIC_CHAT_WIDGET_ENABLED",
   "NEXT_PUBLIC_GA_MEASUREMENT_ID",
   "SQUARE_SUBSCRIPTION_PLAN_MONTHLY",
   "SQUARE_SUBSCRIPTION_PLAN_BIMONTHLY",
   "SQUARE_SUBSCRIPTION_PLAN_QUARTERLY",
 ] as const;
 
-export function isChatWidgetEnabled(): boolean {
-  return process.env.NEXT_PUBLIC_CHAT_WIDGET_ENABLED === "true";
-}
-
-export function isChatEnabled(): boolean {
-  return isChatWidgetEnabled() && Boolean(process.env.OPENAI_API_KEY?.trim());
-}
-
 export function getGaMeasurementId(): string | undefined {
   return process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim() || undefined;
-}
-
-export function getOpenAIModel(): string {
-  return process.env.OPENAI_MODEL?.trim() || "gpt-4o-mini";
 }
 
 export function getMissingProductionEnv(): string[] {

@@ -35,7 +35,6 @@ const optional = [
   "STRIPE_SECRET_KEY",
   "STRIPE_WEBHOOK_SECRET",
   "RESEND_API_KEY",
-  "OPENAI_API_KEY",
 ];
 
 function status(key) {
