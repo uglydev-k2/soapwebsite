@@ -29,6 +29,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${cormorant.variable} ${jost.variable}`}>
+      <head>
+        <link rel="icon" href="/favicon.ico?v=2" sizes="48x48" />
+        <link rel="apple-touch-icon" href="/apple-icon.png?v=2" />
+      </head>
       <body className="grain">
         <JsonLd data={buildOrganizationJsonLd()} />
         <Providers>
