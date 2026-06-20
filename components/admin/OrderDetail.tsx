@@ -188,11 +188,21 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
           </Badge>
           {orderMeta.purchaseType === "subscription" && (
             <Badge variant="default" className="mt-3 ml-2">
-              Subscription
+              {orderMeta.subscriptionRenewal ? "Subscription renewal" : "Subscription"}
               {orderMeta.subscriptionCadence
                 ? ` · ${getCadenceLabel(orderMeta.subscriptionCadence)}`
                 : ""}
             </Badge>
+          )}
+          {orderMeta.subscriptionId && (
+            <p className="mt-2 text-sm text-muted">
+              <Link
+                href="/admin/subscriptions"
+                className="text-terra hover:underline"
+              >
+                View subscription profile
+              </Link>
+            </p>
           )}
           {orderMeta.includeFreeSample && (
             <p className="mt-3 text-sm text-terra">

@@ -4,6 +4,9 @@ import Link from "next/link";
 import type { Customer, Order, OrderItem, Product } from "@prisma/client";
 import { cn, formatDate, formatPrice, statusColors } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
+import { getOrderPurchaseType } from "@/lib/admin-orders";
+import { parseOrderNotes } from "@/lib/order-notes";
+import { getCadenceLabel } from "@/lib/subscriptions";
 
 export type OrderRow = Order & {
   customer: Pick<Customer, "firstName" | "lastName" | "email"> | Customer;
@@ -43,6 +46,9 @@ export function OrdersTable({
       <ul className="admin-mobile-list">
         {orders.map((order) => {
           const itemCount = order.items.reduce((s, i) => s + i.quantity, 0);
+          const purchaseType = getOrderPurchaseType(order.notes);
+          const orderMeta = parseOrderNotes(order.notes);
+          const isSubscription = purchaseType === "subscription";
           return (
             <li key={order.id} className="admin-mobile-card">
               <div className="flex items-start justify-between gap-3">
@@ -53,6 +59,20 @@ export function OrdersTable({
                   >
                     {order.orderNumber}
                   </Link>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <Badge variant={isSubscription ? "terra" : "default"}>
+                      {isSubscription
+                        ? orderMeta.subscriptionRenewal
+                          ? "Subscription renewal"
+                          : "Subscription"
+                        : "One-time"}
+                    </Badge>
+                    {isSubscription && orderMeta.subscriptionCadence ? (
+                      <span className="text-xs text-muted">
+                        {getCadenceLabel(orderMeta.subscriptionCadence)}
+                      </span>
+                    ) : null}
+                  </div>
                   <p className="mt-1.5 text-sm text-text">
                     {order.customer.firstName} {order.customer.lastName}
                   </p>
@@ -96,6 +116,7 @@ export function OrdersTable({
               </th>
             )}
             <th className="label-caps px-4 py-3 text-muted">Order #</th>
+            <th className="label-caps px-4 py-3 text-muted">Type</th>
             <th className="label-caps px-4 py-3 text-muted">Customer</th>
             <th className="label-caps px-4 py-3 text-muted">Date</th>
             <th className="label-caps px-4 py-3 text-muted">Items</th>
@@ -107,6 +128,9 @@ export function OrdersTable({
         <tbody>
           {orders.map((order) => {
             const itemCount = order.items.reduce((s, i) => s + i.quantity, 0);
+            const purchaseType = getOrderPurchaseType(order.notes);
+            const orderMeta = parseOrderNotes(order.notes);
+            const isSubscription = purchaseType === "subscription";
             return (
               <tr
                 key={order.id}
@@ -123,6 +147,20 @@ export function OrdersTable({
                 )}
                 <td className="px-4 py-3 font-medium text-green">
                   {order.orderNumber}
+                </td>
+                <td className="px-4 py-3">
+                  <Badge variant={isSubscription ? "terra" : "default"}>
+                    {isSubscription
+                      ? orderMeta.subscriptionRenewal
+                        ? "Subscription renewal"
+                        : "Subscription"
+                      : "One-time"}
+                  </Badge>
+                  {isSubscription && orderMeta.subscriptionCadence ? (
+                    <p className="mt-1 text-xs text-muted">
+                      {getCadenceLabel(orderMeta.subscriptionCadence)}
+                    </p>
+                  ) : null}
                 </td>
                 <td className="px-4 py-3">
                   <p className="text-text">

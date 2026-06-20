@@ -28,6 +28,8 @@ export type FulfillOrderInput = {
   squareSubscriptionId?: string;
   squareCustomerId?: string;
   subscriptionStatus?: "active" | "pending_setup";
+  subscriptionId?: string;
+  subscriptionRenewal?: boolean;
   cartItems: ValidatedCartItem[];
   orderNumber?: string;
   promoCode?: string;
@@ -179,8 +181,10 @@ export async function fulfillOrder(
             squareSubscriptionId: input.squareSubscriptionId,
             squareCustomerId: input.squareCustomerId,
             subscriptionStatus: input.subscriptionStatus,
-            includeFreeSample: true,
-            fulfillmentNotes: FREE_SAMPLE_PROMO,
+            subscriptionId: input.subscriptionId,
+            subscriptionRenewal: input.subscriptionRenewal,
+            includeFreeSample: input.subscriptionRenewal ? false : true,
+            fulfillmentNotes: input.subscriptionRenewal ? undefined : FREE_SAMPLE_PROMO,
             promoCode: input.promoCode,
             promoDiscount: input.promoDiscount,
           }),

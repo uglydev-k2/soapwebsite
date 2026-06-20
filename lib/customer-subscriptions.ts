@@ -17,8 +17,11 @@ type CreateSubscriptionInput = {
   total: number;
 };
 
-function computeNextChargeAt(cadence: SubscriptionCadence): Date {
-  const next = new Date();
+export function computeNextChargeAt(
+  cadence: SubscriptionCadence,
+  fromDate: Date = new Date()
+): Date {
+  const next = new Date(fromDate);
   const months = cadence === "monthly" ? 1 : cadence === "bimonthly" ? 2 : 3;
   next.setMonth(next.getMonth() + months);
   return next;

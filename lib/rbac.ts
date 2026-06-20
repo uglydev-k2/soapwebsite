@@ -142,6 +142,7 @@ export const ROUTE_PERMISSIONS: Record<string, Permission> = {
   "/admin/customers": "customers:read",
   "/admin/users": "users:read",
   "/admin/billing": "billing:read",
+  "/admin/subscriptions": "billing:read",
   "/admin/content": "content:read",
   "/admin/reviews": "content:read",
   "/admin/promo-codes": "settings:read",

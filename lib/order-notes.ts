@@ -11,6 +11,8 @@ export type OrderNotesMeta = {
   squareSubscriptionId?: string;
   squareCustomerId?: string;
   subscriptionStatus?: "active" | "pending_setup";
+  subscriptionId?: string;
+  subscriptionRenewal?: boolean;
   /** Fulfillment note for warehouse (e.g. free sample). */
   fulfillmentNotes?: string;
   includeFreeSample?: boolean;

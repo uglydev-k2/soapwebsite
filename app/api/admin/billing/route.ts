@@ -18,12 +18,8 @@ export const GET = withApiHandler("admin.billing", async () => {
   const { error } = await requireAdmin("billing:read");
   if (error) return error;
 
-  const subscriptions = await prisma.customerSubscription.findMany({
-    include: {
-      customer: { select: { firstName: true, lastName: true, email: true } },
-    },
-    orderBy: { createdAt: "desc" },
-    take: 100,
+  const activeSubscriptions = await prisma.customerSubscription.count({
+    where: { status: "ACTIVE" },
   });
 
   const monthStart = new Date();
@@ -62,30 +58,6 @@ export const GET = withApiHandler("admin.billing", async () => {
     : 0;
 
   return jsonResponse({
-    subscriptions: subscriptions.map((s) => {
-      const snapshot = s.cartSnapshot as {
-        items?: Array<{ quantity?: number }>;
-        totals?: { total?: number };
-      };
-      const itemCount = snapshot.items?.reduce(
-        (sum, item) => sum + (item.quantity ?? 1),
-        0
-      );
-      return {
-        id: s.id,
-        orderNumber: s.sourceOrderNumber,
-        customer: `${s.customer.firstName} ${s.customer.lastName}`,
-        email: s.customer.email,
-        status: s.status,
-        amount: snapshot.totals?.total ?? 0,
-        renewalDate: s.nextChargeAt,
-        paymentId: s.squareCardId,
-        items: itemCount ?? 0,
-        purchaseType: "subscription",
-        subscriptionCadence: s.cadence,
-        subscriptionStatus: s.status.toLowerCase(),
-      };
-    }),
     metrics: {
       mrr,
       arr,
@@ -93,6 +65,7 @@ export const GET = withApiHandler("admin.billing", async () => {
       ltv: Math.round(avgOrder * 3),
       totalRevenue: totalRevenue._sum.total ?? 0,
       refundedCount: refunded,
+      activeSubscriptions,
     },
   });
 });

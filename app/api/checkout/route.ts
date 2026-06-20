@@ -14,8 +14,11 @@ import {
 import { getBundleLineTotal } from "@/lib/bundle-pricing";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
-import { getCountryCode } from "@/lib/shipping";
-import { getSquareClient, getSquareLocationId, isSquareConfigured } from "@/lib/square";
+import { isSquareConfigured } from "@/lib/square";
+import {
+  chargeSquarePayment,
+  SQUARE_PAYMENT_SUCCESS_STATUSES,
+} from "@/lib/square-payments";
 import { fulfillOrder } from "@/lib/fulfill-order";
 import { generateOrderNumber } from "@/lib/utils";
 import {
@@ -28,60 +31,6 @@ import {
   createSquareCustomer,
 } from "@/lib/square-subscription";
 import { createCustomerSubscription } from "@/lib/customer-subscriptions";
-
-const SUCCESS_STATUSES = new Set(["COMPLETED", "APPROVED", "PENDING"]);
-
-async function chargeSquarePayment(input: {
-  sourceId: string;
-  idempotencyKey: string;
-  amountCents: bigint;
-  orderNumber: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  line1: string;
-  line2?: string;
-  city: string;
-  state?: string;
-  postalCode: string;
-  country: string;
-}) {
-  return getSquareClient().payments.create({
-    sourceId: input.sourceId,
-    idempotencyKey: input.idempotencyKey,
-    amountMoney: {
-      amount: input.amountCents,
-      currency: "USD",
-    },
-    locationId: getSquareLocationId(),
-    referenceId: input.orderNumber.slice(0, 40),
-    note: `mvlusciouslather order ${input.orderNumber}`,
-    buyerEmailAddress: input.email,
-    shippingAddress: {
-      addressLine1: input.line1,
-      addressLine2: input.line2,
-      locality: input.city,
-      administrativeDistrictLevel1: input.state ?? undefined,
-      postalCode: input.postalCode,
-      country: getCountryCode(input.country) as
-        | "US"
-        | "CA"
-        | "MX"
-        | "GB"
-        | "AU"
-        | "DE"
-        | "FR"
-        | "IE"
-        | "NL"
-        | "JP"
-        | "NZ"
-        | "SG",
-      firstName: input.firstName,
-      lastName: input.lastName,
-    },
-    autocomplete: true,
-  });
-}
 
 export const POST = withApiHandler("checkout.create", async (request: NextRequest) => {
   if (!isSquareConfigured()) {
@@ -223,7 +172,7 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
     return errorResponse("Payment could not be processed. Please try again.", 402);
   }
 
-  if (!payment.status || !SUCCESS_STATUSES.has(payment.status)) {
+  if (!payment.status || !SQUARE_PAYMENT_SUCCESS_STATUSES.has(payment.status)) {
     return errorResponse(
       payment.status === "FAILED"
         ? "Your card was declined. Please try another payment method."
@@ -268,7 +217,8 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
     subscriptionCadence &&
     squareCustomerId &&
     savedCardId &&
-    result.customerId
+    result.customerId &&
+    result.orderId
   ) {
     await createCustomerSubscription({
       customerId: result.customerId,

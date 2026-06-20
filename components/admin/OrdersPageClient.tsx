@@ -15,14 +15,21 @@ type OrderWithRelations = Order & {
   items: OrderItem[];
 };
 
-const tabs = ["ALL", "PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
+const statusTabs = ["ALL", "PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
+const typeTabs = [
+  { id: "ALL", label: "All types" },
+  { id: "one_time", label: "One-time" },
+  { id: "subscription", label: "Subscription" },
+] as const;
 
 export default function OrdersPageClient({
   orders,
   initialStatus,
+  initialType,
 }: {
   orders: OrderWithRelations[];
   initialStatus: string;
+  initialType: string;
 }) {
   const router = useRouter();
   const params = useSearchParams();
@@ -33,6 +40,13 @@ export default function OrdersPageClient({
     const p = new URLSearchParams(params.toString());
     if (status === "ALL") p.delete("status");
     else p.set("status", status);
+    router.push(`/admin/orders?${p.toString()}`);
+  };
+
+  const setType = (type: string) => {
+    const p = new URLSearchParams(params.toString());
+    if (type === "ALL") p.delete("type");
+    else p.set("type", type);
     router.push(`/admin/orders?${p.toString()}`);
   };
 
@@ -59,8 +73,8 @@ export default function OrdersPageClient({
 
   return (
     <div>
-      <div className="admin-tabs-scroll mb-8 border-b border-green/10 sm:mb-6">
-        {tabs.map((tab) => (
+      <div className="admin-tabs-scroll mb-4 border-b border-green/10 sm:mb-3">
+        {statusTabs.map((tab) => (
           <button
             key={tab}
             type="button"
@@ -73,6 +87,24 @@ export default function OrdersPageClient({
             )}
           >
             {tab}
+          </button>
+        ))}
+      </div>
+
+      <div className="mb-8 flex flex-wrap gap-2 sm:mb-6">
+        {typeTabs.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setType(tab.id)}
+            className={cn(
+              "px-4 py-2 text-xs label-caps border transition-colors",
+              initialType === tab.id
+                ? "border-terra bg-terra text-white"
+                : "border-green/15 text-muted hover:border-green/30"
+            )}
+          >
+            {tab.label}
           </button>
         ))}
       </div>
