@@ -37,6 +37,7 @@ export type FulfillOrderInput = {
 export type FulfillOrderResult = {
   orderNumber: string;
   orderId?: string;
+  customerId?: string;
   alreadyExists: boolean;
 };
 
@@ -54,6 +55,7 @@ export async function fulfillOrder(
       return {
         orderNumber: existing.orderNumber,
         orderId: existing.id,
+        customerId: undefined,
         alreadyExists: true,
       };
     }
@@ -80,6 +82,7 @@ export async function fulfillOrder(
   });
 
   let createdOrderId: string | undefined;
+  let createdCustomerId: string | undefined;
   const newlyLowStock: { name: string; stock: number; slug: string }[] = [];
 
   if (isDatabaseConfigured()) {
@@ -98,6 +101,7 @@ export async function fulfillOrder(
           phone: input.phone,
         },
       });
+      createdCustomerId = customer.id;
 
       const orderItems = [];
       for (const item of input.cartItems) {
@@ -230,5 +234,10 @@ export async function fulfillOrder(
     }
   }
 
-  return { orderNumber, orderId: createdOrderId, alreadyExists: false };
+  return {
+    orderNumber,
+    orderId: createdOrderId,
+    customerId: createdCustomerId,
+    alreadyExists: false,
+  };
 }

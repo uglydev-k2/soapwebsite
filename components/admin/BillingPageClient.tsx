@@ -77,7 +77,7 @@ export default function BillingPageClient() {
           ? json.data?.paymentRefunded
             ? "Order refunded via Stripe"
             : "Order marked refunded"
-          : "Order cancelled";
+          : "Subscription cancelled";
       addToast(msg);
       setConfirm(null);
       load();
@@ -167,9 +167,11 @@ export default function BillingPageClient() {
               render: (s) => (
                 <div className="space-y-1">
                   <Badge status={s.status} />
-                  {s.subscriptionStatus === "pending_setup" && (
-                    <p className="text-xs text-terra">Square setup pending</p>
-                  )}
+                  {s.subscriptionCadence ? (
+                    <p className="text-xs text-muted capitalize">
+                      {s.subscriptionCadence}
+                    </p>
+                  ) : null}
                 </div>
               ),
             },
@@ -183,26 +185,15 @@ export default function BillingPageClient() {
               header: "Actions",
               render: (s) =>
                 canAct(s.status) ? (
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setConfirm({ order: s, action: "cancel" })
-                      }
-                      className="text-xs text-muted hover:text-green"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setConfirm({ order: s, action: "refund" })
-                      }
-                      className="text-xs text-terra hover:underline"
-                    >
-                      Refund
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setConfirm({ order: s, action: "cancel" })
+                    }
+                    className="text-xs text-muted hover:text-green"
+                  >
+                    Cancel subscription
+                  </button>
                 ) : (
                   <span className="text-xs text-muted">—</span>
                 ),
@@ -215,17 +206,13 @@ export default function BillingPageClient() {
         open={!!confirm}
         onClose={() => setConfirm(null)}
         title={
-          confirm?.action === "refund"
-            ? "Refund order?"
-            : "Cancel order?"
+          "Cancel subscription?"
         }
       >
         {confirm && (
           <>
             <p className="mb-4 text-sm text-muted">
-              {confirm.action === "refund"
-                ? `Refund ${confirm.order.orderNumber} (${formatPrice(confirm.order.amount)})?${confirm.order.paymentId ? " The payment will be refunded via Square if configured." : ""}`
-                : `Cancel ${confirm.order.orderNumber}? This cannot be undone.`}
+              {`Cancel subscription for ${confirm.order.orderNumber}? Future recurring charges will stop.`}
             </p>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setConfirm(null)}>

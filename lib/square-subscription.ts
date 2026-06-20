@@ -1,7 +1,5 @@
 import { randomUUID } from "crypto";
-import { getSquareClient, getSquareLocationId } from "@/lib/square";
-import type { SubscriptionCadence } from "@/lib/subscriptions";
-import { getSubscriptionPlanVariationId } from "@/lib/subscriptions";
+import { getSquareClient } from "@/lib/square";
 
 export async function createSquareCustomer(input: {
   email: string;
@@ -42,34 +40,4 @@ export async function createSquareCardOnFile(input: {
     throw new Error("Card could not be saved for subscription billing");
   }
   return cardId;
-}
-
-export async function createSquareSubscription(input: {
-  customerId: string;
-  cardId: string;
-  cadence: SubscriptionCadence;
-  idempotencyKey: string;
-}): Promise<string> {
-  const planVariationId = getSubscriptionPlanVariationId(input.cadence);
-  if (!planVariationId) {
-    throw new Error(`Subscription plan is not configured for ${input.cadence}`);
-  }
-
-  const response = await getSquareClient().subscriptions.create({
-    idempotencyKey: input.idempotencyKey,
-    locationId: getSquareLocationId(),
-    customerId: input.customerId,
-    planVariationId,
-    cardId: input.cardId,
-    timezone: "America/Chicago",
-    source: {
-      name: "MV Luscious Lather Checkout",
-    },
-  });
-
-  const subscriptionId = response.subscription?.id;
-  if (!subscriptionId) {
-    throw new Error("Square subscription could not be created");
-  }
-  return subscriptionId;
 }

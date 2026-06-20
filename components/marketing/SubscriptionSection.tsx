@@ -42,7 +42,7 @@ export default function SubscriptionSection() {
           ))}
         </StaggerContainer>
         <p className="mt-8 text-center text-sm text-muted">
-          Add items to cart, then choose <strong>Subscribe</strong> at checkout. Square plan IDs must be configured in production.
+          Add any products to cart, then choose <strong>Subscribe</strong> at checkout.
         </p>
       </div>
     </section>

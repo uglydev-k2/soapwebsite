@@ -192,7 +192,6 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
               {orderMeta.subscriptionCadence
                 ? ` · ${getCadenceLabel(orderMeta.subscriptionCadence)}`
                 : ""}
-              {orderMeta.subscriptionStatus === "pending_setup" ? " · setup pending" : ""}
             </Badge>
           )}
           {orderMeta.includeFreeSample && (

@@ -20,15 +20,14 @@ import { fulfillOrder } from "@/lib/fulfill-order";
 import { generateOrderNumber } from "@/lib/utils";
 import {
   applySubscriptionDiscount,
-  isSquareSubscriptionPlanConfigured,
   type PurchaseType,
 } from "@/lib/subscriptions";
 import { validatePromoCode, redeemPromoCode } from "@/lib/promo-codes";
 import {
   createSquareCardOnFile,
   createSquareCustomer,
-  createSquareSubscription,
 } from "@/lib/square-subscription";
+import { createCustomerSubscription } from "@/lib/customer-subscriptions";
 
 const SUCCESS_STATUSES = new Set(["COMPLETED", "APPROVED", "PENDING"]);
 
@@ -165,8 +164,7 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
   const amountCents = BigInt(Math.round(totals.total * 100));
 
   let squareCustomerId: string | undefined;
-  let squareSubscriptionId: string | undefined;
-  let subscriptionStatus: "active" | "pending_setup" | undefined;
+  let subscriptionStatus: "active" | undefined;
   let paymentSourceId = parsed.data.sourceId;
   let savedCardId: string | undefined;
 
@@ -235,25 +233,7 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
   }
 
   if (purchaseType === "subscription" && subscriptionCadence && squareCustomerId && savedCardId) {
-    if (isSquareSubscriptionPlanConfigured(subscriptionCadence)) {
-      try {
-        squareSubscriptionId = await createSquareSubscription({
-          customerId: squareCustomerId,
-          cardId: savedCardId,
-          cadence: subscriptionCadence,
-          idempotencyKey: randomUUID(),
-        });
-        subscriptionStatus = "active";
-      } catch (error) {
-        subscriptionStatus = "pending_setup";
-        console.error("[msvee:checkout] Square subscription enrollment failed:", error);
-      }
-    } else {
-      subscriptionStatus = "pending_setup";
-      console.warn(
-        `[msvee:checkout] Subscription plan not configured for ${subscriptionCadence}`
-      );
-    }
+    subscriptionStatus = "active";
   }
 
   const result = await fulfillOrder({
@@ -272,7 +252,6 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
     paymentProvider: "square",
     purchaseType,
     subscriptionCadence,
-    squareSubscriptionId,
     squareCustomerId,
     subscriptionStatus,
     promoCode: promoCodeApplied,
@@ -282,6 +261,28 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
 
   if (promoCodeApplied) {
     await redeemPromoCode(promoCodeApplied);
+  }
+
+  if (
+    purchaseType === "subscription" &&
+    subscriptionCadence &&
+    squareCustomerId &&
+    savedCardId &&
+    result.customerId
+  ) {
+    await createCustomerSubscription({
+      customerId: result.customerId,
+      cadence: subscriptionCadence,
+      squareCustomerId,
+      squareCardId: savedCardId,
+      sourceOrderId: result.orderId,
+      sourceOrderNumber: result.orderNumber,
+      items: validatedItems,
+      subtotal: totals.subtotal,
+      shipping: totals.shipping,
+      tax: totals.tax,
+      total: totals.total,
+    });
   }
 
   return jsonResponse({

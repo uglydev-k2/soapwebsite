@@ -40,18 +40,12 @@ export async function getAdminOverview() {
 }
 
 async function fetchAdminOverview() {
-  const [pendingOrders, lowStockCount, flaggedProducts, newsletterSubscribers, pendingSubscriptions] =
+  const [pendingOrders, lowStockCount, flaggedProducts, newsletterSubscribers] =
     await Promise.all([
       prisma.order.count({ where: { status: "PENDING" } }),
       countLowStockItems(),
       prisma.product.count({ where: { moderationStatus: "FLAGGED" } }),
       prisma.newsletterSubscriber.count(),
-      prisma.order.count({
-        where: {
-          notes: { contains: '"subscriptionStatus":"pending_setup"' },
-          status: { notIn: ["CANCELLED", "REFUNDED"] },
-        },
-      }),
     ]);
 
   const alerts: AdminAlert[] = [];
@@ -75,17 +69,6 @@ async function fetchAdminOverview() {
       count: lowStockCount,
       href: "/admin/inventory",
       severity: "warning",
-    });
-  }
-
-  if (pendingSubscriptions > 0) {
-    alerts.push({
-      id: "pending-subscriptions",
-      title: "Subscriptions need setup",
-      description: `${pendingSubscriptions} subscription${pendingSubscriptions > 1 ? "s" : ""} paid but not enrolled in Square`,
-      count: pendingSubscriptions,
-      href: "/admin/billing?filter=pending_setup",
-      severity: "critical",
     });
   }
 

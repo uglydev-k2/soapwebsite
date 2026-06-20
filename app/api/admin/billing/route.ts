@@ -12,17 +12,15 @@ import { logAdminAction } from "@/lib/audit";
 import { getClientIp } from "@/lib/rate-limit";
 import { getStripe } from "@/lib/stripe";
 import { getSquareClient, isSquareConfigured } from "@/lib/square";
-import { parseOrderNotes } from "@/lib/order-notes";
 import type { OrderStatus } from "@prisma/client";
 
 export const GET = withApiHandler("admin.billing", async () => {
   const { error } = await requireAdmin("billing:read");
   if (error) return error;
 
-  const orders = await prisma.order.findMany({
+  const subscriptions = await prisma.customerSubscription.findMany({
     include: {
       customer: { select: { firstName: true, lastName: true, email: true } },
-      items: { include: { product: { select: { name: true } } } },
     },
     orderBy: { createdAt: "desc" },
     take: 100,
@@ -64,21 +62,28 @@ export const GET = withApiHandler("admin.billing", async () => {
     : 0;
 
   return jsonResponse({
-    subscriptions: orders.map((o) => {
-      const meta = parseOrderNotes(o.notes);
+    subscriptions: subscriptions.map((s) => {
+      const snapshot = s.cartSnapshot as {
+        items?: Array<{ quantity?: number }>;
+        totals?: { total?: number };
+      };
+      const itemCount = snapshot.items?.reduce(
+        (sum, item) => sum + (item.quantity ?? 1),
+        0
+      );
       return {
-        id: o.id,
-        orderNumber: o.orderNumber,
-        customer: `${o.customer.firstName} ${o.customer.lastName}`,
-        email: o.customer.email,
-        status: o.status,
-        amount: o.total,
-        renewalDate: o.createdAt,
-        paymentId: o.paymentId,
-        items: o.items.length,
-        purchaseType: meta.purchaseType ?? "one_time",
-        subscriptionCadence: meta.subscriptionCadence,
-        subscriptionStatus: meta.subscriptionStatus,
+        id: s.id,
+        orderNumber: s.sourceOrderNumber,
+        customer: `${s.customer.firstName} ${s.customer.lastName}`,
+        email: s.customer.email,
+        status: s.status,
+        amount: snapshot.totals?.total ?? 0,
+        renewalDate: s.nextChargeAt,
+        paymentId: s.squareCardId,
+        items: itemCount ?? 0,
+        purchaseType: "subscription",
+        subscriptionCadence: s.cadence,
+        subscriptionStatus: s.status.toLowerCase(),
       };
     }),
     metrics: {
@@ -153,6 +158,47 @@ export const PATCH = withApiHandler(
 
     if (!orderId || !action) {
       return errorResponse("orderId and action required");
+    }
+
+    const subscription = await prisma.customerSubscription.findUnique({
+      where: { id: orderId },
+    });
+    if (subscription) {
+      if (action !== "cancel") {
+        return errorResponse("Only cancellation is supported for subscriptions");
+      }
+      if (subscription.status === "CANCELLED") {
+        return errorResponse("Subscription already cancelled");
+      }
+
+      const updatedSubscription = await prisma.customerSubscription.update({
+        where: { id: orderId },
+        data: {
+          status: "CANCELLED",
+          cancelledAt: new Date(),
+        },
+      });
+
+      await logAdminAction({
+        adminId: session!.user!.id,
+        adminEmail: session!.user!.email ?? "",
+        adminRole: (session!.user as { role?: string }).role ?? "",
+        action: "UPDATE",
+        entity: "CustomerSubscription",
+        entityId: orderId,
+        metadata: {
+          action,
+          previousStatus: subscription.status,
+          newStatus: updatedSubscription.status,
+          sourceOrderNumber: subscription.sourceOrderNumber,
+        },
+        ipAddress: getClientIp(request),
+      });
+
+      return jsonResponse({
+        subscription: updatedSubscription,
+        paymentRefunded: false,
+      });
     }
 
     const order = await prisma.order.findUnique({ where: { id: orderId } });

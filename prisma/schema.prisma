@@ -99,6 +99,7 @@ model Customer {
   bannedReason String?
   lastActiveAt DateTime?
   orders       Order[]
+  subscriptions CustomerSubscription[]
   createdAt    DateTime       @default(now())
 
   @@schema("public")
@@ -238,9 +239,48 @@ model PromoCode {
   @@schema("public")
 }
 
+model CustomerSubscription {
+  id                String               @id @default(cuid())
+  customerId        String
+  customer          Customer             @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  status            CustomerSubStatus    @default(ACTIVE)
+  cadence           SubscriptionCadence
+  squareCustomerId  String
+  squareCardId      String
+  sourceOrderId     String?
+  sourceOrderNumber String
+  cartSnapshot      Json
+  nextChargeAt      DateTime
+  lastChargedAt     DateTime?
+  pausedAt          DateTime?
+  cancelledAt       DateTime?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  @@index([customerId, status])
+  @@index([nextChargeAt, status])
+  @@schema("public")
+}
+
 enum PromoDiscountType {
   PERCENT
   FIXED
+
+  @@schema("public")
+}
+
+enum SubscriptionCadence {
+  monthly
+  bimonthly
+  quarterly
+
+  @@schema("public")
+}
+
+enum CustomerSubStatus {
+  ACTIVE
+  PAUSED
+  CANCELLED
 
   @@schema("public")
 }

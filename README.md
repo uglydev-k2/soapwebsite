@@ -69,7 +69,6 @@ See `.env.example` for all required variables.
 | `UPLOADTHING_TOKEN` | Admin product image uploads |
 | `RESEND_*` | Transactional email |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Optional GA4 analytics |
-| `SQUARE_SUBSCRIPTION_PLAN_*` | Square subscription plan variation IDs |
 
 ## Database
 
@@ -85,7 +84,7 @@ Seed includes sample products, orders, customers, and admin `mvlusciouslather@gm
 
 1. Set all required env vars in `.env.example` (DATABASE_URL, AUTH_SECRET, NEXTAUTH_URL)
 2. Configure Square (`SQUARE_*`, `NEXT_PUBLIC_SQUARE_*`) for checkout
-3. Add Square subscription plan IDs if offering subscribe & save
+3. Subscriptions are cart-based and managed in-app (no preassigned Square plan IDs needed)
 4. Set `RESEND_API_KEY` + `RESEND_FROM_EMAIL` for order emails
 5. Optional: `NEXT_PUBLIC_GA_MEASUREMENT_ID`
 6. Run `npm run db:push` after schema updates

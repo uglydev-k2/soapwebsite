@@ -3,7 +3,6 @@ import { withApiHandler } from "@/lib/api-handler";
 import {
   SUBSCRIPTION_CADENCES,
   SUBSCRIPTION_DISCOUNT_RATE,
-  isSquareSubscriptionPlanConfigured,
 } from "@/lib/subscriptions";
 
 export const GET = withApiHandler("checkout.subscription-options", async () => {
@@ -13,7 +12,7 @@ export const GET = withApiHandler("checkout.subscription-options", async () => {
       id: cadence.id,
       label: cadence.label,
       description: cadence.description,
-      planConfigured: isSquareSubscriptionPlanConfigured(cadence.id),
+      planConfigured: true,
     })),
   });
 });
