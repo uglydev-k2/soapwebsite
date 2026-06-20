@@ -81,7 +81,8 @@ export function SearchDialog() {
 
       <div
         className={cn(
-          "fixed inset-x-3 top-[7.25rem] z-[110] mx-auto max-w-xl border border-green/10 bg-white shadow-2xl transition-all duration-300 sm:inset-x-4 sm:top-28 md:inset-x-auto md:left-1/2 md:-translate-x-1/2",
+          "fixed inset-x-3 z-[110] mx-auto max-w-xl border border-green/10 bg-white shadow-2xl transition-all duration-300 sm:inset-x-4 md:inset-x-auto md:left-1/2 md:-translate-x-1/2",
+          "top-[calc(var(--marketing-promo-h)+var(--marketing-nav-h)+var(--marketing-header-gap))] md:top-28",
           open ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-4 opacity-0"
         )}
         role="dialog"
@@ -100,7 +101,7 @@ export function SearchDialog() {
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="text-muted hover:text-green"
+            className="touch-target text-muted hover:text-green"
             aria-label="Close search"
           >
             <X size={18} />

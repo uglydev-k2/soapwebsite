@@ -35,10 +35,10 @@ export default function CartPage() {
             {items.map((item) => (
               <div
                 key={`${item.productId}:${item.scentOptionId ?? ""}`}
-                className="flex gap-6 card-border p-4 bg-white"
+                className="flex gap-4 card-border p-4 bg-white sm:gap-6"
               >
                 <div
-                  className="w-20 h-20 flex-shrink-0 overflow-hidden"
+                  className="h-20 w-20 flex-shrink-0 overflow-hidden"
                   style={{
                     background: item.image
                       ? undefined
@@ -54,10 +54,10 @@ export default function CartPage() {
                     />
                   ) : null}
                 </div>
-                <div className="flex-1">
+                <div className="min-w-0 flex-1">
                   <Link
                     href={`/collections/${item.slug}`}
-                    className="font-serif text-lg text-green hover:text-terra"
+                    className="font-serif text-base text-green hover:text-terra sm:text-lg"
                   >
                     {item.name}
                   </Link>
@@ -70,7 +70,7 @@ export default function CartPage() {
                       </span>
                     ) : null}
                   </p>
-                  <div className="flex items-center gap-3 mt-3">
+                  <div className="mt-3 flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() =>
@@ -80,12 +80,15 @@ export default function CartPage() {
                           item.scentOptionId
                         )
                       }
-                      className="text-muted hover:text-green"
+                      className="touch-target flex items-center justify-center border border-green/15 text-muted hover:border-green hover:text-green"
+                      style={{ borderRadius: "2px" }}
                       aria-label="Decrease quantity"
                     >
                       <Minus size={16} />
                     </button>
-                    <span className="text-sm">{item.quantity}</span>
+                    <span className="min-w-[1.5rem] text-center text-sm font-medium">
+                      {item.quantity}
+                    </span>
                     <button
                       type="button"
                       onClick={() =>
@@ -95,7 +98,8 @@ export default function CartPage() {
                           item.scentOptionId
                         )
                       }
-                      className="text-muted hover:text-green"
+                      className="touch-target flex items-center justify-center border border-green/15 text-muted hover:border-green hover:text-green"
+                      style={{ borderRadius: "2px" }}
                       aria-label="Increase quantity"
                     >
                       <Plus size={16} />
@@ -103,20 +107,20 @@ export default function CartPage() {
                     <button
                       type="button"
                       onClick={() => removeItem(item.productId, item.scentOptionId)}
-                      className="ml-auto text-muted hover:text-terra"
+                      className="touch-target ml-auto flex items-center justify-center text-muted hover:text-terra"
                       aria-label="Remove item"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={18} />
                     </button>
                   </div>
                 </div>
-                <p className="font-serif text-green">
+                <p className="shrink-0 font-serif text-base text-green sm:text-lg">
                   {formatPrice(getBundleLineTotal(item.price, item.quantity))}
                 </p>
               </div>
             ))}
           </div>
-          <div className="card-border p-6 bg-white h-fit">
+          <div className="card-border sticky bottom-4 p-6 bg-white h-fit lg:static lg:bottom-auto">
             <h2 className="label-caps text-muted mb-6">Order Summary</h2>
             <div className="space-y-2 text-sm mb-6">
               <div className="flex justify-between">

@@ -224,7 +224,7 @@ export default function CheckoutPageClient() {
   if (!items.length) return null;
 
   return (
-    <section className="pt-32 pb-24 px-6 min-h-screen bg-cream">
+    <section className="marketing-header-offset min-h-screen bg-cream px-4 pb-24 sm:px-6">
       <div className="max-w-5xl mx-auto">
         <Link
           href="/cart"

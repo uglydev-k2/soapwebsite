@@ -41,11 +41,11 @@ export default function Hero() {
             <span className="hidden h-px max-w-16 flex-1 bg-gold sm:block" aria-hidden />
           </motion.div>
 
-          <motion.div className="flex flex-wrap gap-2" variants={fadeUp}>
-            <span className="border border-green/15 bg-white px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-green">
+          <motion.div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap" variants={fadeUp}>
+            <span className="border border-green/15 bg-white px-3 py-1.5 text-[11px] uppercase tracking-[0.16em] text-green sm:py-1">
               {FREE_SHIPPING_PROMO}
             </span>
-            <span className="border border-green/15 bg-white px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-green">
+            <span className="border border-green/15 bg-white px-3 py-1.5 text-[11px] uppercase tracking-[0.16em] text-green sm:py-1">
               {FREE_SAMPLE_PROMO}
             </span>
           </motion.div>

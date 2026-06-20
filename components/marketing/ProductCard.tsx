@@ -224,51 +224,49 @@ export default function ProductCard({
             )
           )}
 
-          <div className="mt-auto flex items-center justify-between pt-3 sm:pt-4">
-            <motion.div
-              className="flex items-baseline gap-2"
-              initial={reduced ? false : { opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4, delay: reduced ? 0 : 0.35 + index * 0.06 }}
-            >
-              <span className="font-serif text-base text-terra sm:text-lg">
-                {formatPrice(product.price)}
-              </span>
-              {hasDiscount && product.comparePrice != null && (
-                <span className="text-sm text-muted line-through">
-                  {formatPrice(product.comparePrice)}
+          <div className="mt-auto space-y-3 pt-3 sm:space-y-0 sm:pt-4">
+            <div className="flex items-center justify-between">
+              <motion.div
+                className="flex items-baseline gap-2"
+                initial={reduced ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4, delay: reduced ? 0 : 0.35 + index * 0.06 }}
+              >
+                <span className="font-serif text-base text-terra sm:text-lg">
+                  {formatPrice(product.price)}
                 </span>
-              )}
-            </motion.div>
-            {hasScentOptions ? (
+                {hasDiscount && product.comparePrice != null && (
+                  <span className="text-sm text-muted line-through">
+                    {formatPrice(product.comparePrice)}
+                  </span>
+                )}
+              </motion.div>
               <button
                 type="button"
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
                 className={cn(
-                  "flex h-9 w-9 items-center justify-center border border-green/20 text-green",
+                  "touch-target flex items-center justify-center border border-green/20 text-green",
                   "transition-colors duration-250 hover:border-terra hover:bg-terra hover:text-white",
-                  "disabled:cursor-not-allowed disabled:opacity-40"
+                  "disabled:cursor-not-allowed disabled:opacity-40",
+                  !hasScentOptions && "hidden sm:flex"
                 )}
                 style={{ borderRadius: "2px" }}
                 aria-label={`Add ${product.name} to cart`}
               >
-                <ShoppingBag size={16} strokeWidth={1.5} />
+                <ShoppingBag size={18} strokeWidth={1.5} />
               </button>
-            ) : (
+            </div>
+            {!hasScentOptions && (
               <button
                 type="button"
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
-                className={cn(
-                  "flex h-9 w-9 items-center justify-center border border-green/20 text-green",
-                  "transition-colors duration-250 hover:border-terra hover:bg-terra hover:text-white",
-                  "disabled:cursor-not-allowed disabled:opacity-40"
-                )}
+                className="flex min-h-11 w-full items-center justify-center gap-2 bg-terra px-4 text-sm label-caps text-white transition-colors duration-250 hover:bg-terra-2 disabled:cursor-not-allowed disabled:opacity-40 sm:hidden"
                 style={{ borderRadius: "2px" }}
-                aria-label={`Add ${product.name} to cart`}
               >
                 <ShoppingBag size={16} strokeWidth={1.5} />
+                {isOutOfStock ? "Sold Out" : "Add to Cart"}
               </button>
             )}
           </div>

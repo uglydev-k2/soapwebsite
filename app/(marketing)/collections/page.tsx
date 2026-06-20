@@ -69,7 +69,7 @@ async function CollectionsList({
   }
 
   return (
-    <StaggerContainer className="grid [grid-template-columns:repeat(2,minmax(0,1fr))] gap-3 sm:gap-6 lg:[grid-template-columns:repeat(3,minmax(0,1fr))]">
+    <StaggerContainer className="grid [grid-template-columns:repeat(2,minmax(0,1fr))] gap-4 sm:gap-6 lg:[grid-template-columns:repeat(3,minmax(0,1fr))]">
       {products.map((product, index) => (
         <StaggerItem key={product.id} className="h-full min-w-0">
           <ProductCard

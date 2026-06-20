@@ -44,7 +44,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
           <button
             type="button"
             onClick={onClose}
-            className="text-muted hover:text-green"
+            className="touch-target text-muted hover:text-green"
             aria-label="Close cart"
           >
             <X size={22} />
@@ -61,7 +61,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                   key={`${item.productId}:${item.scentOptionId ?? ""}`}
                   className="flex gap-4 border-b border-green/10 pb-4"
                 >
-                  <div className="flex-1">
+                  <div className="min-w-0 flex-1">
                     <Link
                       href={`/collections/${item.slug}`}
                       onClick={onClose}
@@ -82,11 +82,15 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                             item.scentOptionId
                           )
                         }
-                        className="text-muted hover:text-green"
+                        className="touch-target flex items-center justify-center border border-green/15 text-muted hover:text-green"
+                        style={{ borderRadius: "2px" }}
+                        aria-label="Decrease quantity"
                       >
-                        <Minus size={14} />
+                        <Minus size={16} />
                       </button>
-                      <span className="text-sm">{item.quantity}</span>
+                      <span className="min-w-[1.5rem] text-center text-sm">
+                        {item.quantity}
+                      </span>
                       <button
                         type="button"
                         onClick={() =>
@@ -96,14 +100,16 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                             item.scentOptionId
                           )
                         }
-                        className="text-muted hover:text-green"
+                        className="touch-target flex items-center justify-center border border-green/15 text-muted hover:text-green"
+                        style={{ borderRadius: "2px" }}
+                        aria-label="Increase quantity"
                       >
-                        <Plus size={14} />
+                        <Plus size={16} />
                       </button>
                       <button
                         type="button"
                         onClick={() => removeItem(item.productId, item.scentOptionId)}
-                        className="ml-2 text-xs text-terra hover:underline"
+                        className="touch-target ml-auto px-2 text-xs text-terra hover:underline"
                       >
                         Remove
                       </button>

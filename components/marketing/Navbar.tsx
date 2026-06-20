@@ -15,6 +15,10 @@ import { FREE_SAMPLE_PROMO, FREE_SHIPPING_PROMO } from "@/lib/shipping";
 import { SHOP_CATEGORY_MENU } from "@/lib/categories";
 import type { NavbarAuthUser } from "@/lib/navbar-auth";
 import { BrandLogo } from "@/components/BrandLogo";
+import {
+  syncNavHeight,
+  usePromoBannerStore,
+} from "@/store/promoBannerStore";
 
 const navLinks = [
   { label: "Collections", href: "/collections" },
@@ -40,6 +44,7 @@ export default function Navbar({
   const [cartBounce, setCartBounce] = useState(false);
   const itemCount = useCartStore((s) => s.itemCount());
   const wishlistCount = useWishlistStore((s) => s.items.length);
+  const promoVisible = usePromoBannerStore((s) => s.visible);
   const prevCount = useRef(itemCount);
   const lastScrollY = useRef(0);
 
@@ -76,11 +81,22 @@ export default function Navbar({
     };
   }, [mobileOpen]);
 
+  useEffect(() => {
+    const sync = () => {
+      const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+      syncNavHeight(hidden, isDesktop);
+    };
+    sync();
+    window.addEventListener("resize", sync);
+    return () => window.removeEventListener("resize", sync);
+  }, [hidden]);
+
   return (
     <>
       <motion.header
         className={cn(
-          "fixed inset-x-0 top-9 z-50 transition-colors duration-300 md:top-0",
+          "fixed inset-x-0 z-50 transition-[top,colors] duration-300 md:top-0",
+          promoVisible ? "top-[var(--marketing-promo-h)]" : "top-0",
           scrolled
             ? "border-b border-green/10 bg-cream/85 backdrop-blur-md shadow-sm"
             : "bg-cream/50 backdrop-blur-sm"
@@ -232,7 +248,7 @@ export default function Navbar({
           </Link>
           <button
             type="button"
-            className="p-2 text-cream transition-colors hover:text-gold"
+            className="touch-target text-cream transition-colors hover:text-gold"
             onClick={() => setMobileOpen(false)}
             aria-label="Close menu"
           >

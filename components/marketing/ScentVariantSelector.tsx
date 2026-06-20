@@ -16,7 +16,7 @@ function ScentSwatch({
   onSelect: (variant: ScentVariant) => void;
 }) {
   const disabled = !variant.inStock && !selected;
-  const dimension = size === "sm" ? "h-9 w-9" : "h-11 w-11";
+  const dimension = size === "sm" ? "h-10 w-10 sm:h-9 sm:w-9" : "h-11 w-11";
 
   return (
     <button

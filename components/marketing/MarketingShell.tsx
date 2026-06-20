@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import {
@@ -19,6 +20,7 @@ import { pageTransition } from "@/lib/motion";
 import type { NavbarAuthUser } from "@/lib/navbar-auth";
 import { CHAT_WIDGET_ENABLED } from "@/lib/chat/constants";
 import { ChatWidget } from "@/components/marketing/chat/ChatWidget";
+import { shouldHideMobileShopCta } from "@/lib/mobile-chrome";
 
 export function MarketingShell({
   children,
@@ -33,12 +35,18 @@ export function MarketingShell({
 }) {
   const pathname = usePathname();
   const reduced = useReducedMotion();
+  const hideMobileCta = shouldHideMobileShopCta(pathname);
   const { scrollY } = useScroll();
   const mobileCtaY = useTransform(scrollY, [0, 120], [reduced ? 0 : 80, 0]);
   const mobileCtaOpacity = useTransform(scrollY, [0, 80], [0, 1]);
   const { dismissed, dismiss, ready } = useMaintenanceDismissed();
   const showMaintenance = maintenance && ready && !dismissed;
   const showStorefrontChrome = !maintenance || dismissed;
+
+  useEffect(() => {
+    document.body.classList.toggle("mobile-cta-hidden", hideMobileCta);
+    return () => document.body.classList.remove("mobile-cta-hidden");
+  }, [hideMobileCta]);
 
   return (
     <>
@@ -60,7 +68,7 @@ export function MarketingShell({
           {children}
         </motion.main>
       </AnimatePresence>
-      {showStorefrontChrome && (
+      {showStorefrontChrome && !hideMobileCta && (
         <motion.div
           className="pointer-events-none fixed inset-x-0 bottom-0 z-[55] px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:hidden"
           style={{ y: mobileCtaY, opacity: reduced ? 1 : mobileCtaOpacity }}

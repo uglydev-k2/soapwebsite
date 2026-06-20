@@ -16,6 +16,9 @@
   --muted: #3a3530;
   --font-serif: var(--font-cormorant), Georgia, serif;
   --font-sans: var(--font-jost), system-ui, sans-serif;
+  --marketing-promo-h: 0px;
+  --marketing-nav-h: 4rem;
+  --marketing-header-gap: 0.75rem;
 }
 
 * {
@@ -67,12 +70,20 @@ html {
 
 /* Fixed navbar (+ optional mobile promo) clearance */
 .marketing-header-offset {
-  padding-top: 7.25rem;
+  padding-top: calc(
+    var(--marketing-promo-h) + var(--marketing-nav-h) + var(--marketing-header-gap)
+  );
 }
 
 @media (min-width: 768px) {
+  :root {
+    --marketing-promo-h: 0px;
+    --marketing-nav-h: 5.5rem;
+    --marketing-header-gap: 1rem;
+  }
+
   .marketing-header-offset {
-    padding-top: 8.5rem;
+    padding-top: calc(var(--marketing-nav-h) + var(--marketing-header-gap));
   }
 }
 
@@ -84,6 +95,13 @@ html {
 @media (min-width: 768px) {
   .marketing-main-pad {
     padding-bottom: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .mobile-cta-hidden .marketing-main-pad,
+  .mobile-cta-hidden .marketing-footer-pad {
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
   }
 }
 
