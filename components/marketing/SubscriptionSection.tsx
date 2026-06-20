@@ -1,26 +1,18 @@
 import Link from "next/link";
 import { AnimatedSectionHeader, StaggerContainer, StaggerItem } from "@/components/motion/ScrollReveal";
+import { SUBSCRIPTION_CADENCES } from "@/lib/subscriptions";
 
-const plans = [
-  {
-    title: "Monthly Ritual Box",
-    cadence: "Every month",
-    perks: "10% off every box",
-    href: "/collections?category=GIFT_SET&sort=featured",
-  },
-  {
-    title: "Bi-Monthly Refresh",
-    cadence: "Every 2 months",
-    perks: "Curated seasonal scent picks",
-    href: "/collections?sort=newest",
-  },
-  {
-    title: "Seasonal Discovery",
-    cadence: "Every 3 months",
-    perks: "Best for gifting and reset",
-    href: "/collections?category=BAR_SOAP&sort=featured",
-  },
-];
+const plans = SUBSCRIPTION_CADENCES.map((cadence) => ({
+  title:
+    cadence.id === "monthly"
+      ? "Monthly Ritual Box"
+      : cadence.id === "bimonthly"
+        ? "Bi-Monthly Refresh"
+        : "Seasonal Discovery",
+  cadence: cadence.label,
+  perks: cadence.description,
+  href: `/collections?sort=featured&subscribe=${cadence.id}`,
+}));
 
 export default function SubscriptionSection() {
   return (
@@ -29,7 +21,7 @@ export default function SubscriptionSection() {
         <AnimatedSectionHeader
           eyebrow="Save with Subscriptions"
           title="Build Your Ritual, Automatically"
-          description="Choose a cadence that fits your lifestyle and keep your essentials arriving on time."
+          description="Choose a cadence that fits your lifestyle — 10% off every subscription box at checkout."
         />
         <StaggerContainer className="mt-12 grid gap-4 lg:grid-cols-3">
           {plans.map((plan) => (
@@ -43,12 +35,15 @@ export default function SubscriptionSection() {
                   className="mt-8 inline-flex items-center justify-center bg-terra px-6 py-3 text-xs label-caps text-white transition-colors duration-250 hover:bg-terra-2"
                   style={{ borderRadius: 0 }}
                 >
-                  Explore Plan
+                  Shop & Subscribe
                 </Link>
               </article>
             </StaggerItem>
           ))}
         </StaggerContainer>
+        <p className="mt-8 text-center text-sm text-muted">
+          Add items to cart, then choose <strong>Subscribe</strong> at checkout. Square plan IDs must be configured in production.
+        </p>
       </div>
     </section>
   );

@@ -85,6 +85,30 @@ export const stockNotifySchema = z.object({
   email: z.string().email("Please enter a valid email"),
   productSlug: z.string().min(1),
   productName: z.string().min(1),
+  scentOptionId: z.string().optional(),
+  scentLabel: z.string().optional(),
+});
+
+export const reviewSubmitSchema = z.object({
+  productSlug: z.string().min(1),
+  authorName: z.string().min(2, "Name is required"),
+  title: z.string().min(3, "Title is required"),
+  body: z.string().min(20, "Please share a bit more detail"),
+  rating: z.coerce.number().int().min(1).max(5),
+});
+
+export const promoCodeSchema = z.object({
+  code: z.string().min(2).max(32),
+  discountType: z.enum(["PERCENT", "FIXED"]),
+  discountValue: z.coerce.number().positive(),
+  minSubtotal: z.coerce.number().min(0).optional().nullable(),
+  active: z.boolean().default(true),
+  expiresAt: z.string().datetime().optional().nullable(),
+  maxUses: z.coerce.number().int().min(1).optional().nullable(),
+});
+
+export const profileUpdateSchema = z.object({
+  fullName: z.string().min(1, "Name is required").max(120),
 });
 
 export const wholesaleSchema = z.object({
@@ -247,6 +271,7 @@ export const checkoutPaymentSchema = checkoutAddressBase
     idempotencyKey: z.string().uuid("Invalid payment request"),
     purchaseType: purchaseTypeSchema.default("one_time"),
     subscriptionCadence: subscriptionCadenceSchema.optional(),
+    promoCode: z.string().optional(),
   })
   .superRefine(refineUsState)
   .superRefine(refinePurchaseType);

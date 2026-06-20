@@ -84,15 +84,66 @@ export async function sendStockNotifyRequest(data: {
   email: string;
   productName: string;
   productSlug: string;
+  scentLabel?: string;
 }) {
   const to = process.env.STORE_CONTACT_EMAIL || process.env.RESEND_FROM_EMAIL || BRAND_EMAIL;
+  const scentLine = data.scentLabel ? ` (${data.scentLabel})` : "";
   const result = await sendEmail({
     to,
-    subject: `[Back in stock] ${data.productName}`,
-    html: `<p><strong>${data.email}</strong> wants to know when <strong>${data.productName}</strong> (${data.productSlug}) is back in stock.</p>`,
+    subject: `[Back in stock] ${data.productName}${scentLine}`,
+    html: `<p><strong>${data.email}</strong> wants to know when <strong>${data.productName}${scentLine}</strong> (${data.productSlug}) is back in stock.</p>`,
   });
   if (!result.ok) console.info("[msvee:stock-notify]", data);
   return result;
+}
+
+export async function sendBackInStockEmail(data: {
+  email: string;
+  productName: string;
+  productUrl: string;
+}) {
+  const siteUrl = process.env.NEXTAUTH_URL?.replace(/\/$/, "") ?? "";
+  return sendEmail({
+    to: data.email,
+    subject: `${data.productName} is back in stock`,
+    html: `
+      <div style="font-family: Georgia, serif; color: #1C1C1C; max-width: 560px; margin: 0 auto;">
+        <h1 style="color: #2C4A3E; font-weight: 400;">Good news — it's back</h1>
+        <p><strong>${data.productName}</strong> is back in stock at mvlusciouslather.</p>
+        <p><a href="${data.productUrl || siteUrl}" style="color:#963f1a;">Shop now →</a></p>
+      </div>
+    `,
+    replyTo: BRAND_EMAIL,
+  });
+}
+
+export async function sendReorderEmail(data: {
+  email: string;
+  firstName: string;
+  orderNumber: string;
+  items: { name: string; slug?: string; quantity: number }[];
+}) {
+  const siteUrl = process.env.NEXTAUTH_URL?.replace(/\/$/, "") ?? "";
+  const list = data.items
+    .map((item) => {
+      const href = item.slug ? `${siteUrl}/collections/${item.slug}` : `${siteUrl}/collections`;
+      return `<li><a href="${href}" style="color:#963f1a;">${item.name}</a> × ${item.quantity}</li>`;
+    })
+    .join("");
+
+  return sendEmail({
+    to: data.email,
+    subject: `Ready for your next ritual? — ${data.orderNumber}`,
+    html: `
+      <div style="font-family: Georgia, serif; color: #1C1C1C; max-width: 560px; margin: 0 auto;">
+        <h1 style="color: #2C4A3E; font-weight: 400;">Time to restock</h1>
+        <p>Hi ${data.firstName}, hope you're loving your last order. Reorder your favorites in one click:</p>
+        <ul style="line-height: 1.8;">${list}</ul>
+        <p><a href="${siteUrl}/collections" style="color:#963f1a;">Browse all collections →</a></p>
+      </div>
+    `,
+    replyTo: BRAND_EMAIL,
+  });
 }
 
 export async function sendWholesaleInquiry(data: {

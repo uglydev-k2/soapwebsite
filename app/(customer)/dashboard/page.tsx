@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUserProfile, getNavbarAuthUser } from "@/lib/profile";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
-import { getSupabaseOrdersForUser } from "@/lib/supabase/orders";
+import { getCustomerOrderSummaries } from "@/lib/customer-orders";
 import { formatDate, formatPrice } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -26,7 +26,7 @@ export default async function DashboardPage() {
   const name = profile?.full_name || user.email?.split("@")[0] || "there";
   const isAdmin = authUser?.isAdmin ?? false;
   const orders = user.email
-    ? await getSupabaseOrdersForUser(user.id, user.email)
+    ? await getCustomerOrderSummaries(user.id, user.email)
     : [];
 
   return (
@@ -85,18 +85,34 @@ export default async function DashboardPage() {
         <div className="admin-card mt-8">
           <p className="label-caps text-muted mb-4">Recent Orders</p>
           <ul className="space-y-4">
-            {orders.slice(0, 5).map((order) => (
+            {orders.slice(0, 8).map((order) => (
               <li
-                key={order.id}
+                key={order.orderNumber}
                 className="flex flex-wrap items-center justify-between gap-3 border-b border-green/10 pb-4 last:border-0 last:pb-0"
               >
                 <div>
-                  <p className="font-medium text-green">{order.order_number}</p>
+                  <p className="font-medium text-green">{order.orderNumber}</p>
                   <p className="text-sm text-muted">
-                    {formatDate(order.created_at)} · {order.status}
+                    {formatDate(order.createdAt)} · {order.status}
                   </p>
+                  {order.trackingNumber && (
+                    <p className="text-sm mt-1">
+                      {order.trackingUrl ? (
+                        <a
+                          href={order.trackingUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-terra hover:text-terra-2"
+                        >
+                          Track {order.trackingNumber}
+                        </a>
+                      ) : (
+                        <span className="text-muted">Tracking: {order.trackingNumber}</span>
+                      )}
+                    </p>
+                  )}
                 </div>
-                <p className="font-serif text-green">{formatPrice(Number(order.total))}</p>
+                <p className="font-serif text-green">{formatPrice(order.total)}</p>
               </li>
             ))}
           </ul>

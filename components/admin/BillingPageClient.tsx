@@ -19,6 +19,9 @@ interface Subscription {
   renewalDate: string;
   paymentId: string | null;
   items: number;
+  purchaseType?: string;
+  subscriptionCadence?: string;
+  subscriptionStatus?: string;
 }
 
 interface BillingData {
@@ -161,7 +164,14 @@ export default function BillingPageClient() {
             {
               key: "status",
               header: "Status",
-              render: (s) => <Badge status={s.status} />,
+              render: (s) => (
+                <div className="space-y-1">
+                  <Badge status={s.status} />
+                  {s.subscriptionStatus === "pending_setup" && (
+                    <p className="text-xs text-terra">Square setup pending</p>
+                  )}
+                </div>
+              ),
             },
             {
               key: "date",

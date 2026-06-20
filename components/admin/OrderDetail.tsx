@@ -195,6 +195,17 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
               {orderMeta.subscriptionStatus === "pending_setup" ? " · setup pending" : ""}
             </Badge>
           )}
+          {orderMeta.includeFreeSample && (
+            <p className="mt-3 text-sm text-terra">
+              Fulfillment: {orderMeta.fulfillmentNotes ?? "Include complimentary sample"}
+            </p>
+          )}
+          {orderMeta.promoCode && (
+            <p className="mt-1 text-sm text-muted">
+              Promo: {orderMeta.promoCode}
+              {orderMeta.promoDiscount ? ` (−$${orderMeta.promoDiscount.toFixed(2)})` : ""}
+            </p>
+          )}
         </div>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:items-end print:hidden">
           <label className="label-caps text-muted">Update Status</label>

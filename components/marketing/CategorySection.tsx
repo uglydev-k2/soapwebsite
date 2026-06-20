@@ -6,7 +6,7 @@ import {
   StaggerContainer,
   StaggerItem,
 } from "@/components/motion/ScrollReveal";
-import { SHOP_CATEGORY_MENU } from "@/lib/categories";
+import { VISIBLE_SHOP_CATEGORY_MENU } from "@/lib/categories";
 
 export default function CategorySection() {
   return (
@@ -26,7 +26,7 @@ export default function CategorySection() {
 
         <StaggerContainer className="mt-10 max-w-xl" stagger={0.05}>
           <div className="border border-green/15 bg-cream/30 px-5 py-2 sm:px-6">
-            {SHOP_CATEGORY_MENU.map((category) => (
+            {VISIBLE_SHOP_CATEGORY_MENU.map((category) => (
               <StaggerItem key={category.slug}>
                 <Link
                   href={`/collections/category/${category.slug}`}

@@ -1,6 +1,7 @@
 import { adminProductSelect } from "@/lib/admin-product-select";
 import { safeDbQuery } from "@/lib/db";
 import { prisma } from "@/lib/prisma";
+import { countLowStockItems } from "@/lib/admin-inventory";
 import {
   getMissingProductionEnv,
   isDatabaseConfigured,
@@ -39,12 +40,18 @@ export async function getAdminOverview() {
 }
 
 async function fetchAdminOverview() {
-  const [pendingOrders, lowStockCount, flaggedProducts, newsletterSubscribers] =
+  const [pendingOrders, lowStockCount, flaggedProducts, newsletterSubscribers, pendingSubscriptions] =
     await Promise.all([
       prisma.order.count({ where: { status: "PENDING" } }),
-      prisma.product.count({ where: { active: true, stock: { lt: 10 } } }),
+      countLowStockItems(),
       prisma.product.count({ where: { moderationStatus: "FLAGGED" } }),
       prisma.newsletterSubscriber.count(),
+      prisma.order.count({
+        where: {
+          notes: { contains: '"subscriptionStatus":"pending_setup"' },
+          status: { notIn: ["CANCELLED", "REFUNDED"] },
+        },
+      }),
     ]);
 
   const alerts: AdminAlert[] = [];
@@ -64,10 +71,21 @@ async function fetchAdminOverview() {
     alerts.push({
       id: "low-stock",
       title: "Low inventory",
-      description: `${lowStockCount} product${lowStockCount > 1 ? "s" : ""} below 10 units`,
+      description: `${lowStockCount} product or scent variant${lowStockCount > 1 ? "s" : ""} below 10 units`,
       count: lowStockCount,
-      href: "/admin/products",
+      href: "/admin/inventory",
       severity: "warning",
+    });
+  }
+
+  if (pendingSubscriptions > 0) {
+    alerts.push({
+      id: "pending-subscriptions",
+      title: "Subscriptions need setup",
+      description: `${pendingSubscriptions} subscription${pendingSubscriptions > 1 ? "s" : ""} paid but not enrolled in Square`,
+      count: pendingSubscriptions,
+      href: "/admin/billing?filter=pending_setup",
+      severity: "critical",
     });
   }
 

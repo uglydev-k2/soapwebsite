@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, jsonResponse, errorResponse } from "@/lib/api-helpers";
 import { orderUpdateSchema } from "@/lib/validations";
-import { sendDeliveredEmail, sendTrackingEmail } from "@/lib/resend";
+import { sendDeliveredEmail, sendTrackingEmail, sendReorderEmail } from "@/lib/resend";
 import { logAdminAction } from "@/lib/audit";
 import { getClientIp } from "@/lib/rate-limit";
 import {
@@ -83,6 +83,16 @@ export async function PATCH(
 
   if (parsed.data.status === "DELIVERED" && order.customer.email) {
     await sendDeliveredEmail(buildDeliveredEmailPayload(order));
+    await sendReorderEmail({
+      email: order.customer.email,
+      firstName: order.customer.firstName,
+      orderNumber: order.orderNumber,
+      items: order.items.map((item) => ({
+        name: item.product.name,
+        slug: item.product.slug,
+        quantity: item.quantity,
+      })),
+    });
   }
 
   await logAdminAction({
@@ -170,6 +180,16 @@ export async function POST(
   }
 
   await sendDeliveredEmail(buildDeliveredEmailPayload(order));
+  await sendReorderEmail({
+    email: order.customer.email,
+    firstName: order.customer.firstName,
+    orderNumber: order.orderNumber,
+    items: order.items.map((item) => ({
+      name: item.product.name,
+      slug: item.product.slug,
+      quantity: item.quantity,
+    })),
+  });
 
   await logAdminAction({
     adminId: session!.user!.id,

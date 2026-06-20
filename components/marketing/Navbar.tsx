@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import { EASE_OUT, fadeUp, staggerContainer } from "@/lib/motion";
 import { FREE_SAMPLE_PROMO, FREE_SHIPPING_PROMO } from "@/lib/shipping";
-import { SHOP_CATEGORY_MENU } from "@/lib/categories";
+import { VISIBLE_SHOP_CATEGORY_MENU } from "@/lib/categories";
 import type { NavbarAuthUser } from "@/lib/navbar-auth";
 import { BrandLogo } from "@/components/BrandLogo";
 import {
@@ -272,7 +272,7 @@ export default function Navbar({
           <li className="pt-6">
             <p className="label-caps mb-3 text-gold/80">Categories</p>
             <ul className="space-y-0 border border-cream/10 bg-cream/5 px-4">
-              {SHOP_CATEGORY_MENU.map((category) => (
+              {VISIBLE_SHOP_CATEGORY_MENU.map((category) => (
                 <li key={category.slug} className="border-b border-cream/10 last:border-b-0">
                   <Link
                     href={`/collections/category/${category.slug}`}

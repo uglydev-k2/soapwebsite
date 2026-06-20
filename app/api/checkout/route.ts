@@ -23,6 +23,7 @@ import {
   isSquareSubscriptionPlanConfigured,
   type PurchaseType,
 } from "@/lib/subscriptions";
+import { validatePromoCode, redeemPromoCode } from "@/lib/promo-codes";
 import {
   createSquareCardOnFile,
   createSquareCustomer,
@@ -111,7 +112,23 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
     (sum, item) => sum + getBundleLineTotal(item.price, item.quantity),
     0
   );
-  const subtotal = applySubscriptionDiscount(rawSubtotal, purchaseType);
+
+  let promoDiscount = 0;
+  let promoCodeApplied: string | undefined;
+  if (parsed.data.promoCode?.trim()) {
+    const promoResult = await validatePromoCode(parsed.data.promoCode, rawSubtotal);
+    if (!promoResult.valid) {
+      return errorResponse(promoResult.error);
+    }
+    promoDiscount = promoResult.discountAmount;
+    promoCodeApplied = promoResult.code;
+  }
+
+  const subtotalAfterPromo = Math.max(
+    0,
+    Math.round((rawSubtotal - promoDiscount) * 100) / 100
+  );
+  const subtotal = applySubscriptionDiscount(subtotalAfterPromo, purchaseType);
 
   const shippingAddress: ShippingAddress = {
     line1: parsed.data.line1,
@@ -258,8 +275,14 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
     squareSubscriptionId,
     squareCustomerId,
     subscriptionStatus,
+    promoCode: promoCodeApplied,
+    promoDiscount: promoDiscount > 0 ? promoDiscount : undefined,
     cartItems: validatedItems,
   });
+
+  if (promoCodeApplied) {
+    await redeemPromoCode(promoCodeApplied);
+  }
 
   return jsonResponse({
     paymentId: payment.id,

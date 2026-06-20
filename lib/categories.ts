@@ -16,6 +16,8 @@ export type ShopCategoryMenuItem = {
   description: string;
   /** Prisma categories included in this menu item. */
   values: Category[];
+  /** Hide from nav until products exist in this category. */
+  hidden?: boolean;
 };
 
 export const SHOP_CATEGORY_MENU: ShopCategoryMenuItem[] = [
@@ -42,6 +44,7 @@ export const SHOP_CATEGORY_MENU: ShopCategoryMenuItem[] = [
     label: "Accessories",
     description: "Soap dishes, bags, and little extras for your ritual.",
     values: ["ACCESSORIES"],
+    hidden: true,
   },
   {
     slug: "gift-set",
@@ -50,6 +53,11 @@ export const SHOP_CATEGORY_MENU: ShopCategoryMenuItem[] = [
     values: ["GIFT_SET"],
   },
 ];
+
+/** Categories shown in navbar, footer, and homepage tiles. */
+export const VISIBLE_SHOP_CATEGORY_MENU = SHOP_CATEGORY_MENU.filter(
+  (item) => !item.hidden
+);
 
 const SHOP_CATEGORY_SLUG_ALIASES: Record<string, string> = {
   "gift-sets": "gift-set",

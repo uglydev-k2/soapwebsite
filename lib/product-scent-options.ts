@@ -1,14 +1,22 @@
 import { prisma } from "@/lib/prisma";
 import type { ProductScentOptionFormData } from "@/lib/validations";
+import { notifyWaitlistIfRestocked } from "@/lib/stock-notify";
 
 export async function syncProductScentOptions(
   productId: string,
   options: ProductScentOptionFormData[]
 ) {
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+    select: { name: true, slug: true },
+  });
+  if (!product) return;
+
   const existing = await prisma.productScentOption.findMany({
     where: { productId },
-    select: { id: true },
+    select: { id: true, stock: true },
   });
+  const existingById = new Map(existing.map((row) => [row.id, row]));
   const existingIds = new Set(existing.map((row) => row.id));
   const keptIds = new Set<string>();
 
@@ -25,10 +33,21 @@ export async function syncProductScentOptions(
 
     if (option.id && existingIds.has(option.id)) {
       keptIds.add(option.id);
+      const before = existingById.get(option.id);
       await prisma.productScentOption.update({
         where: { id: option.id },
         data,
       });
+      if (before) {
+        await notifyWaitlistIfRestocked({
+          productSlug: product.slug,
+          productName: product.name,
+          previousStock: before.stock,
+          newStock: data.stock,
+          scentOptionId: option.id,
+          scentLabel: data.label,
+        });
+      }
       continue;
     }
 

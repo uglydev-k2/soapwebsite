@@ -2,8 +2,8 @@ import type { ProductWithMeta } from "@/types";
 
 /** Homepage featured order — hero bar soaps first, then gift set */
 export const FEATURED_PRODUCT_SLUGS = [
-  "lavender-sage",
-  "spearmint-eucalyptus",
+  "blush-rose-artisan-bar",
+  "botanical-swirl-bar",
   "oat-honey-comfort-bar",
   "full-ritual-gift-set",
 ] as const;

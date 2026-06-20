@@ -33,6 +33,8 @@ import {
   type SubscriptionCadence,
 } from "@/lib/subscriptions";
 import type { ShippingQuote } from "@/lib/shipping-calculator";
+import { PromoCodeField } from "@/components/marketing/PromoCodeField";
+import { FREE_SAMPLE_PROMO } from "@/lib/shipping";
 
 export default function CheckoutPageClient() {
   const router = useRouter();
@@ -47,6 +49,8 @@ export default function CheckoutPageClient() {
   const [purchaseType, setPurchaseType] = useState<PurchaseType>("one_time");
   const [subscriptionCadence, setSubscriptionCadence] =
     useState<SubscriptionCadence>("monthly");
+  const [promoDiscount, setPromoDiscount] = useState(0);
+  const [promoCode, setPromoCode] = useState<string | undefined>();
 
   useEffect(() => {
     if (searchParams.get("cancelled") === "true") {
@@ -64,9 +68,10 @@ export default function CheckoutPageClient() {
   }, []);
 
   const sub = subtotal();
-  const discountedSubtotal = applySubscriptionDiscount(sub, purchaseType);
+  const subAfterPromo = Math.max(0, Math.round((sub - promoDiscount) * 100) / 100);
+  const discountedSubtotal = applySubscriptionDiscount(subAfterPromo, purchaseType);
   const subscriptionSavings =
-    purchaseType === "subscription" ? sub - discountedSubtotal : 0;
+    purchaseType === "subscription" ? subAfterPromo - discountedSubtotal : 0;
 
   const {
     register,
@@ -181,6 +186,7 @@ export default function CheckoutPageClient() {
         purchaseType,
         subscriptionCadence:
           purchaseType === "subscription" ? subscriptionCadence : undefined,
+        promoCode,
         items: items.map((item) => ({
           productId: item.productId,
           scentOptionId: item.scentOptionId,
@@ -389,6 +395,17 @@ export default function CheckoutPageClient() {
                 </li>
               ))}
             </ul>
+            <PromoCodeField
+              subtotal={sub}
+              onApplied={(discount, code) => {
+                setPromoDiscount(discount);
+                setPromoCode(code);
+              }}
+              onClear={() => {
+                setPromoDiscount(0);
+                setPromoCode(undefined);
+              }}
+            />
             {shippingQuote && (
               <p className="mb-4 text-xs text-muted">
                 Est. {shippingQuote.weightOz} oz · {shippingQuote.method}
@@ -397,9 +414,15 @@ export default function CheckoutPageClient() {
             )}
             <div className="space-y-2 text-sm mb-6 border-t border-green/10 pt-4">
               <div className="flex justify-between">
-                <span className="text-muted">Subtotal</span>
-                <span>{formatPrice(totals.subtotal)}</span>
+                <span className="text-muted">Merchandise</span>
+                <span>{formatPrice(sub)}</span>
               </div>
+              {promoDiscount > 0 && (
+                <div className="flex justify-between text-terra">
+                  <span>Promo ({promoCode})</span>
+                  <span>-{formatPrice(promoDiscount)}</span>
+                </div>
+              )}
               {subscriptionSavings > 0 && (
                 <div className="flex justify-between text-terra">
                   <span>Subscription savings ({Math.round(SUBSCRIPTION_DISCOUNT_RATE * 100)}%)</span>
@@ -442,6 +465,7 @@ export default function CheckoutPageClient() {
                   : `Pay ${formatPrice(totals.total)}`}
             </Button>
             <p className="mt-3 text-xs text-muted text-center">
+              {FREE_SAMPLE_PROMO} ·{" "}
               {purchaseType === "subscription"
                 ? "Secure payment via Square · Recurring billing on your schedule"
                 : "Secure payment via Square · Ships via USPS"}

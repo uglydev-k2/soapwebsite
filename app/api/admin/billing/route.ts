@@ -12,6 +12,7 @@ import { logAdminAction } from "@/lib/audit";
 import { getClientIp } from "@/lib/rate-limit";
 import { getStripe } from "@/lib/stripe";
 import { getSquareClient, isSquareConfigured } from "@/lib/square";
+import { parseOrderNotes } from "@/lib/order-notes";
 import type { OrderStatus } from "@prisma/client";
 
 export const GET = withApiHandler("admin.billing", async () => {
@@ -63,17 +64,23 @@ export const GET = withApiHandler("admin.billing", async () => {
     : 0;
 
   return jsonResponse({
-    subscriptions: orders.map((o) => ({
-      id: o.id,
-      orderNumber: o.orderNumber,
-      customer: `${o.customer.firstName} ${o.customer.lastName}`,
-      email: o.customer.email,
-      status: o.status,
-      amount: o.total,
-      renewalDate: o.createdAt,
-      paymentId: o.paymentId,
-      items: o.items.length,
-    })),
+    subscriptions: orders.map((o) => {
+      const meta = parseOrderNotes(o.notes);
+      return {
+        id: o.id,
+        orderNumber: o.orderNumber,
+        customer: `${o.customer.firstName} ${o.customer.lastName}`,
+        email: o.customer.email,
+        status: o.status,
+        amount: o.total,
+        renewalDate: o.createdAt,
+        paymentId: o.paymentId,
+        items: o.items.length,
+        purchaseType: meta.purchaseType ?? "one_time",
+        subscriptionCadence: meta.subscriptionCadence,
+        subscriptionStatus: meta.subscriptionStatus,
+      };
+    }),
     metrics: {
       mrr,
       arr,

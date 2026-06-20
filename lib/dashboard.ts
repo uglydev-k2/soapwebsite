@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { safeDbQuery } from "@/lib/db";
 import { subDays, startOfDay } from "date-fns";
 import { getRecentActivity } from "@/lib/audit";
+import { countLowStockItems } from "@/lib/admin-inventory";
 
 const EMPTY = {
   kpis: {
@@ -82,7 +83,7 @@ async function fetchDashboardData() {
     prisma.order.count(),
     prisma.order.count({ where: { createdAt: { gte: weekStart } } }),
     prisma.product.count({ where: { active: true } }),
-    prisma.product.count({ where: { stock: { lt: 10 }, active: true } }),
+    countLowStockItems(),
     prisma.customer.count(),
     prisma.customer.count({
       where: {

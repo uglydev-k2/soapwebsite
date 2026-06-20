@@ -7,6 +7,7 @@ import { LOW_STOCK_THRESHOLD } from "@/lib/admin-inventory";
 import { saveOrderToSupabase } from "@/lib/supabase/orders";
 import type { ShippingAddress, ValidatedCartItem } from "@/lib/checkout";
 import { isDatabaseConfigured } from "@/lib/env";
+import { FREE_SAMPLE_PROMO } from "@/lib/shipping";
 import { getBundleLineTotal } from "@/lib/bundle-pricing";
 
 export type FulfillOrderInput = {
@@ -29,6 +30,8 @@ export type FulfillOrderInput = {
   subscriptionStatus?: "active" | "pending_setup";
   cartItems: ValidatedCartItem[];
   orderNumber?: string;
+  promoCode?: string;
+  promoDiscount?: number;
 };
 
 export type FulfillOrderResult = {
@@ -172,6 +175,10 @@ export async function fulfillOrder(
             squareSubscriptionId: input.squareSubscriptionId,
             squareCustomerId: input.squareCustomerId,
             subscriptionStatus: input.subscriptionStatus,
+            includeFreeSample: true,
+            fulfillmentNotes: FREE_SAMPLE_PROMO,
+            promoCode: input.promoCode,
+            promoDiscount: input.promoDiscount,
           }),
           items: { create: orderItems },
         },

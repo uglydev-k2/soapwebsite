@@ -5,6 +5,7 @@ import { productWithScentOptionsSchema } from "@/lib/validations";
 import { syncProductScentOptions } from "@/lib/product-scent-options";
 import { logAdminAction } from "@/lib/audit";
 import { getClientIp } from "@/lib/rate-limit";
+import { notifyWaitlistIfRestocked } from "@/lib/stock-notify";
 
 export async function GET(
   _request: NextRequest,
@@ -49,11 +50,25 @@ export async function PUT(
 
   const { scentOptions, ...productData } = parsed.data;
 
+  const before = await prisma.product.findUnique({
+    where: { id: params.id },
+    select: { stock: true, slug: true, name: true },
+  });
+
   const product = await prisma.product.update({
     where: { id: params.id },
     data: productData,
   });
   await syncProductScentOptions(params.id, scentOptions);
+
+  if (before && before.stock !== product.stock) {
+    await notifyWaitlistIfRestocked({
+      productSlug: product.slug,
+      productName: product.name,
+      previousStock: before.stock,
+      newStock: product.stock,
+    });
+  }
 
   await logAdminAction({
     adminId: session!.user!.id,

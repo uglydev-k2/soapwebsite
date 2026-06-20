@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { BRAND_SITE_URL } from "@/lib/brand";
-import { SHOP_CATEGORY_MENU } from "@/lib/categories";
+import { VISIBLE_SHOP_CATEGORY_MENU } from "@/lib/categories";
 import { JOURNAL_POSTS } from "@/lib/content/journal";
 import { getActiveProductSlugs } from "@/lib/products";
 
@@ -34,7 +34,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: path === "" ? 1 : 0.7,
   }));
 
-  const categoryEntries: MetadataRoute.Sitemap = SHOP_CATEGORY_MENU.map(
+  const categoryEntries: MetadataRoute.Sitemap = VISIBLE_SHOP_CATEGORY_MENU.map(
     (category) => ({
       url: `${base}/collections/category/${category.slug}`,
       lastModified: now,

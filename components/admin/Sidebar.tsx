@@ -58,6 +58,7 @@ const navSections: NavSection[] = [
       { label: "Products", href: "/admin/products", icon: Package, permission: "products:read" },
       { label: "Inventory", href: "/admin/inventory", icon: Boxes, permission: "products:read" },
       { label: "Content", href: "/admin/content", icon: FileText, permission: "content:read" },
+      { label: "Reviews", href: "/admin/reviews", icon: FileText, permission: "content:read" },
     ],
   },
   {
@@ -65,6 +66,7 @@ const navSections: NavSection[] = [
     items: [
       { label: "Orders", href: "/admin/orders", icon: ShoppingCart, permission: "orders:read" },
       { label: "Customers", href: "/admin/customers", icon: Users, permission: "customers:read" },
+      { label: "Promo Codes", href: "/admin/promo-codes", icon: CreditCard, permission: "settings:read" },
       { label: "Billing", href: "/admin/billing", icon: CreditCard, permission: "billing:read" },
     ],
   },

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUserProfile, getNavbarAuthUser } from "@/lib/profile";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { getInitials } from "@/lib/utils";
+import { AccountProfileForm } from "@/components/customer/AccountProfileForm";
 
 export const dynamic = "force-dynamic";
 
@@ -72,10 +73,10 @@ export default async function AccountPage() {
       )}
 
       <section id="settings" className="admin-card">
-        <h2 className="font-serif text-2xl text-green mb-4">Settings</h2>
-        <p className="text-sm text-muted mb-4">
-          Profile editing will be available soon. For now, manage your password
-          via{" "}
+        <h2 className="font-serif text-2xl text-green mb-4">Profile</h2>
+        <AccountProfileForm defaultName={displayName} />
+        <p className="text-sm text-muted mt-6">
+          To change your password, use{" "}
           <Link href="/forgot-password" className="text-terra hover:text-terra-2">
             password reset
           </Link>
@@ -83,7 +84,7 @@ export default async function AccountPage() {
         </p>
         <Link
           href="/dashboard"
-          className="text-sm text-terra hover:text-terra-2 transition-colors"
+          className="mt-4 inline-block text-sm text-terra hover:text-terra-2 transition-colors"
         >
           Back to dashboard
         </Link>

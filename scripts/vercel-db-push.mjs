@@ -29,6 +29,13 @@ const backfillVariantScript = join(
 );
 
 const scentOptionsSql = join(process.cwd(), "scripts", "add-product-scent-options.sql");
+const roadmapSql = join(process.cwd(), "scripts", "add-roadmap-tables.sql");
+
+if (existsSync(roadmapSql)) {
+  run(
+    "npx prisma db execute --file scripts/add-roadmap-tables.sql --schema prisma/schema.prisma"
+  );
+}
 
 if (existsSync(scentOptionsSql)) {
   run(

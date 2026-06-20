@@ -1,7 +1,8 @@
 export const CHAT_ASSISTANT_NAME = "Ritual Guide";
 
 /** Set to true to show the Ritual Guide chat widget on the storefront. */
-export const CHAT_WIDGET_ENABLED = false;
+export const CHAT_WIDGET_ENABLED =
+  process.env.NEXT_PUBLIC_CHAT_WIDGET_ENABLED === "true";
 
 export const CHAT_WELCOME =
   "Hello — I'm your Ritual Guide. I can help you find the perfect scent, compare products, answer shipping questions, and build a gift ritual. What are you looking for today?";

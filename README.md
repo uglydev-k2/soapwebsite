@@ -11,7 +11,7 @@ Premium botanical bath and body brand — production-ready Next.js 14 App Router
 - **NextAuth.js v5** (admin credentials)
 - **Zustand** (cart + toasts)
 - **React Hook Form + Zod**
-- **Recharts**, **UploadThing**, **Resend**, **Stripe**
+- **Recharts**, **UploadThing**, **Resend**, **Square**
 
 ## Quick Start
 
@@ -50,7 +50,7 @@ components/
   marketing/       # Hero, Navbar, ProductGrid, etc.
   admin/           # Sidebar, charts, forms, tables
   ui/              # Shared Button, Input, Modal, Toast
-lib/               # Auth, Prisma, Stripe, Resend, validations
+lib/               # Auth, Prisma, Square, Resend, validations
 prisma/            # Schema + seed data
 store/             # Zustand cart + toast stores
 ```
@@ -64,9 +64,13 @@ See `.env.example` for all required variables.
 | `DATABASE_URL` | PostgreSQL connection string |
 | `NEXTAUTH_SECRET` / `AUTH_SECRET` | Session encryption |
 | `NEXTAUTH_URL` | App URL for auth callbacks |
-| `STRIPE_*` | Checkout + webhooks |
-| `UPLOADTHING_*` | Product image uploads |
+| `SQUARE_*` | Checkout + subscriptions |
+| `NEXT_PUBLIC_SUPABASE_*` | Customer accounts + order history |
+| `UPLOADTHING_TOKEN` | Admin product image uploads |
 | `RESEND_*` | Transactional email |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Optional GA4 analytics |
+| `NEXT_PUBLIC_CHAT_WIDGET_ENABLED` | Ritual Guide chat (`true` + `OPENAI_API_KEY`) |
+| `SQUARE_SUBSCRIPTION_PLAN_*` | Square subscription plan variation IDs |
 
 ## Database
 
@@ -76,13 +80,16 @@ npm run db:seed      # Seed products, orders, admin user
 npm run db:studio    # Prisma Studio GUI
 ```
 
-Seed includes 6 products, 20 orders, 5 customers, and admin `mvlusciouslather@gmail.com`.
+Seed includes sample products, orders, customers, and admin `mvlusciouslather@gmail.com`.
 
-## Stripe Webhooks (local)
+## Production checklist
 
-```bash
-stripe listen --forward-to localhost:3000/api/stripe/webhook
-```
+1. Set all required env vars in `.env.example` (DATABASE_URL, AUTH_SECRET, NEXTAUTH_URL)
+2. Configure Square (`SQUARE_*`, `NEXT_PUBLIC_SQUARE_*`) for checkout
+3. Add Square subscription plan IDs if offering subscribe & save
+4. Set `RESEND_API_KEY` + `RESEND_FROM_EMAIL` for order emails
+5. Optional: `NEXT_PUBLIC_GA_MEASUREMENT_ID`, `NEXT_PUBLIC_CHAT_WIDGET_ENABLED=true` + `OPENAI_API_KEY`
+6. Run `npm run db:push` after schema updates
 
 ## Deploy (Vercel)
 
@@ -96,7 +103,6 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
    - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
 4. Redeploy — Vercel build auto-runs `prisma db push` when `DATABASE_URL` is set
 5. Seed once locally: fill `.env.local`, then `npm run db:setup`
-6. Configure Stripe webhook: `https://your-domain.com/api/stripe/webhook`
 
 If you see **Application error** on the homepage, `DATABASE_URL` is usually missing or the DB is unreachable. Check Vercel → Project → Settings → Environment Variables.
 
@@ -105,14 +111,19 @@ If you see **Application error** on the homepage, `DATABASE_URL` is usually miss
 ### Marketing Site
 - Hero with botanical SVG animation
 - Featured products from database
-- Fragrance profiles, ritual philosophy, testimonials
+- Fragrance profiles, ritual philosophy, customer reviews (moderated)
+- Back-in-stock waitlist with email alerts
+- Promo codes at checkout
 - Newsletter signup (saves to DB + Resend welcome email)
-- Cart with Stripe Checkout
+- Cart with Square embedded checkout + optional subscriptions
 
 ### Admin Dashboard
 - KPI overview with live revenue charts
 - Product CRUD with image upload
-- Order management with status updates
+- Order management with status updates, tracking emails, free-sample fulfillment notes
 - Customer list with slide-over detail
+- Review moderation and promo code management
+- Low-stock alerts (products + scent variants)
+- Pending subscription setup alerts when Square plans are missing
 - Analytics with date range filters
 - Store settings, password change, admin invites

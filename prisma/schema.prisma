@@ -194,6 +194,57 @@ model AdminPushSubscription {
   @@schema("public")
 }
 
+model StockNotifyRequest {
+  id            String    @id @default(cuid())
+  email         String
+  productSlug   String
+  productName   String
+  scentOptionId String?
+  scentLabel    String?
+  notifiedAt    DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@index([productSlug, notifiedAt])
+  @@index([email])
+  @@schema("public")
+}
+
+model ProductReview {
+  id          String           @id @default(cuid())
+  productSlug String
+  authorName  String
+  title       String
+  body        String
+  rating      Int
+  status      ModerationStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+
+  @@index([productSlug, status])
+  @@schema("public")
+}
+
+model PromoCode {
+  id            String            @id @default(cuid())
+  code          String            @unique
+  discountType  PromoDiscountType
+  discountValue Float
+  minSubtotal   Float?
+  active        Boolean           @default(true)
+  expiresAt     DateTime?
+  maxUses       Int?
+  usedCount     Int               @default(0)
+  createdAt     DateTime          @default(now())
+
+  @@schema("public")
+}
+
+enum PromoDiscountType {
+  PERCENT
+  FIXED
+
+  @@schema("public")
+}
+
 enum Category {
   BAR_SOAP
   BATH_BODY

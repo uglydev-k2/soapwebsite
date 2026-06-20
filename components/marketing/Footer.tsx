@@ -1,12 +1,12 @@
 import Link from "next/link";
 
 import { BrandLogo } from "@/components/BrandLogo";
-import { SHOP_CATEGORY_MENU } from "@/lib/categories";
+import { VISIBLE_SHOP_CATEGORY_MENU } from "@/lib/categories";
 import { SOCIAL_HANDLE, SOCIAL_PROFILES, socialProfileLabel } from "@/lib/social";
 
 const shopLinks = [
   { label: "All Products", href: "/collections" },
-  ...SHOP_CATEGORY_MENU.map((c) => ({
+  ...VISIBLE_SHOP_CATEGORY_MENU.map((c) => ({
     label: c.label,
     href: `/collections/category/${c.slug}`,
   })),
