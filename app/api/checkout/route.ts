@@ -89,7 +89,7 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
 
   const shippingQuote = applyFreeShippingIfEligible(
     await calculateCheckoutShipping(validatedItems, shippingAddress),
-    subtotal,
+    subtotalAfterPromo,
     settings.freeShippingThreshold,
     parsed.data.country
   );

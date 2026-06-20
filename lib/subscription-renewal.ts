@@ -12,6 +12,13 @@ import {
   parseSubscriptionCartSnapshot,
   type SubscriptionCartSnapshot,
 } from "@/lib/subscription-cart";
+import { getBundleLineTotal } from "@/lib/bundle-pricing";
+import {
+  applyFreeShippingIfEligible,
+  calculateCheckoutShipping,
+  calculateOrderTotals,
+  getCheckoutSettings,
+} from "@/lib/checkout";
 import { generateOrderNumber } from "@/lib/utils";
 import type { ShippingAddress, ValidatedCartItem } from "@/lib/checkout";
 import type { Customer, CustomerSubscription } from "@prisma/client";
@@ -145,13 +152,51 @@ async function getSubscriptionShippingAddress(
   return parseOrderNotes(recentOrder?.notes).shippingAddress ?? null;
 }
 
+async function resolveRenewalTotals(input: {
+  cartItems: ValidatedCartItem[];
+  shippingAddress: ShippingAddress;
+  snapshot: SubscriptionCartSnapshot;
+}) {
+  const settings = await getCheckoutSettings();
+  const merchandiseSubtotal = input.snapshot.items.reduce(
+    (sum, item) => sum + getBundleLineTotal(item.price, item.quantity),
+    0
+  );
+
+  let quote = await calculateCheckoutShipping(
+    input.cartItems,
+    input.shippingAddress
+  );
+  quote = applyFreeShippingIfEligible(
+    quote,
+    merchandiseSubtotal,
+    settings.freeShippingThreshold,
+    input.shippingAddress.country
+  );
+
+  const subtotal = input.snapshot.totals.subtotal;
+  const orderTotals = calculateOrderTotals(subtotal, settings, quote.shipping);
+
+  return {
+    subtotal: orderTotals.subtotal,
+    shipping: orderTotals.shipping,
+    tax: orderTotals.tax,
+    total: orderTotals.total,
+  };
+}
+
 async function chargeSubscriptionRenewal(input: {
   subscription: CustomerSubscription & { customer: Customer };
   cartItems: ValidatedCartItem[];
   shippingAddress: ShippingAddress;
-  totals: SubscriptionCartSnapshot["totals"];
+  snapshot: SubscriptionCartSnapshot;
 }): Promise<SubscriptionChargeResult> {
-  const { subscription, cartItems, shippingAddress, totals } = input;
+  const { subscription, cartItems, shippingAddress, snapshot } = input;
+  const totals = await resolveRenewalTotals({
+    cartItems,
+    shippingAddress,
+    snapshot,
+  });
   const orderNumber = generateOrderNumber();
   const idempotencyKey = `renewal-${subscription.id}-${subscription.nextChargeAt.toISOString()}`;
   const amountCents = BigInt(Math.round(totals.total * 100));
@@ -321,7 +366,7 @@ export async function processDueSubscriptionCharges(
       subscription,
       cartItems,
       shippingAddress,
-      totals: snapshot.totals,
+      snapshot,
     });
 
     summary.results.push(result);

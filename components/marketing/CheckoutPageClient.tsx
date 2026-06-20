@@ -123,7 +123,7 @@ export default function CheckoutPageClient() {
               quantity: item.quantity,
               price: item.price,
             })),
-            subtotal: discountedSubtotal,
+            subtotal: subAfterPromo,
             country: watchedCountry,
             state: watchedState,
             postalCode: watchedPostal,
@@ -141,7 +141,7 @@ export default function CheckoutPageClient() {
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [items, discountedSubtotal, watchedCountry, watchedState, watchedPostal]);
+  }, [items, subAfterPromo, watchedCountry, watchedState, watchedPostal]);
 
   const totals = useMemo(
     () => calculateCartTotals(discountedSubtotal, shippingQuote?.shipping),

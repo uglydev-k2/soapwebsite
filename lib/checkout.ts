@@ -91,12 +91,12 @@ export async function calculateCheckoutShipping(
 
 export function applyFreeShippingIfEligible(
   quote: ShippingQuote,
-  subtotal: number,
+  merchandiseSubtotal: number,
   threshold: number,
   country: string
 ): ShippingQuote {
   const countryCode = getCountryCode(country);
-  if (!isUsCountry(countryCode) || subtotal < threshold) {
+  if (!isUsCountry(countryCode) || merchandiseSubtotal < threshold) {
     return quote;
   }
   return {
