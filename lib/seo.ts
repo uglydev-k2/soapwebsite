@@ -43,6 +43,14 @@ export const rootMetadata: Metadata = {
   alternates: {
     canonical: BRAND_SITE_URL,
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.png", type: "image/png", sizes: "32x32" },
+    ],
+    apple: "/apple-icon.png",
+    shortcut: "/favicon.ico",
+  },
 };
 
 export function buildProductMetadata(product: Product): Metadata {
