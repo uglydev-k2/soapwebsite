@@ -1,8 +1,13 @@
 import Link from "next/link";
 import { MarketingPage } from "@/components/marketing/MarketingPage";
 import { GIFT_GUIDE_SECTIONS } from "@/lib/content/site-content";
+import { brandTitle } from "@/lib/brand";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata = { title: "Gift Guide — mvlusciouslather" };
+export const metadata = buildPageMetadata("/gift-guide", {
+  title: brandTitle("Gift Guide"),
+  description: "Curated botanical rituals for every person and every moment.",
+});
 
 export default function GiftGuidePage() {
   return (

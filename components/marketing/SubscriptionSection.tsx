@@ -16,9 +16,10 @@ const plans = SUBSCRIPTION_CADENCES.map((cadence) => ({
 
 export default function SubscriptionSection() {
   return (
-    <section className="bg-white py-20 lg:py-24">
+    <section className="bg-lavender-light py-20 lg:py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <AnimatedSectionHeader
+          accent="lavender"
           eyebrow="Save with Subscriptions"
           title="Build Your Ritual, Automatically"
           description="Choose a cadence that fits your lifestyle — 10% off every subscription box at checkout."
@@ -26,13 +27,16 @@ export default function SubscriptionSection() {
         <StaggerContainer className="mt-12 grid gap-4 lg:grid-cols-3">
           {plans.map((plan) => (
             <StaggerItem key={plan.title}>
-              <article className="h-full border border-green/10 bg-cream p-8" style={{ borderRadius: "2px" }}>
-                <p className="label-caps text-terra">{plan.cadence}</p>
+              <article
+                className="lavender-card-accent h-full p-8 transition-shadow duration-250 hover:shadow-md"
+                style={{ borderRadius: "2px" }}
+              >
+                <p className="label-caps text-lavender-3">{plan.cadence}</p>
                 <h3 className="mt-3 font-serif text-3xl text-green">{plan.title}</h3>
-                <p className="mt-3 text-sm text-muted">{plan.perks}</p>
+                <p className="mt-3 text-sm text-text/85">{plan.perks}</p>
                 <Link
                   href={plan.href}
-                  className="mt-8 inline-flex items-center justify-center bg-terra px-6 py-3 text-xs label-caps text-white transition-colors duration-250 hover:bg-terra-2"
+                  className="mt-8 inline-flex items-center justify-center bg-lavender-3 px-6 py-3 text-xs label-caps text-white transition-colors duration-250 hover:bg-lavender"
                   style={{ borderRadius: 0 }}
                 >
                   Shop & Subscribe
@@ -41,7 +45,7 @@ export default function SubscriptionSection() {
             </StaggerItem>
           ))}
         </StaggerContainer>
-        <p className="mt-8 text-center text-sm text-muted">
+        <p className="mt-8 text-center text-sm text-text/80">
           Add any products to cart, then choose <strong>Subscribe</strong> at checkout.
         </p>
       </div>

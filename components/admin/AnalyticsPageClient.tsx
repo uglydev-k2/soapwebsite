@@ -6,13 +6,16 @@ import {
   type AnalyticsData,
 } from "@/components/admin/AnalyticsCharts";
 import { ProductSkuTable } from "@/components/admin/ProductSkuTable";
+import { TrafficCharts } from "@/components/admin/TrafficCharts";
 import type { ProductSkuMetric } from "@/lib/admin-analytics";
+import type { TrafficAnalytics } from "@/lib/visitors";
 import { Skeleton } from "@/components/ui/Skeleton";
 
 type AnalyticsPayload = AnalyticsData & {
   productSkus?: ProductSkuMetric[];
   totalRevenue?: number;
   totalOrders?: number;
+  traffic?: TrafficAnalytics;
 };
 
 export default function AnalyticsPageClient() {
@@ -80,6 +83,14 @@ export default function AnalyticsPageClient() {
                   </p>
                 </div>
               )}
+            </div>
+          )}
+          {data.traffic && (
+            <div className="mb-8">
+              <h2 className="mb-4 font-serif text-xl text-green">
+                Storefront Traffic
+              </h2>
+              <TrafficCharts traffic={data.traffic} />
             </div>
           )}
           <AnalyticsCharts data={data} />

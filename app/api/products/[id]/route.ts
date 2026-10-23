@@ -39,7 +39,7 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { session, error } = await requireAdmin();
+  const { session, error } = await requireAdmin("products:write");
   if (error) return error;
 
   const body = await request.json();
@@ -88,13 +88,22 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { session, error } = await requireAdmin();
+  const { session, error } = await requireAdmin("products:write");
   if (error) return error;
 
   const body = await request.json();
+  const allowedFields = ["active", "featured", "stock", "price", "comparePrice"] as const;
+  const patch: Record<string, unknown> = {};
+  for (const field of allowedFields) {
+    if (field in body) patch[field] = body[field];
+  }
+  if (!Object.keys(patch).length) {
+    return errorResponse("No valid fields to update");
+  }
+
   const product = await prisma.product.update({
     where: { id: params.id },
-    data: body,
+    data: patch,
   });
 
   await logAdminAction({
@@ -115,7 +124,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { session, error } = await requireAdmin();
+  const { session, error } = await requireAdmin("products:delete");
   if (error) return error;
 
   const { searchParams } = request.nextUrl;

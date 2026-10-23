@@ -4,6 +4,7 @@ export type DashboardPermissions = {
   viewRevenueKpis: boolean;
   viewOrdersKpis: boolean;
   viewCustomersKpis: boolean;
+  viewVisitors: boolean;
   viewFulfillment: boolean;
   viewOps: boolean;
   viewSystemHealth: boolean;
@@ -24,6 +25,7 @@ export function getDashboardPermissions(
       hasPermission(role, "billing:read"),
     viewOrdersKpis: hasPermission(role, "orders:read"),
     viewCustomersKpis: hasPermission(role, "customers:read"),
+    viewVisitors: hasPermission(role, "dashboard:read"),
     viewFulfillment: hasPermission(role, "orders:read"),
     viewOps:
       hasPermission(role, "orders:read") ||

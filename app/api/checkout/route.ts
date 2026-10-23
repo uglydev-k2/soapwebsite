@@ -31,10 +31,18 @@ import {
   createSquareCustomer,
 } from "@/lib/square-subscription";
 import { createCustomerSubscription } from "@/lib/customer-subscriptions";
+import { getCheckoutBlockReason } from "@/lib/checkout-guards";
+import { FulfillOrderError } from "@/lib/fulfill-order";
+import { isDatabaseConfigured } from "@/lib/env";
 
 export const POST = withApiHandler("checkout.create", async (request: NextRequest) => {
   if (!isSquareConfigured()) {
     return errorResponse("Square payments are not configured", 503);
+  }
+
+  const checkoutBlockReason = await getCheckoutBlockReason();
+  if (checkoutBlockReason) {
+    return errorResponse(checkoutBlockReason, 503);
   }
 
   const body = await request.json();
@@ -114,7 +122,7 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
 
   let squareCustomerId: string | undefined;
   let subscriptionStatus: "active" | undefined;
-  let paymentSourceId = parsed.data.sourceId;
+  const paymentSourceId = parsed.data.sourceId;
   let savedCardId: string | undefined;
 
   if (purchaseType === "subscription") {
@@ -129,17 +137,10 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
         lastName: parsed.data.lastName,
         phone: parsed.data.phone,
       });
-
-      savedCardId = await createSquareCardOnFile({
-        customerId: squareCustomerId,
-        sourceId: parsed.data.sourceId,
-        idempotencyKey: randomUUID(),
-      });
-      paymentSourceId = savedCardId;
     } catch (error) {
-      console.error("[msvee:checkout] Subscription card setup failed:", error);
+      console.error("[msvee:checkout] Square customer setup failed:", error);
       return errorResponse(
-        "We could not save your card for subscription billing. Please try again or choose a one-time purchase.",
+        "We could not set up subscription billing. Please try again or choose a one-time purchase.",
         402
       );
     }
@@ -181,36 +182,76 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
     );
   }
 
+  if (purchaseType === "subscription" && squareCustomerId) {
+    try {
+      savedCardId = await createSquareCardOnFile({
+        customerId: squareCustomerId,
+        sourceId: payment.id,
+        idempotencyKey: randomUUID(),
+      });
+    } catch (error) {
+      console.error(
+        "[msvee:checkout] Card-on-file save failed after payment:",
+        error
+      );
+    }
+  }
+
   if (purchaseType === "subscription" && subscriptionCadence && squareCustomerId && savedCardId) {
     subscriptionStatus = "active";
   }
 
-  const result = await fulfillOrder({
-    orderNumber,
-    email: parsed.data.email,
-    firstName: parsed.data.firstName,
-    lastName: parsed.data.lastName,
-    phone: parsed.data.phone,
-    userId: supabaseUserId,
-    shippingAddress,
-    subtotal: totals.subtotal,
-    shipping: totals.shipping,
-    tax: totals.tax,
-    total: totals.total,
-    paymentId: payment.id,
-    paymentProvider: "square",
-    purchaseType,
-    subscriptionCadence,
-    squareCustomerId,
-    subscriptionStatus,
-    promoCode: promoCodeApplied,
-    promoDiscount: promoDiscount > 0 ? promoDiscount : undefined,
-    cartItems: validatedItems,
-  });
+  let result;
+  try {
+    result = await fulfillOrder({
+      orderNumber,
+      email: parsed.data.email,
+      firstName: parsed.data.firstName,
+      lastName: parsed.data.lastName,
+      phone: parsed.data.phone,
+      userId: supabaseUserId,
+      shippingAddress,
+      subtotal: totals.subtotal,
+      shipping: totals.shipping,
+      tax: totals.tax,
+      total: totals.total,
+      paymentId: payment.id,
+      paymentProvider: "square",
+      purchaseType,
+      subscriptionCadence,
+      squareCustomerId,
+      subscriptionStatus,
+      promoCode: promoCodeApplied,
+      promoDiscount: promoDiscount > 0 ? promoDiscount : undefined,
+      cartItems: validatedItems,
+    });
+  } catch (error) {
+    console.error("[msvee:checkout] Fulfillment failed after payment:", error);
+    return errorResponse(
+      error instanceof FulfillOrderError
+        ? "Your payment was received but we could not save your order. Please contact us with your email and we will resolve this promptly."
+        : "Your payment was received but order processing failed. Please contact support.",
+      500
+    );
+  }
+
+  if (isDatabaseConfigured() && !result.orderId) {
+    console.error(
+      "[msvee:checkout] Payment succeeded without order record:",
+      payment.id
+    );
+    return errorResponse(
+      "Your payment was received but we could not save your order. Please contact us with your email and we will resolve this promptly.",
+      500
+    );
+  }
 
   if (promoCodeApplied) {
     await redeemPromoCode(promoCodeApplied);
   }
+
+  let subscriptionSetupFailed =
+    purchaseType === "subscription" && Boolean(squareCustomerId) && !savedCardId;
 
   if (
     purchaseType === "subscription" &&
@@ -220,19 +261,27 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
     result.customerId &&
     result.orderId
   ) {
-    await createCustomerSubscription({
-      customerId: result.customerId,
-      cadence: subscriptionCadence,
-      squareCustomerId,
-      squareCardId: savedCardId,
-      sourceOrderId: result.orderId,
-      sourceOrderNumber: result.orderNumber,
-      items: validatedItems,
-      subtotal: totals.subtotal,
-      shipping: totals.shipping,
-      tax: totals.tax,
-      total: totals.total,
-    });
+    try {
+      await createCustomerSubscription({
+        customerId: result.customerId,
+        cadence: subscriptionCadence,
+        squareCustomerId,
+        squareCardId: savedCardId,
+        sourceOrderId: result.orderId,
+        sourceOrderNumber: result.orderNumber,
+        items: validatedItems,
+        subtotal: totals.subtotal,
+        shipping: totals.shipping,
+        tax: totals.tax,
+        total: totals.total,
+      });
+    } catch (error) {
+      subscriptionSetupFailed = true;
+      console.error(
+        "[msvee:checkout] Subscription profile failed after order:",
+        error
+      );
+    }
   }
 
   return jsonResponse({
@@ -241,6 +290,7 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
     orderId: result.orderId,
     purchaseType,
     subscriptionCadence,
-    subscriptionStatus,
+    subscriptionStatus: subscriptionSetupFailed ? undefined : subscriptionStatus,
+    subscriptionSetupFailed,
   });
 });

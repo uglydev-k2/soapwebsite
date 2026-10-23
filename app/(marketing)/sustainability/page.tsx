@@ -1,7 +1,13 @@
 import { MarketingPage } from "@/components/marketing/MarketingPage";
 import { SUSTAINABILITY_POINTS } from "@/lib/content/ingredients";
+import { brandTitle } from "@/lib/brand";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata = { title: "Sustainability — mvlusciouslather" };
+export const metadata = buildPageMetadata("/sustainability", {
+  title: brandTitle("Sustainability"),
+  description:
+    "How we source, produce, and package with the planet and your skin in mind.",
+});
 
 export default function SustainabilityPage() {
   return (

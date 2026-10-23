@@ -2,8 +2,8 @@
 export const US_COUNTRY = "United States";
 export const US_COUNTRY_CODE = "US";
 export const FLAT_SHIPPING_RATE = 8;
-export const FREE_SHIPPING_THRESHOLD = 75;
-export const FREE_SHIPPING_PROMO = "Free shipping on $75+ orders";
+export const FREE_SHIPPING_THRESHOLD = 65;
+export const FREE_SHIPPING_PROMO = "Free shipping on $65+ orders";
 export const FREE_SAMPLE_PROMO = "Free sample every order";
 export const TAX_RATE = 0.08;
 

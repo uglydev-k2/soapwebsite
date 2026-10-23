@@ -10,6 +10,9 @@ import {
 import { socialProfileUrls } from "@/lib/social";
 const DEFAULT_OG_IMAGE = `${BRAND_SITE_URL}/images/mv-luscious-lather-logo.jpg`;
 
+export const DEFAULT_SITE_DESCRIPTION =
+  "Artisanal botanical bath and body care handcrafted in small batches. Soaps, scrubs, candles, and gift sets — where ritual meets luxury.";
+
 export function absoluteUrl(path: string): string {
   if (!path) return DEFAULT_OG_IMAGE;
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
@@ -22,8 +25,7 @@ export const rootMetadata: Metadata = {
     default: brandTitle(),
     template: `%s — ${BRAND_DISPLAY_NAME}`,
   },
-  description:
-    "Artisanal botanical bath and body care handcrafted in small batches. Soaps, scrubs, candles, and gift sets — where ritual meets luxury.",
+  description: DEFAULT_SITE_DESCRIPTION,
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -40,9 +42,6 @@ export const rootMetadata: Metadata = {
     description: BRAND_TAGLINE,
     images: [DEFAULT_OG_IMAGE],
   },
-  alternates: {
-    canonical: BRAND_SITE_URL,
-  },
   icons: {
     icon: [
       { url: "/favicon.ico?v=2", sizes: "48x48" },
@@ -52,6 +51,30 @@ export const rootMetadata: Metadata = {
     shortcut: "/favicon.ico?v=2",
   },
 };
+
+export function buildPageMetadata(
+  path: string,
+  options: {
+    title: string;
+    description?: string;
+    robots?: Metadata["robots"];
+  }
+): Metadata {
+  const url = absoluteUrl(path);
+  const description = options.description;
+
+  return {
+    title: options.title,
+    ...(description ? { description } : {}),
+    alternates: { canonical: url },
+    openGraph: {
+      url,
+      title: options.title,
+      ...(description ? { description } : {}),
+    },
+    ...(options.robots ? { robots: options.robots } : {}),
+  };
+}
 
 export function buildProductMetadata(product: Product): Metadata {
   const description =

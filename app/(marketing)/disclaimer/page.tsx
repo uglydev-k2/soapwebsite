@@ -1,8 +1,13 @@
 import Link from "next/link";
 import { MarketingPage } from "@/components/marketing/MarketingPage";
 import { PRODUCT_DISCLAIMER_SECTIONS } from "@/lib/content/disclaimer";
+import { brandTitle } from "@/lib/brand";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata = { title: "Product Disclaimer — mvlusciouslather" };
+export const metadata = buildPageMetadata("/disclaimer", {
+  title: brandTitle("Product Disclaimer"),
+  description: "Please read before purchasing or using MV Luscious Lather products.",
+});
 
 export default function DisclaimerPage() {
   return (

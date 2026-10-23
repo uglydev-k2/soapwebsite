@@ -20,24 +20,24 @@ export function RitualStepCard({
   return (
     <motion.article
       className={cn(
-        "group border border-green/15 bg-white p-8",
-        "transition-colors duration-300 hover:border-terra/35 hover:bg-cream"
+        "lavender-card-accent group p-8",
+        "transition-all duration-300 hover:border-lavender/30 hover:bg-lavender-light/40"
       )}
       style={{ borderRadius: "2px" }}
       whileHover={reduced ? undefined : { x: 6 }}
       transition={{ duration: 0.35, ease: EASE_OUT }}
     >
       <motion.span
-        className="label-caps text-terra"
+        className="label-caps text-lavender-3"
         whileHover={reduced ? undefined : { scale: 1.08 }}
         transition={{ duration: 0.25 }}
       >
         {number}
       </motion.span>
-      <h3 className="mt-3 font-serif text-2xl text-green transition-colors duration-250 group-hover:text-terra">
+      <h3 className="mt-3 font-serif text-2xl text-green transition-colors duration-250 group-hover:text-lavender-3">
         {title}
       </h3>
-      <p className="mt-3 text-sm leading-relaxed text-muted">{description}</p>
+      <p className="mt-3 text-sm leading-relaxed text-text/85">{description}</p>
     </motion.article>
   );
 }

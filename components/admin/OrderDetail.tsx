@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useState } from "react";
-import { Mail, PackageCheck, Printer } from "lucide-react";
+import { Mail, PackageCheck, Printer, Truck } from "lucide-react";
 import type { Customer, Order, OrderItem, OrderStatus, Product } from "@prisma/client";
 import {
   cn,
@@ -13,7 +13,7 @@ import {
   statusColors,
 } from "@/lib/utils";
 import { useToastStore } from "@/store/toastStore";
-import { parseOrderNotes } from "@/lib/order-notes";
+import { parseOrderNotes, formatShippingAddressBlock } from "@/lib/order-notes";
 import { getCadenceLabel } from "@/lib/subscriptions";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -51,11 +51,19 @@ function getTimelineIndex(status: OrderStatus, hasStripe: boolean): number {
 
 interface OrderDetailProps {
   order: OrderDetailData;
+  packageWeightOz?: number;
+  packageBillingTier?: string;
   onUpdate?: (order: OrderDetailData) => void;
   className?: string;
 }
 
-export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderDetailProps) {
+export function OrderDetail({
+  order: initialOrder,
+  packageWeightOz,
+  packageBillingTier,
+  onUpdate,
+  className,
+}: OrderDetailProps) {
   const addToast = useToastStore((s) => s.addToast);
   const orderMeta = parseOrderNotes(initialOrder.notes);
   const [order, setOrder] = useState(initialOrder);
@@ -66,6 +74,8 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
   const [emailSending, setEmailSending] = useState<"tracking" | "delivered" | null>(
     null
   );
+  const [labelLoading, setLabelLoading] = useState(false);
+  const [labelUrl, setLabelUrl] = useState(orderMeta.labelUrl ?? "");
 
   const timelineIndex = getTimelineIndex(order.status, !!order.paymentId);
 
@@ -125,6 +135,60 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
   const handlePrint = () => {
     window.print();
   };
+
+  const handleCreateLabel = async () => {
+    setLabelLoading(true);
+    try {
+      const res = await fetch(`/api/orders/${order.id}/label`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ markShipped: true, sendEmail: true }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        addToast(json.error ?? "Failed to create shipping label", "error");
+        return;
+      }
+
+      const data = json.data as {
+        labelUrl: string;
+        trackingNumber: string;
+        status?: OrderStatus;
+        alreadyExists?: boolean;
+      };
+
+      setLabelUrl(data.labelUrl);
+      setTrackingNumber(data.trackingNumber);
+      if (data.status) {
+        setStatus(data.status);
+        setOrder((current) => ({ ...current, status: data.status! }));
+      }
+
+      window.open(data.labelUrl, "_blank", "noopener,noreferrer");
+      addToast(
+        data.alreadyExists
+          ? "Opened existing shipping label"
+          : "Shipping label created and order marked shipped"
+      );
+    } catch {
+      addToast("Failed to create shipping label", "error");
+    } finally {
+      setLabelLoading(false);
+    }
+  };
+
+  const handlePrintLabel = () => {
+    if (!labelUrl) return;
+    window.open(labelUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const shippingAddress = orderMeta.shippingAddress;
+  const shippingAddressLines = shippingAddress
+    ? formatShippingAddressBlock(
+        shippingAddress,
+        `${order.customer.firstName} ${order.customer.lastName}`.trim()
+      )
+    : [];
 
   const handleSendTracking = async () => {
     setEmailSending("tracking");
@@ -233,8 +297,8 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="admin-card lg:col-span-1">
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="admin-card">
           <h3 className="label-caps mb-4 text-muted">Customer</h3>
           <p className="font-serif text-xl text-green">
             {order.customer.firstName} {order.customer.lastName}
@@ -251,7 +315,37 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
           </Link>
         </div>
 
-        <div className="admin-card lg:col-span-2">
+        <div className="admin-card">
+          <h3 className="label-caps mb-4 text-muted">Ship To</h3>
+          {shippingAddressLines.length > 0 ? (
+            <address className="not-italic text-sm leading-relaxed text-green">
+              {shippingAddressLines.map((line) => (
+                <p key={line}>{line}</p>
+              ))}
+            </address>
+          ) : (
+            <p className="text-sm text-muted">No shipping address saved on this order.</p>
+          )}
+          {(orderMeta.shippingWeightOz || packageWeightOz) && (
+            <p className="mt-4 text-sm text-muted">
+              Package weight:{" "}
+              <span className="text-green">
+                {(orderMeta.shippingWeightOz ?? packageWeightOz)?.toFixed(1)} oz
+              </span>
+              {(orderMeta.shippingBillingTier ?? packageBillingTier)
+                ? ` · USPS tier ${orderMeta.shippingBillingTier ?? packageBillingTier}`
+                : ""}
+            </p>
+          )}
+          {orderMeta.shippingService && (
+            <p className="mt-2 text-sm text-muted">
+              Service: <span className="text-green">{orderMeta.shippingService}</span>
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className="admin-card">
           <h3 className="label-caps mb-4 text-muted">Order Items</h3>
 
           <ul className="flex flex-col gap-3 lg:hidden">
@@ -363,7 +457,6 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
               </dd>
             </div>
           </dl>
-        </div>
       </div>
 
       <div className="admin-card">
@@ -438,6 +531,28 @@ export function OrderDetail({ order: initialOrder, onUpdate, className }: OrderD
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap print:hidden">
+        {shippingAddressLines.length > 0 && (
+          labelUrl ? (
+            <Button
+              type="button"
+              onClick={handlePrintLabel}
+              className="w-full gap-2 sm:w-auto"
+            >
+              <Truck size={16} />
+              Print Shipping Label
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              onClick={handleCreateLabel}
+              disabled={labelLoading}
+              className="w-full gap-2 sm:w-auto"
+            >
+              <Truck size={16} />
+              {labelLoading ? "Creating label…" : "Create Shipping Label"}
+            </Button>
+          )
+        )}
         <Button type="button" variant="outline" onClick={handlePrint} className="w-full gap-2 sm:w-auto">
           <Printer size={16} />
           Print Invoice

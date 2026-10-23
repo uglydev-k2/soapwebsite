@@ -4,8 +4,13 @@ import { getSupabaseAdminRole } from "@/lib/admin-auth";
 import { isSupabaseConfigured } from "./env";
 import type { AdminRole } from "@/lib/rbac";
 
-export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
+export async function updateSession(
+  request: NextRequest,
+  requestHeaders: Headers
+) {
+  let supabaseResponse = NextResponse.next({
+    request: { headers: requestHeaders },
+  });
 
   if (!isSupabaseConfigured()) {
     return { supabaseResponse, user: null, adminRole: null as AdminRole | null };
@@ -24,7 +29,9 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) => {
             request.cookies.set(name, value);
           });
-          supabaseResponse = NextResponse.next({ request });
+          supabaseResponse = NextResponse.next({
+            request: { headers: requestHeaders },
+          });
           cookiesToSet.forEach(({ name, value, options }) => {
             supabaseResponse.cookies.set(name, value, options);
           });
@@ -50,7 +57,9 @@ export async function updateSession(request: NextRequest) {
   } catch (error) {
     console.error("[middleware] Supabase session update failed:", error);
     return {
-      supabaseResponse: NextResponse.next({ request }),
+      supabaseResponse: NextResponse.next({
+        request: { headers: requestHeaders },
+      }),
       user: null,
       adminRole: null as AdminRole | null,
     };

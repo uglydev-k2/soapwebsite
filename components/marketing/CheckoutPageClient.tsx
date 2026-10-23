@@ -35,6 +35,8 @@ import {
 import type { ShippingQuote } from "@/lib/shipping-calculator";
 import { PromoCodeField } from "@/components/marketing/PromoCodeField";
 import { FREE_SAMPLE_PROMO } from "@/lib/shipping";
+import { consumeSubscribeCheckoutIntent } from "@/components/marketing/SubscribeCheckoutIntent";
+import { formatSquareBillingPhone } from "@/lib/square-billing-contact";
 
 export default function CheckoutPageClient() {
   const router = useRouter();
@@ -57,6 +59,14 @@ export default function CheckoutPageClient() {
       addToast("Checkout was cancelled", "error");
     }
   }, [searchParams, addToast]);
+
+  useEffect(() => {
+    const cadence = consumeSubscribeCheckoutIntent();
+    if (cadence) {
+      setPurchaseType("subscription");
+      setSubscriptionCadence(cadence);
+    }
+  }, []);
 
   useEffect(() => {
     fetch("/api/account/me")
@@ -163,7 +173,24 @@ export default function CheckoutPageClient() {
     try {
       let sourceId: string;
       try {
-        const token = await squareRef.current.tokenize();
+        const addressLines = [data.line1, data.line2?.trim()].filter(
+          (line): line is string => Boolean(line?.trim())
+        );
+        const token = await squareRef.current.tokenize({
+          amount: totals.total.toFixed(2),
+          intent: "CHARGE",
+          billingContact: {
+            givenName: data.firstName,
+            familyName: data.lastName,
+            email: data.email,
+            phone: formatSquareBillingPhone(data.phone, data.country),
+            addressLines,
+            city: data.city,
+            state: data.state || undefined,
+            postalCode: data.postalCode,
+            countryCode: data.country,
+          },
+        });
         if (!token) {
           addToast("Please enter valid card details.", "error");
           setLoading(false);
@@ -212,14 +239,21 @@ export default function CheckoutPageClient() {
       });
       const json = await res.json();
 
-      if (!res.ok || !json.data?.paymentId) {
+      if (!res.ok || !json.data?.paymentId || !json.data?.orderId) {
         addToast(json.error || "Checkout failed", "error");
         setLoading(false);
         return;
       }
 
+      if (json.data.subscriptionSetupFailed) {
+        addToast(
+          "Your order was placed, but subscription setup needs a quick follow-up from our team.",
+          "error"
+        );
+      }
+
       router.push(
-        `/order/confirmation?payment_id=${encodeURIComponent(json.data.paymentId)}`
+        `/order/confirmation?payment_id=${encodeURIComponent(json.data.paymentId)}&email=${encodeURIComponent(data.email)}`
       );
     } catch {
       addToast("Checkout failed", "error");

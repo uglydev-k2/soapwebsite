@@ -9,9 +9,33 @@ import {
 } from "react";
 import Script from "next/script";
 
+type SquareTokenizeIntent = "CHARGE" | "STORE" | "CHARGE_AND_STORE";
+
+export type SquareTokenizeInput = {
+  amount: string;
+  intent: SquareTokenizeIntent;
+  billingContact: {
+    givenName: string;
+    familyName: string;
+    email?: string;
+    phone?: string;
+    addressLines?: string[];
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    countryCode?: string;
+  };
+};
+
 type SquareCard = {
   attach: (selector: string) => Promise<void>;
-  tokenize: () => Promise<{
+  tokenize: (
+    verificationDetails?: SquareTokenizeInput & {
+      currencyCode: string;
+      customerInitiated: boolean;
+      sellerKeyedIn: boolean;
+    }
+  ) => Promise<{
     status: string;
     token?: string;
     errors?: { message?: string }[];
@@ -32,7 +56,7 @@ declare global {
 }
 
 export type SquarePaymentFormHandle = {
-  tokenize: () => Promise<string | null>;
+  tokenize: (details: SquareTokenizeInput) => Promise<string | null>;
   isReady: boolean;
 };
 
@@ -41,6 +65,20 @@ type CheckoutConfig = {
   locationId: string;
   scriptUrl: string;
 };
+
+function formatTokenizeError(
+  result: { status: string; errors?: { message?: string }[] },
+  caught?: unknown
+): string {
+  if (caught instanceof Error && caught.message.trim()) {
+    return caught.message.trim();
+  }
+  const parts = result.errors?.map((e) => e.message?.trim()).filter(Boolean);
+  if (parts?.length) {
+    return parts.join(" ");
+  }
+  return "Card details could not be verified. Please check and try again.";
+}
 
 export const SquarePaymentForm = forwardRef<SquarePaymentFormHandle>(
   function SquarePaymentForm(_props, ref) {
@@ -70,6 +108,13 @@ export const SquarePaymentForm = forwardRef<SquarePaymentFormHandle>(
 
       async function initCard() {
         try {
+          const container = document.getElementById("square-card-container");
+          if (!container) {
+            throw new Error("Card container not found");
+          }
+          // Clear stale iframes from a prior init attempt (e.g. React strict mode).
+          container.replaceChildren();
+
           const payments = await window.Square!.payments(
             config!.applicationId,
             config!.locationId
@@ -83,7 +128,8 @@ export const SquarePaymentForm = forwardRef<SquarePaymentFormHandle>(
           cardRef.current = card;
           setReady(true);
           setInitError("");
-        } catch {
+        } catch (error) {
+          console.error("[SquarePaymentForm] init failed:", error);
           if (!cancelled) {
             setInitError("Could not initialize card form.");
           }
@@ -100,20 +146,38 @@ export const SquarePaymentForm = forwardRef<SquarePaymentFormHandle>(
       };
     }, [config, scriptLoaded]);
 
-    useImperativeHandle(ref, () => ({
-      isReady: ready,
-      tokenize: async () => {
-        if (!cardRef.current) return null;
-        const result = await cardRef.current.tokenize();
-        if (result.status === "OK" && result.token) {
-          return result.token;
-        }
-        const message =
-          result.errors?.[0]?.message ||
-          "Card details could not be verified. Please check and try again.";
-        throw new Error(message);
-      },
-    }));
+    useImperativeHandle(
+      ref,
+      () => ({
+        isReady: ready,
+        tokenize: async (details: SquareTokenizeInput) => {
+          if (!cardRef.current) return null;
+
+          const verificationDetails = {
+            ...details,
+            currencyCode: "USD",
+            customerInitiated: true,
+            sellerKeyedIn: false,
+          };
+
+          let result: Awaited<ReturnType<SquareCard["tokenize"]>>;
+          try {
+            result = await cardRef.current.tokenize(verificationDetails);
+          } catch (error) {
+            console.error("[SquarePaymentForm] tokenize threw:", error);
+            throw new Error(formatTokenizeError({ status: "ERROR" }, error));
+          }
+
+          if (result.status === "OK" && result.token) {
+            return result.token;
+          }
+
+          console.error("[SquarePaymentForm] tokenize failed:", result);
+          throw new Error(formatTokenizeError(result));
+        },
+      }),
+      [ready]
+    );
 
     return (
       <>

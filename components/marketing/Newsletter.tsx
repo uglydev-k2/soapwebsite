@@ -53,14 +53,26 @@ export default function Newsletter() {
   return (
     <section className="bg-terra py-20 lg:py-24">
       <ScrollReveal className="mx-auto max-w-2xl px-6 text-center lg:px-8">
-        <span className="label-caps text-cream/70">Stay Connected</span>
-        <h2 className="mt-4 font-serif text-4xl font-semibold text-cream lg:text-5xl">
-          Join the Ritual
+        <h2 className="font-serif text-4xl font-semibold text-cream lg:text-5xl">
+          Stay Beautifully Connected
         </h2>
-        <p className="mt-4 text-cream/90">
-          Be the first to know about new scents, seasonal collections, and
-          exclusive offers. No spam — just botanical goodness.
+        <p className="mt-4 font-serif text-xl text-cream/90 sm:text-2xl">
+          Be First to Smell What&apos;s New
         </p>
+        <ul className="mt-6 inline-block space-y-2 text-left text-sm text-cream/90 sm:text-base">
+          <li className="flex items-center gap-2">
+            <span className="text-cream/70" aria-hidden>
+              •
+            </span>
+            Discover New Scents First
+          </li>
+          <li className="flex items-center gap-2">
+            <span className="text-cream/70" aria-hidden>
+              •
+            </span>
+            Find Your Next Favorite
+          </li>
+        </ul>
 
         {submitted ? (
           <div

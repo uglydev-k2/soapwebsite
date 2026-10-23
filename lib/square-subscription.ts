@@ -22,6 +22,7 @@ export async function createSquareCustomer(input: {
   return customerId;
 }
 
+/** `sourceId` may be a Web Payments nonce or a Square payment id after CreatePayment. */
 export async function createSquareCardOnFile(input: {
   customerId: string;
   sourceId: string;

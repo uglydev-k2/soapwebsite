@@ -23,6 +23,12 @@ const config: Config = {
           2: "var(--terra-2)",
         },
         gold: "rgb(201 169 110 / <alpha-value>)",
+        lavender: {
+          DEFAULT: "var(--lavender)",
+          2: "var(--lavender-2)",
+          3: "var(--lavender-3)",
+          light: "var(--lavender-light)",
+        },
         text: "rgb(18 18 18 / <alpha-value>)",
         muted: "rgb(58 53 48 / <alpha-value>)",
       },

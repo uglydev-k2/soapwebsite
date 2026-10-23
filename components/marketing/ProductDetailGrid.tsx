@@ -55,7 +55,7 @@ export function ProductDetailGrid({
 
   useEffect(() => {
     setActiveVariantId(getInitialVariantId(product, scentVariants));
-  }, [product.id, product.slug, scentVariants]);
+  }, [product, scentVariants]);
 
   const activeVariant = useMemo(
     () => scentVariants.find((variant) => variant.id === activeVariantId) ?? null,

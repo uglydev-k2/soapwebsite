@@ -1,7 +1,13 @@
 import { MarketingPage } from "@/components/marketing/MarketingPage";
 import { ContactForm } from "@/components/marketing/ContactForm";
+import { brandTitle } from "@/lib/brand";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata = { title: "Contact — mvlusciouslather" };
+export const metadata = buildPageMetadata("/contact", {
+  title: brandTitle("Contact"),
+  description:
+    "Questions about an order, wholesale, or finding your perfect scent? We would love to hear from you.",
+});
 
 export default function ContactPage() {
   return (

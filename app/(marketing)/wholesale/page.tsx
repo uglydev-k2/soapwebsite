@@ -1,7 +1,13 @@
 import { MarketingPage } from "@/components/marketing/MarketingPage";
 import { WholesaleForm } from "@/components/marketing/WholesaleForm";
+import { brandTitle } from "@/lib/brand";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata = { title: "Wholesale — mvlusciouslather" };
+export const metadata = buildPageMetadata("/wholesale", {
+  title: brandTitle("Wholesale"),
+  description:
+    "Boutiques, spas, and gift shops — partner with us for small-batch botanical care.",
+});
 
 export default function WholesalePage() {
   return (

@@ -15,10 +15,20 @@ export async function chargeSquarePayment(input: {
   state?: string;
   postalCode: string;
   country: string;
+  /** Required when `sourceId` is a Square card-on-file id (`ccof:…`). */
+  customerId?: string;
 }) {
+  const isCardOnFile = input.sourceId.startsWith("ccof:");
+  if (isCardOnFile && !input.customerId?.trim()) {
+    throw new Error(
+      "Square customerId is required when charging a saved card (ccof)"
+    );
+  }
+
   return getSquareClient().payments.create({
     sourceId: input.sourceId,
     idempotencyKey: input.idempotencyKey,
+    customerId: input.customerId?.trim() || undefined,
     amountMoney: {
       amount: input.amountCents,
       currency: "USD",

@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { getJournalPost, JOURNAL_POSTS } from "@/lib/content/journal";
 import { Breadcrumbs } from "@/components/marketing/Breadcrumbs";
 import { ShopThisRitual } from "@/components/marketing/ShopThisRitual";
+import { BRAND_DISPLAY_NAME } from "@/lib/brand";
+import { buildPageMetadata } from "@/lib/seo";
 
 export function generateStaticParams() {
   return JOURNAL_POSTS.map((p) => ({ slug: p.slug }));
@@ -10,7 +12,11 @@ export function generateStaticParams() {
 
 export function generateMetadata({ params }: { params: { slug: string } }) {
   const post = getJournalPost(params.slug);
-  return { title: post ? `${post.title} — mvlusciouslather Journal` : "Journal" };
+  if (!post) return { title: "Journal" };
+  return buildPageMetadata(`/journal/${params.slug}`, {
+    title: `${post.title} — ${BRAND_DISPLAY_NAME} Journal`,
+    description: post.excerpt,
+  });
 }
 
 export default function JournalArticlePage({ params }: { params: { slug: string } }) {

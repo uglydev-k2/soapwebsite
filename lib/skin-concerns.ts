@@ -1,50 +1,46 @@
-export const SKIN_CONCERN_IDS = ["sensitive", "acne", "eczema", "men"] as const;
+export const SKIN_CONCERN_IDS = ["sensitive", "acne", "eczema", "men", "baby"] as const;
 
 export type SkinConcernId = (typeof SKIN_CONCERN_IDS)[number];
 
 type SkinConcernDefinition = {
   label: string;
+  description?: string;
+  /** When true, only explicit slugs match (no keyword/pattern broadening). */
+  curated?: boolean;
   slugPatterns?: RegExp[];
   slugs?: readonly string[];
   keywords: readonly string[];
 };
 
+const ACNE_CURATED_SLUGS = [
+  "kojic-acid-soap",
+  "ginger-turmeric-lemongrass-soap",
+  "goatmilk-honey-oatmeal",
+  "charcoal-turmeric-tea-tree-face-soap",
+  "red-polo-activated-charcoal",
+] as const;
+
 export const SKIN_CONCERN_DEFINITIONS: Record<SkinConcernId, SkinConcernDefinition> = {
   sensitive: {
     label: "Sensitive Skin",
-    slugPatterns: [/^goatmilk-/],
-    slugs: [
-      "bebe-soap",
-      "oat-honey-comfort-bar",
-      "lavender-chamomile",
-      "lavender-oat-sugar-scrub",
-      "bonfire-oatmeal-soap",
-      "blush-rose-artisan-bar",
-    ],
-    keywords: [
-      "sensitive",
-      "colloidal",
-      "oatmeal",
-      "goat milk",
-      "goatmilk",
-      "chamomile",
-      "bebe",
-      "delicate",
-      "eczema-prone",
-      "fragrance-free",
-      "reactive",
-      "stressed skin",
-      "never tight",
-      "comfort bar",
-      "dry skin",
-    ],
+    description:
+      "Gentle formulas with soft botanicals and no harsh additives.",
+    curated: true,
+    slugs: ACNE_CURATED_SLUGS,
+    keywords: [],
   },
   acne: {
     label: "Acne",
-    keywords: ["charcoal", "tea tree", "turmeric", "kojic", "clarifying", "blemish"],
+    description:
+      "Clarifying bars and washes designed to cleanse without stripping.",
+    curated: true,
+    slugs: ACNE_CURATED_SLUGS,
+    keywords: [],
   },
   eczema: {
     label: "Eczema",
+    description:
+      "Moisture-forward picks with comforting ingredients for dry skin.",
     slugPatterns: [/^goatmilk-/],
     keywords: [
       "eczema",
@@ -59,7 +55,30 @@ export const SKIN_CONCERN_DEFINITIONS: Record<SkinConcernId, SkinConcernDefiniti
   },
   men: {
     label: "Men",
-    keywords: ["cedar", "wood", "mint", "spearmint", "cologne", "leather"],
+    description:
+      "Grounded wood and mint profiles with rich, long-lasting lather.",
+    curated: true,
+    slugs: [
+      "perfection-for-him-scrub-soap",
+      "ocean-breeze",
+      "extremely-for-him",
+      "sandalwood-vanilla",
+      "tobacco-vanilla",
+      "sophisticated-for-him",
+      "red-polo-activated-charcoal",
+      "bayrum-soap",
+      "bonfire-oatmeal-soap",
+      "rich-leather-soap",
+    ],
+    keywords: [],
+  },
+  baby: {
+    label: "Baby Gifts",
+    description:
+      "Soft, giftable routines tailored for gentle everyday care.",
+    curated: true,
+    slugs: ["bebe-soap", "goatmilk-honey-oatmeal", "goatmilk-lotion"],
+    keywords: [],
   },
 };
 
@@ -104,10 +123,29 @@ export function matchesSkinConcern(
     return true;
   }
 
+  if (definition.curated) {
+    return false;
+  }
+
   if (definition.slugPatterns?.some((pattern) => pattern.test(product.slug))) {
     return true;
   }
 
   const haystack = buildProductHaystack(product);
   return definition.keywords.some((keyword) => haystack.includes(keyword.toLowerCase()));
+}
+
+export function sortByConcernSlugOrder<T extends { slug: string }>(
+  products: T[],
+  concern: SkinConcernId
+): T[] {
+  const slugs = SKIN_CONCERN_DEFINITIONS[concern].slugs;
+  if (!slugs?.length) return products;
+
+  const order = new Map(slugs.map((slug, index) => [slug, index]));
+  return [...products].sort((a, b) => {
+    const aIndex = order.get(a.slug) ?? Number.MAX_SAFE_INTEGER;
+    const bIndex = order.get(b.slug) ?? Number.MAX_SAFE_INTEGER;
+    return aIndex - bIndex || a.slug.localeCompare(b.slug);
+  });
 }

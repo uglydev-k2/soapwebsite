@@ -14,6 +14,13 @@ import FragranceMap from "@/components/marketing/FragranceMap";
 import TestimonialsCarousel from "@/components/marketing/TestimonialsCarousel";
 import Newsletter from "@/components/marketing/Newsletter";
 import { getProductsBySlugs } from "@/lib/products";
+import { brandTitle } from "@/lib/brand";
+import { buildPageMetadata, DEFAULT_SITE_DESCRIPTION } from "@/lib/seo";
+
+export const metadata = buildPageMetadata("/", {
+  title: brandTitle(),
+  description: DEFAULT_SITE_DESCRIPTION,
+});
 
 export default async function HomePage() {
   const ritualProducts = await getProductsBySlugs([
@@ -32,8 +39,9 @@ export default async function HomePage() {
       <CategorySection />
       <ProductGrid
         products={ritualProducts}
-        title="Start Your Ritual"
-        subtitle="Signature bar soaps"
+        title="Luxury Bath Rituals Start Here"
+        subtitle="Indulge in Luxury"
+        description="Experience the Collection. Experience the Luxury."
         limit={4}
       />
       <TrustPressSection />

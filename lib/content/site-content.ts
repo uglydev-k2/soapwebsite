@@ -64,7 +64,7 @@ export function getShippingSections() {
 /** @deprecated Use getFaqItems(settings) for accurate shipping copy. */
 export const FAQ_ITEMS = getFaqItems({
   flatShippingRate: 8,
-  freeShippingThreshold: 75,
+  freeShippingThreshold: 65,
 });
 
 /** @deprecated Use getShippingSections() for accurate shipping copy. */
@@ -86,7 +86,7 @@ export const GIFT_GUIDE_SECTIONS = [
   {
     title: "For Him",
     description: "Woody cedar and fresh mint profiles with rich, lasting lather.",
-    href: "/collections?scent=cedar&sort=featured",
+    href: "/collections?concern=men&sort=featured",
     cta: "Shop men's picks",
   },
   {

@@ -21,7 +21,7 @@ export const CRAFT_PROCESS = [
   {
     step: "01",
     title: "Source with Care",
-    body: "We select plant oils, butters, clays, and botanical extracts from suppliers we trust. Shea butter, coconut oil, colloidal oat, essential oils, and fragrance blends are chosen for performance — and for how they wear on sensitive skin.",
+    body: "We select Plant Oils, Butters, Clays, and Botanical extracts from suppliers we trust. Shea Butter, Mango Seed Butter, Coconut Oil, Colloidal Oat, Essential Oils, and fragrance blends are chosen for performance — and for how they wear on sensitive skin.",
     image: "/images/products/botanical-swirl-bar.jpg",
     imageAlt: "Botanical swirl artisan soap bar",
   },

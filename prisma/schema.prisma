@@ -126,7 +126,7 @@ model StoreSettings {
   phone                 String?
   address               String?
   flatShippingRate      Float    @default(8)
-  freeShippingThreshold Float    @default(75)
+  freeShippingThreshold Float    @default(65)
   notifyNewOrder        Boolean  @default(true)
   notifyOrderShipped    Boolean  @default(true)
   notifyLowStock        Boolean  @default(true)
@@ -329,5 +329,19 @@ enum ModerationStatus {
   REJECTED
   FLAGGED
 
+  @@schema("public")
+}
+
+model PageView {
+  id        String   @id @default(cuid())
+  visitorId String
+  sessionId String
+  path      String
+  referrer  String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([visitorId])
+  @@index([sessionId])
   @@schema("public")
 }

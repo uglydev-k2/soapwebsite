@@ -10,6 +10,8 @@ import {
   StaggerContainer,
   StaggerItem,
 } from "@/components/motion/ScrollReveal";
+import { BRAND_DISPLAY_NAME } from "@/lib/brand";
+import { buildPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -17,11 +19,11 @@ export async function generateMetadata({
   params: { slug: string };
 }) {
   const category = getShopCategoryBySlug(params.slug);
-  if (!category) return { title: "Category — mvlusciouslather" };
-  return {
-    title: `${category.label} — mvlusciouslather`,
+  if (!category) return { title: "Category" };
+  return buildPageMetadata(`/collections/category/${params.slug}`, {
+    title: `${category.label} — ${BRAND_DISPLAY_NAME}`,
     description: category.description,
-  };
+  });
 }
 
 export default async function CategoryCollectionPage({
@@ -51,6 +53,7 @@ export default async function CategoryCollectionPage({
         </Link>
 
         <AnimatedSectionHeader
+          headingLevel="h1"
           align="left"
           eyebrow="Product Category"
           title={category.label}

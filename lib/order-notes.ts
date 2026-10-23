@@ -6,6 +6,12 @@ export type OrderNotesMeta = {
   paymentProvider?: string;
   trackingNumber?: string;
   carrier?: string;
+  labelUrl?: string;
+  shippoTransactionId?: string;
+  shippingService?: string;
+  shippingWeightOz?: number;
+  shippingBillingTier?: string;
+  labelCreatedAt?: string;
   purchaseType?: "one_time" | "subscription";
   subscriptionCadence?: "monthly" | "bimonthly" | "quarterly";
   squareSubscriptionId?: string;

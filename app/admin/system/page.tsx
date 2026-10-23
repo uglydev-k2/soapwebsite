@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { SystemHealthPanel } from "@/components/admin/SystemHealthPanel";
+import { RunbookDownloadCard } from "@/components/admin/RunbookDownloadCard";
 import { ActivityFeed } from "@/components/admin/ActivityFeed";
 import { getAdminOverview } from "@/lib/admin-overview";
 import { getRecentActivity } from "@/lib/audit";
@@ -35,6 +36,10 @@ export default async function AdminSystemPage() {
       ]}
       showNewProduct={false}
     >
+      <div className="mb-6">
+        <RunbookDownloadCard />
+      </div>
+
       <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <SystemHealthPanel services={overview.services} />
         <div className="admin-card p-6">

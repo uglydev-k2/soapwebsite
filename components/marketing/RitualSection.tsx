@@ -55,6 +55,7 @@ export default function RitualSection() {
             <AnimatedSectionHeader
               align="left"
               theme="light"
+              accent="lavender"
               eyebrow="The mvlusciouslather Ritual"
               title={
                 <>
@@ -69,10 +70,10 @@ export default function RitualSection() {
             <dl className="mt-12 grid grid-cols-2 gap-8">
               {stats.map((stat) => (
                 <div key={stat.label}>
-                  <dt className="font-serif text-3xl text-gold lg:text-4xl">
+                  <dt className="font-serif text-3xl text-lavender-3 lg:text-4xl">
                     <CountUpStat value={stat.value} />
                   </dt>
-                  <dd className="mt-1 label-caps text-muted">{stat.label}</dd>
+                  <dd className="mt-1 label-caps text-text/75">{stat.label}</dd>
                 </div>
               ))}
             </dl>

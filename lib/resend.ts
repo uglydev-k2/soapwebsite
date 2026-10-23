@@ -1,25 +1,30 @@
 import {
+  pickProductImage,
   renderAdminNewOrderEmailHtml,
   renderDeliveredEmailHtml,
   renderOrderConfirmationEmailHtml,
   renderShippingEmailHtml,
+  renderWelcomeEmailHtml,
   type AdminNewOrderEmailPayload,
   type OrderConfirmationEmailPayload,
 } from "@/lib/email-templates";
 import { sendEmail, type SendEmailResult } from "@/lib/email-send";
-import { BRAND_EMAIL } from "@/lib/brand";
+import { BRAND_DISPLAY_NAME, BRAND_EMAIL } from "@/lib/brand";
+import { getFeaturedProducts } from "@/lib/products";
 
 export async function sendWelcomeEmail(email: string): Promise<SendEmailResult> {
+  const featured = await getFeaturedProducts(4);
+  const products = featured.map((product) => ({
+    name: product.name,
+    slug: product.slug,
+    price: product.price,
+    image: pickProductImage(product.images),
+  }));
+
   return sendEmail({
     to: email,
-    subject: "Welcome to mvlusciouslather",
-    html: `
-      <div style="font-family: Georgia, serif; color: #1C1C1C; max-width: 560px; margin: 0 auto;">
-        <h1 style="color: #2C4A3E; font-weight: 300;">Welcome to mvlusciouslather</h1>
-        <p>Thank you for joining our botanical ritual. You'll be the first to know about new collections, seasonal scents, and artisanal releases.</p>
-        <p style="color: #6B5E52;">With warmth,<br/>The mvlusciouslather team</p>
-      </div>
-    `,
+    subject: `Welcome to ${BRAND_DISPLAY_NAME}`,
+    html: renderWelcomeEmailHtml(products),
   });
 }
 
@@ -169,7 +174,12 @@ export async function sendWholesaleInquiry(data: {
   return result;
 }
 
-export async function sendAdminInvite(email: string, name: string) {
+export async function sendAdminInvite(
+  email: string,
+  name: string,
+  temporaryPassword: string
+) {
+  const loginUrl = `${process.env.NEXTAUTH_URL}/admin/login`;
   return sendEmail({
     to: email,
     subject: "You've been invited to mvlusciouslather Admin",
@@ -177,7 +187,9 @@ export async function sendAdminInvite(email: string, name: string) {
       <div style="font-family: Georgia, serif; color: #1C1C1C;">
         <h1 style="color: #2C4A3E;">Admin Invitation</h1>
         <p>Hi ${name}, you've been invited to manage mvlusciouslather.</p>
-        <p>Sign in at <a href="${process.env.NEXTAUTH_URL}/admin/login">${process.env.NEXTAUTH_URL}/admin/login</a></p>
+        <p>Sign in at <a href="${loginUrl}">${loginUrl}</a></p>
+        <p>Your temporary password: <strong>${temporaryPassword}</strong></p>
+        <p>Please change your password after signing in.</p>
       </div>
     `,
   });

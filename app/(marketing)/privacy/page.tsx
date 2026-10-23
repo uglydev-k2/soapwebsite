@@ -1,6 +1,12 @@
 import { MarketingPage } from "@/components/marketing/MarketingPage";
+import { brandTitle } from "@/lib/brand";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata = { title: "Privacy Policy — mvlusciouslather" };
+export const metadata = buildPageMetadata("/privacy", {
+  title: brandTitle("Privacy Policy"),
+  description:
+    "How MV Luscious Lather collects, uses, and protects your personal information.",
+});
 
 export default function PrivacyPage() {
   return (

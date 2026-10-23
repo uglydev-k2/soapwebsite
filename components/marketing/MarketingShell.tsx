@@ -56,9 +56,7 @@ export function MarketingShell({
         <motion.main
           key={pathname}
           className="marketing-main-pad"
-          initial={
-            reduced ? false : { opacity: 0, y: 12 }
-          }
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           exit={reduced ? undefined : { opacity: 0, y: -8 }}
           transition={pageTransition(!!reduced)}

@@ -1,8 +1,14 @@
 import Link from "next/link";
 import { MarketingPage } from "@/components/marketing/MarketingPage";
 import { JOURNAL_POSTS } from "@/lib/content/journal";
+import { brandTitle } from "@/lib/brand";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata = { title: "Journal — mvlusciouslather" };
+export const metadata = buildPageMetadata("/journal", {
+  title: brandTitle("Journal"),
+  description:
+    "Apothecary notes on building a bath routine that feels intentional.",
+});
 
 export default function JournalPage() {
   return (

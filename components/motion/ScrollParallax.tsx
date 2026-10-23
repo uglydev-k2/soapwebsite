@@ -44,9 +44,9 @@ export function AmbientOrbs({ className }: AmbientOrbsProps) {
       className={cn("pointer-events-none absolute inset-0 overflow-hidden", className)}
       aria-hidden
     >
-      <div className="absolute -left-20 top-1/4 h-64 w-64 animate-orb-drift rounded-full bg-terra/8 blur-3xl" />
+      <div className="absolute -left-20 top-1/4 h-64 w-64 animate-orb-drift rounded-full bg-lavender/14 blur-2xl" />
       <div
-        className="absolute -right-16 bottom-1/4 h-72 w-72 animate-orb-drift rounded-full bg-gold/10 blur-3xl"
+        className="absolute -right-16 bottom-1/4 h-72 w-72 animate-orb-drift rounded-full bg-lavender-2/50 blur-2xl"
         style={{ animationDelay: "-6s" }}
       />
     </div>

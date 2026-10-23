@@ -32,7 +32,7 @@ const testimonials = [
       "The Full Ritual Gift Set was the perfect birthday present for my sister. The packaging alone feels like unwrapping something truly special.",
     name: "Priya S.",
     location: "Brooklyn, NY",
-    product: "The Full Ritual Gift Set",
+    product: "Full Ritual Set Men",
     rating: 5,
   },
 ];

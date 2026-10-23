@@ -1,22 +1,35 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { jsonResponse, errorResponse } from "@/lib/api-helpers";
+import { jsonResponse, errorResponse, requireRateLimit } from "@/lib/api-helpers";
 import { getSupabaseOrderByPaymentId } from "@/lib/supabase/orders";
 import { isDatabaseConfigured } from "@/lib/env";
+import { getClientIp } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
+function emailsMatch(a: string, b: string): boolean {
+  return a.trim().toLowerCase() === b.trim().toLowerCase();
+}
+
 export async function GET(request: NextRequest) {
+  const limited = requireRateLimit(request, "order-confirmation", 30);
+  if (limited) return limited;
+
   const paymentId =
     request.nextUrl.searchParams.get("payment_id") ||
     request.nextUrl.searchParams.get("session_id");
+  const email = request.nextUrl.searchParams.get("email");
 
-  if (!paymentId) {
-    return errorResponse("Missing payment_id", 400);
+  if (!paymentId || !email?.trim()) {
+    return errorResponse("Missing payment_id and email", 400);
   }
 
   const supabaseOrder = await getSupabaseOrderByPaymentId(paymentId);
   if (supabaseOrder) {
+    if (!emailsMatch(supabaseOrder.email, email)) {
+      return errorResponse("Order not found", 404);
+    }
+
     return jsonResponse({
       source: "supabase",
       orderNumber: supabaseOrder.order_number,
@@ -49,6 +62,15 @@ export async function GET(request: NextRequest) {
     });
 
     if (order) {
+      if (!emailsMatch(order.customer.email, email)) {
+        console.warn(
+          "[msvee:order-confirmation] Email mismatch for payment",
+          paymentId,
+          getClientIp(request)
+        );
+        return errorResponse("Order not found", 404);
+      }
+
       let shippingAddress = null;
       try {
         shippingAddress = order.notes ? JSON.parse(order.notes).shippingAddress : null;

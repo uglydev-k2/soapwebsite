@@ -1,8 +1,14 @@
 import Link from "next/link";
 import { MarketingPage } from "@/components/marketing/MarketingPage";
 import { FRAGRANCE_PROFILES } from "@/lib/content/fragrances";
+import { brandTitle } from "@/lib/brand";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata = { title: "Scent Guide — mvlusciouslather" };
+export const metadata = buildPageMetadata("/scents", {
+  title: brandTitle("Scent Guide"),
+  description:
+    "Explore our signature fragrance families — each composed like fine perfume, designed for ritual.",
+});
 
 export default function ScentsPage() {
   return (

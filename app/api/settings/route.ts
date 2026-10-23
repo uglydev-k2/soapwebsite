@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, jsonResponse, errorResponse } from "@/lib/api-helpers";
 import { storeSettingsSchema } from "@/lib/validations";
@@ -8,7 +9,7 @@ import { getClientIp } from "@/lib/rate-limit";
 import bcrypt from "bcryptjs";
 
 export async function GET() {
-  const { error } = await requireAdmin();
+  const { error } = await requireAdmin("settings:read");
   if (error) return error;
 
   const settings = await prisma.storeSettings.findUnique({
@@ -21,11 +22,45 @@ export async function GET() {
 }
 
 export async function PUT(request: NextRequest) {
-  const { error, session } = await requireAdmin();
-  if (error) return error;
-
   const body = await request.json();
   const { type, ...data } = body;
+
+  if (type === "password") {
+    const { session, error } = await requireAdmin();
+    if (error) return error;
+
+    const adminMeta = {
+      adminId: session!.user!.id,
+      adminEmail: session!.user!.email ?? "",
+      adminRole: (session!.user as { role?: string }).role ?? "",
+      ipAddress: getClientIp(request),
+    };
+
+    const { currentPassword, newPassword } = data;
+    const admin = await prisma.adminUser.findUnique({
+      where: { id: session!.user!.id },
+    });
+    if (!admin) return errorResponse("User not found", 404);
+    const valid = await bcrypt.compare(currentPassword, admin.password);
+    if (!valid) return errorResponse("Current password is incorrect");
+    const hashed = await bcrypt.hash(newPassword, 12);
+    await prisma.adminUser.update({
+      where: { id: admin.id },
+      data: { password: hashed },
+    });
+    await logAdminAction({
+      ...adminMeta,
+      action: "UPDATE",
+      entity: "AdminUser",
+      entityId: admin.id,
+      metadata: { field: "password" },
+    });
+    return jsonResponse({ success: true });
+  }
+
+  const { error, session } = await requireAdmin("settings:write");
+  if (error) return error;
+
   const adminMeta = {
     adminId: session!.user!.id,
     adminEmail: session!.user!.email ?? "",
@@ -67,39 +102,17 @@ export async function PUT(request: NextRequest) {
     return jsonResponse(settings);
   }
 
-  if (type === "password") {
-    const { currentPassword, newPassword } = data;
-    const admin = await prisma.adminUser.findUnique({
-      where: { id: session!.user!.id },
-    });
-    if (!admin) return errorResponse("User not found", 404);
-    const valid = await bcrypt.compare(currentPassword, admin.password);
-    if (!valid) return errorResponse("Current password is incorrect");
-    const hashed = await bcrypt.hash(newPassword, 12);
-    await prisma.adminUser.update({
-      where: { id: admin.id },
-      data: { password: hashed },
-    });
-    await logAdminAction({
-      ...adminMeta,
-      action: "UPDATE",
-      entity: "AdminUser",
-      entityId: admin.id,
-      metadata: { field: "password" },
-    });
-    return jsonResponse({ success: true });
-  }
-
   if (type === "invite") {
     const { email, name } = data;
-    const tempPass = await bcrypt.hash("changeme123", 12);
+    const tempPassword = randomBytes(18).toString("base64url");
+    const tempPass = await bcrypt.hash(tempPassword, 12);
     const invited = await prisma.adminUser.upsert({
       where: { email },
       create: { email, name, password: tempPass, role: "EDITOR" },
-      update: { name },
+      update: { name, password: tempPass },
     });
     const { sendAdminInvite } = await import("@/lib/resend");
-    await sendAdminInvite(email, name);
+    await sendAdminInvite(email, name, tempPassword);
     await logAdminAction({
       ...adminMeta,
       action: "CREATE",

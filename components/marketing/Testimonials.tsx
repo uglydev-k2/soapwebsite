@@ -27,7 +27,7 @@ const testimonials = [
       "The Full Ritual Gift Set was the perfect birthday present for my sister. The packaging alone feels like unwrapping something truly special.",
     name: "Priya S.",
     location: "Brooklyn, NY",
-    product: "The Full Ritual Gift Set",
+    product: "Full Ritual Set Men",
     rating: 5,
   },
 ];
@@ -51,16 +51,16 @@ function StarRating({ count }: { count: number }) {
 
 export default function Testimonials() {
   return (
-    <section className="bg-white py-20 lg:py-28">
+    <section className="bg-lavender-light py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <AnimatedSectionHeader eyebrow="Kind Words" title="Loved by Ritualists" />
+        <AnimatedSectionHeader accent="lavender" eyebrow="Kind Words" title="Loved by Ritualists" />
 
         <StaggerContainer className="mt-16 grid gap-8 lg:grid-cols-3">
           {testimonials.map((testimonial) => (
             <StaggerItem key={testimonial.name}>
               <blockquote
                 className={cn(
-                  "flex h-full flex-col border border-green/10 bg-cream p-8",
+                  "lavender-card-accent flex h-full flex-col p-8",
                   "transition-shadow duration-300 hover:shadow-md"
                 )}
               >
@@ -68,7 +68,7 @@ export default function Testimonials() {
                 <p className="mt-6 flex-1 font-serif text-lg leading-relaxed text-green">
                   &ldquo;{testimonial.quote}&rdquo;
                 </p>
-                <footer className="mt-8 border-t border-green/10 pt-6">
+                <footer className="mt-8 border-t border-lavender/20 pt-6">
                   <cite className="not-italic">
                     <span className="block font-sans text-sm font-medium text-green">
                       {testimonial.name}
@@ -77,7 +77,7 @@ export default function Testimonials() {
                       {testimonial.location}
                     </span>
                   </cite>
-                  <span className="mt-3 block label-caps text-gold">
+                  <span className="mt-3 block label-caps text-lavender-3">
                     {testimonial.product}
                   </span>
                 </footer>

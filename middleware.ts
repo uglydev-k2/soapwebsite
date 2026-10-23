@@ -9,9 +9,18 @@ import {
   hasPermission,
 } from "@/lib/rbac";
 import type { AdminRole } from "@/lib/rbac";
+import { applySecurityHeaders, createNonce } from "@/lib/security-headers";
 
 const CUSTOMER_AUTH_PAGES = ["/login", "/signup"];
 const CUSTOMER_PROTECTED_PREFIXES = ["/dashboard", "/account"];
+
+function withSecurity(response: NextResponse): NextResponse {
+  return applySecurityHeaders(response);
+}
+
+function nextWithNonce(requestHeaders: Headers): NextResponse {
+  return NextResponse.next({ request: { headers: requestHeaders } });
+}
 
 async function handleAdminAuth(
   request: NextRequest,
@@ -70,6 +79,10 @@ async function handleAdminAuth(
 }
 
 export async function middleware(request: NextRequest) {
+  const nonce = createNonce();
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-nonce", nonce);
+
   if (!isSupabaseConfigured()) {
     console.error(
       "Missing or invalid Supabase env vars in middleware — set NEXT_PUBLIC_SUPABASE_URL (https://...) and NEXT_PUBLIC_SUPABASE_ANON_KEY"
@@ -78,22 +91,27 @@ export async function middleware(request: NextRequest) {
       const adminResult = await handleAdminAuth(
         request,
         request.nextUrl.pathname,
-        NextResponse.next(),
+        nextWithNonce(requestHeaders),
         null
       );
-      return adminResult ?? NextResponse.next();
+      return withSecurity(adminResult ?? nextWithNonce(requestHeaders));
     } catch (error) {
       console.error("[middleware] Error without Supabase config:", error);
-      return NextResponse.next();
+      return withSecurity(nextWithNonce(requestHeaders));
     }
   }
 
   try {
     const pathname = request.nextUrl.pathname;
-    const { supabaseResponse, user, adminRole } = await updateSession(request);
+    const { supabaseResponse, user, adminRole } = await updateSession(
+      request,
+      requestHeaders
+    );
 
     if (user && CUSTOMER_AUTH_PAGES.some((path) => pathname === path)) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return withSecurity(
+        NextResponse.redirect(new URL("/dashboard", request.url))
+      );
     }
 
     if (
@@ -102,7 +120,7 @@ export async function middleware(request: NextRequest) {
     ) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("next", pathname);
-      return NextResponse.redirect(loginUrl);
+      return withSecurity(NextResponse.redirect(loginUrl));
     }
 
     const adminResult = await handleAdminAuth(
@@ -112,13 +130,13 @@ export async function middleware(request: NextRequest) {
       adminRole
     );
     if (adminResult) {
-      return adminResult;
+      return withSecurity(adminResult);
     }
 
-    return supabaseResponse;
+    return withSecurity(supabaseResponse);
   } catch (error) {
     console.error("[middleware] Unhandled error:", error);
-    return NextResponse.next();
+    return withSecurity(nextWithNonce(requestHeaders));
   }
 }
 

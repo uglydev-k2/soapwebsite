@@ -1,7 +1,12 @@
 import { MarketingPage } from "@/components/marketing/MarketingPage";
 import { getShippingSections } from "@/lib/content/site-content";
+import { brandTitle } from "@/lib/brand";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata = { title: "Shipping & Returns — mvlusciouslather" };
+export const metadata = buildPageMetadata("/shipping", {
+  title: brandTitle("Shipping & Returns"),
+  description: "Transparent policies for a calm shopping experience.",
+});
 
 export default function ShippingPage() {
   return (

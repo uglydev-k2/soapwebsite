@@ -217,6 +217,7 @@ async function chargeSubscriptionRenewal(input: {
       state: shippingAddress.state,
       postalCode: shippingAddress.postalCode,
       country: shippingAddress.country,
+      customerId: subscription.squareCustomerId,
     });
   } catch (error) {
     console.error(

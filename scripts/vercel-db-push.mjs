@@ -36,9 +36,17 @@ const customerSubscriptionsSql = join(
   "add-customer-subscriptions.sql"
 );
 
+const pageViewsSql = join(process.cwd(), "scripts", "add-page-views.sql");
+
 if (existsSync(customerSubscriptionsSql)) {
   run(
     "npx prisma db execute --file scripts/add-customer-subscriptions.sql --schema prisma/schema.prisma"
+  );
+}
+
+if (existsSync(pageViewsSql)) {
+  run(
+    "npx prisma db execute --file scripts/add-page-views.sql --schema prisma/schema.prisma"
   );
 }
 

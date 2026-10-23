@@ -10,7 +10,6 @@ import {
   useTransform,
 } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { EASE_OUT, fadeUp, staggerContainer } from "@/lib/motion";
 
 const HERO_IMAGE = "/images/hero-soaps.jpg?v=2";
 
@@ -30,60 +29,42 @@ export default function Hero() {
   return (
     <section className="marketing-header-offset relative overflow-hidden">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-10 sm:gap-12 sm:px-6 sm:py-16 lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-8 lg:py-28">
-        <motion.div
-          className="flex flex-col gap-8"
-          initial={reduced ? false : "hidden"}
-          animate="show"
-          variants={staggerContainer(0.08, 0.1)}
-        >
-          <motion.div className="flex flex-wrap items-center gap-3 sm:gap-4" variants={fadeUp}>
+        <div className="flex flex-col gap-8">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
             <span className="label-caps text-terra">Premium Botanical Bath</span>
             <span className="hidden h-px max-w-16 flex-1 bg-gold sm:block" aria-hidden />
-          </motion.div>
+          </div>
 
-          <motion.div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap" variants={fadeUp}>
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
             <span className="border border-green/15 bg-white px-3 py-1.5 text-[11px] uppercase tracking-[0.16em] text-green sm:py-1">
               {FREE_SHIPPING_PROMO}
             </span>
             <span className="border border-green/15 bg-white px-3 py-1.5 text-[11px] uppercase tracking-[0.16em] text-green sm:py-1">
               {FREE_SAMPLE_PROMO}
             </span>
-          </motion.div>
+          </div>
 
           <h1 className="font-serif text-[2.35rem] font-semibold leading-[1.1] text-green sm:text-5xl lg:text-6xl xl:text-7xl">
-            {headlineWords.map((word, index) => (
-              <motion.span
+            {headlineWords.map((word) => (
+              <span
                 key={word.text}
                 className={cn(
-                  "inline-block mr-[0.28em]",
+                  "mr-[0.28em] inline-block",
                   word.accent && "text-terra italic"
                 )}
-                initial={reduced ? false : { opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: 0.45,
-                  delay: reduced ? 0 : 0.15 + index * 0.08,
-                  ease: EASE_OUT,
-                }}
               >
                 {word.text}
-              </motion.span>
+              </span>
             ))}
           </h1>
 
-          <motion.p
-            className="max-w-md text-base leading-relaxed text-text"
-            variants={fadeUp}
-          >
+          <p className="max-w-md text-base leading-relaxed text-text">
             Handcrafted soaps and body care infused with botanical essences.
             Transform your daily cleanse into a moment of calm, intention, and
             indulgence.
-          </motion.p>
+          </p>
 
-          <motion.div
-            className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4"
-            variants={fadeUp}
-          >
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
             <Link
               href="/collections"
               className="cta-shimmer inline-flex min-h-[3rem] w-full items-center justify-center gap-2 bg-terra px-8 py-3.5 text-sm label-caps text-white transition-colors duration-250 hover:bg-terra-2 sm:w-auto"
@@ -99,8 +80,8 @@ export default function Hero() {
             >
               Discover Our Ritual
             </Link>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
         <div className="relative">
           <motion.div
@@ -124,9 +105,7 @@ export default function Hero() {
               "sm:mt-4 lg:absolute lg:-bottom-8 lg:-left-8 lg:mt-0 lg:w-72"
             )}
             style={{ borderRadius: "2px" }}
-            initial={reduced ? false : { opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.45, ease: EASE_OUT }}
+            initial={false}
           >
             <span className="label-caps text-gold">The Collection</span>
             <h3 className="subheading mt-2 text-xl">Botanical Bath & Body</h3>

@@ -30,6 +30,14 @@ const CARE_BY_CATEGORY: Partial<Record<Category, { title: string; tips: string[]
       "Never leave a lit candle unattended.",
     ],
   },
+  ACCESSORIES: {
+    title: "Accessory care",
+    tips: [
+      "Rinse soap dishes and allow to dry fully between uses.",
+      "Hand-wash fabric or mesh bags on a gentle cycle when needed.",
+      "Store extras in a dry place away from direct moisture.",
+    ],
+  },
   GIFT_SET: {
     title: "Gift set notes",
     tips: [

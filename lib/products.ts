@@ -15,7 +15,12 @@ import {
   STATIC_FEATURED,
   STATIC_PRODUCTS,
 } from "@/lib/catalog";
-import { matchesSkinConcern, type SkinConcernId } from "@/lib/skin-concerns";
+import {
+  matchesSkinConcern,
+  sortByConcernSlugOrder,
+  SKIN_CONCERN_DEFINITIONS,
+  type SkinConcernId,
+} from "@/lib/skin-concerns";
 
 function orderFeaturedProducts<T extends { id: string; slug: string; featured: boolean }>(
   products: T[],
@@ -83,10 +88,19 @@ function matchesSearch(product: Product, query: string): boolean {
 
 function applyConcernFilter<T extends Product>(
   products: T[],
-  concern?: SkinConcernId
+  concern?: SkinConcernId,
+  sort: ProductSort = "featured"
 ): T[] {
   if (!concern) return products;
-  return products.filter((product) => matchesSkinConcern(product, concern));
+
+  const filtered = products.filter((product) => matchesSkinConcern(product, concern));
+  const definition = SKIN_CONCERN_DEFINITIONS[concern];
+
+  if (definition.curated && (sort === "featured" || !sort)) {
+    return sortByConcernSlugOrder(filtered, concern);
+  }
+
+  return filtered;
 }
 
 function applyFallbackFilters(
@@ -117,7 +131,7 @@ function applyFallbackFilters(
     }
   }
 
-  filtered = applyConcernFilter(filtered, concern);
+  filtered = applyConcernFilter(filtered, concern, sort);
 
   const sorted = [...filtered];
   switch (sort) {
@@ -215,7 +229,7 @@ export async function getActiveProducts(
   );
 
   if (products.length > 0) {
-    return applyConcernFilter(products, concern);
+    return applyConcernFilter(products, concern, sort);
   }
   return applyFallbackFilters(STATIC_PRODUCTS as Product[], options);
 }

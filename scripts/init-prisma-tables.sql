@@ -109,7 +109,7 @@ CREATE TABLE "public"."StoreSettings" (
     "phone" TEXT,
     "address" TEXT,
     "flatShippingRate" DOUBLE PRECISION NOT NULL DEFAULT 8,
-    "freeShippingThreshold" DOUBLE PRECISION NOT NULL DEFAULT 75,
+    "freeShippingThreshold" DOUBLE PRECISION NOT NULL DEFAULT 65,
     "notifyNewOrder" BOOLEAN NOT NULL DEFAULT true,
     "notifyOrderShipped" BOOLEAN NOT NULL DEFAULT true,
     "notifyLowStock" BOOLEAN NOT NULL DEFAULT true,

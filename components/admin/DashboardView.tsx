@@ -17,6 +17,7 @@ import type { DashboardPermissions } from "@/lib/dashboard-widgets";
 import type { AdminAlert, ServiceHealth } from "@/lib/admin-overview";
 import type { getDashboardData } from "@/lib/dashboard";
 import type { getPendingFulfillmentOrders } from "@/lib/admin-inventory";
+import type { VisitorStats } from "@/lib/visitors";
 import { formatPrice } from "@/lib/utils";
 import type { getRecentActivity } from "@/lib/audit";
 
@@ -36,6 +37,7 @@ interface DashboardViewProps {
     flaggedProducts: number;
   };
   fulfillmentOrders: FulfillmentOrders;
+  visitorStats: VisitorStats;
 }
 
 export function DashboardView({
@@ -43,6 +45,7 @@ export function DashboardView({
   data,
   overview,
   fulfillmentOrders,
+  visitorStats,
 }: DashboardViewProps) {
   const customerSparkline = data.customerGrowth.slice(-6).map((m) => m.count);
   const revenueSparkline = data.revenueSparkline;
@@ -50,6 +53,7 @@ export function DashboardView({
     permissions.viewRevenueKpis,
     permissions.viewOrdersKpis,
     permissions.viewCustomersKpis,
+    permissions.viewVisitors,
   ].filter(Boolean).length;
 
   return (
@@ -98,6 +102,18 @@ export function DashboardView({
               changeType="positive"
               sparkline={customerSparkline}
               href="/admin/customers"
+            />
+          )}
+          {permissions.viewVisitors && (
+            <KpiCard
+              label="Visitors Today"
+              value={String(visitorStats.visitorsToday)}
+              change={`${visitorStats.changeVsYesterday >= 0 ? "+" : ""}${visitorStats.changeVsYesterday}% vs yesterday · ${visitorStats.visitors7d} in 7d`}
+              changeType={
+                visitorStats.changeVsYesterday >= 0 ? "positive" : "neutral"
+              }
+              sparkline={visitorStats.sparkline}
+              href="/admin/analytics"
             />
           )}
         </div>

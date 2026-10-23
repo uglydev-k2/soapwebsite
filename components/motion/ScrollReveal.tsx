@@ -102,6 +102,8 @@ interface SectionHeaderProps {
   description?: string;
   align?: "center" | "left";
   theme?: "light" | "dark";
+  accent?: "terra" | "lavender";
+  headingLevel?: "h1" | "h2";
   className?: string;
 }
 
@@ -111,28 +113,47 @@ export function AnimatedSectionHeader({
   description,
   align = "center",
   theme = "light",
+  accent = "terra",
+  headingLevel = "h2",
   className,
 }: SectionHeaderProps) {
   const reduced = useReducedMotion();
+  const Heading = headingLevel;
   const centered = align === "center";
   const isDark = theme === "dark";
+  const eyebrowClass =
+    accent === "lavender"
+      ? isDark
+        ? "text-lavender-2"
+        : "text-lavender-3"
+      : isDark
+        ? "text-gold"
+        : "text-terra";
+  const dividerClass =
+    accent === "lavender"
+      ? isDark
+        ? "bg-lavender-2/60"
+        : "bg-lavender/45"
+      : isDark
+        ? "bg-gold/50"
+        : "bg-terra/50";
 
   if (reduced) {
     return (
       <div className={cn(centered && "mx-auto max-w-2xl text-center", className)}>
-        <span className={cn("label-caps", isDark ? "text-gold" : "text-terra")}>
+        <span className={cn("label-caps", eyebrowClass)}>
           {eyebrow}
         </span>
-        <h2
+        <Heading
           className={cn(
             "mt-4 font-serif text-3xl font-semibold sm:text-4xl lg:text-5xl",
             isDark ? "text-cream" : "text-green"
           )}
         >
           {title}
-        </h2>
+        </Heading>
         {description && (
-          <p className={cn("mt-4 text-sm sm:text-base", isDark ? "text-cream" : "text-text/95")}>
+          <p className={cn("mt-4 text-sm sm:text-base", isDark ? "text-cream" : "text-text/90")}>
             {description}
           </p>
         )}
@@ -149,24 +170,25 @@ export function AnimatedSectionHeader({
       variants={staggerContainer(0.1, 0)}
     >
       <motion.span
-        className={cn("label-caps block", isDark ? "text-gold" : "text-terra")}
+        className={cn("label-caps block", eyebrowClass)}
         variants={fadeUp}
       >
         {eyebrow}
       </motion.span>
-      <motion.h2
-        className={cn(
-          "mt-4 font-serif text-3xl font-semibold sm:text-4xl lg:text-5xl",
-          isDark ? "text-cream" : "text-green"
-        )}
-        variants={fadeUp}
-      >
-        {title}
-      </motion.h2>
+      <motion.div variants={fadeUp}>
+        <Heading
+          className={cn(
+            "mt-4 font-serif text-3xl font-semibold sm:text-4xl lg:text-5xl",
+            isDark ? "text-cream" : "text-green"
+          )}
+        >
+          {title}
+        </Heading>
+      </motion.div>
       <motion.div
         className={cn(
           "mt-4 h-px",
-          isDark ? "bg-gold/50" : "bg-terra/50",
+          dividerClass,
           centered ? "mx-auto w-24" : "w-24"
         )}
         initial={{ scaleX: 0 }}
@@ -179,7 +201,7 @@ export function AnimatedSectionHeader({
         <motion.p
           className={cn(
             "mt-4 text-sm sm:text-base",
-            isDark ? "text-cream" : "text-text/95"
+            isDark ? "text-cream" : "text-text/90"
           )}
           variants={fadeUp}
         >

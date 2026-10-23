@@ -7,15 +7,17 @@ import { getAdminOverview } from "@/lib/admin-overview";
 import { getPendingFulfillmentOrders } from "@/lib/admin-inventory";
 import { getDashboardPermissions } from "@/lib/dashboard-widgets";
 import { getAdminSession } from "@/lib/admin-auth";
+import { getVisitorStats } from "@/lib/visitors";
 
 export default async function AdminDashboardPage() {
   const session = await getAdminSession();
   const permissions = getDashboardPermissions(session?.role);
 
-  const [data, overview, fulfillmentOrders] = await Promise.all([
+  const [data, overview, fulfillmentOrders, visitorStats] = await Promise.all([
     getDashboardData(),
     getAdminOverview(),
     getPendingFulfillmentOrders(6),
+    getVisitorStats(),
   ]);
 
   return (
@@ -25,6 +27,7 @@ export default async function AdminDashboardPage() {
         data={data}
         overview={overview}
         fulfillmentOrders={fulfillmentOrders}
+        visitorStats={visitorStats}
       />
     </AdminShell>
   );

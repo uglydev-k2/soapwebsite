@@ -44,7 +44,6 @@ export const SHOP_CATEGORY_MENU: ShopCategoryMenuItem[] = [
     label: "Accessories",
     description: "Soap dishes, bags, and little extras for your ritual.",
     values: ["ACCESSORIES"],
-    hidden: true,
   },
   {
     slug: "gift-set",

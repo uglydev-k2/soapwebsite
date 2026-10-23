@@ -2,8 +2,14 @@ import Link from "next/link";
 import { MarketingPage } from "@/components/marketing/MarketingPage";
 import { IngredientProductLinks } from "@/components/marketing/IngredientProductLinks";
 import { INGREDIENT_GLOSSARY } from "@/lib/content/ingredients";
+import { brandTitle } from "@/lib/brand";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata = { title: "Ingredients — mvlusciouslather" };
+export const metadata = buildPageMetadata("/ingredients", {
+  title: brandTitle("Ingredients"),
+  description:
+    "The botanicals and bases we reach for — and why your skin loves them.",
+});
 
 export default function IngredientsPage() {
   return (

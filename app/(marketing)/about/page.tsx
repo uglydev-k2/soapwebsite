@@ -1,12 +1,13 @@
 import { MarketingPage } from "@/components/marketing/MarketingPage";
 import { AboutStory } from "@/components/marketing/AboutStory";
 import { brandTitle } from "@/lib/brand";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata = {
+export const metadata = buildPageMetadata("/about", {
   title: brandTitle("About"),
   description:
     "Discover how MV Luscious Lather handcrafts small-batch botanical soaps, scrubs, and bath rituals — from sourcing to pour, cure, and pack.",
-};
+});
 
 export default function AboutPage() {
   return (

@@ -102,7 +102,9 @@ export default async function ProductDetailPage({
               </p>
               {product.ingredients && (
                 <div className="mb-8">
-                  <p className="label-caps text-muted mb-2">Ingredients</p>
+                  {product.slug !== "full-ritual-gift-set" ? (
+                    <p className="label-caps text-muted mb-2">Ingredients</p>
+                  ) : null}
                   <p className="text-sm text-muted leading-relaxed">
                     {product.ingredients}
                   </p>

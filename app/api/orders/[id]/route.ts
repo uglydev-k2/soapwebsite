@@ -15,7 +15,7 @@ export async function GET(
   _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { error } = await requireAdmin();
+  const { error } = await requireAdmin("orders:read");
   if (error) return error;
 
   const order = await prisma.order.findUnique({
@@ -33,7 +33,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { session, error } = await requireAdmin();
+  const { session, error } = await requireAdmin("orders:write");
   if (error) return error;
 
   const body = await request.json();

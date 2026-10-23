@@ -39,14 +39,15 @@ export default function OrderConfirmationPage() {
   const searchParams = useSearchParams();
   const paymentId =
     searchParams.get("payment_id") || searchParams.get("session_id");
+  const email = searchParams.get("email");
   const clearCart = useCartStore((s) => s.clearCart);
   const [order, setOrder] = useState<ConfirmationOrder | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!paymentId) {
-      setError("Missing payment reference.");
+    if (!paymentId || !email) {
+      setError("Missing payment reference or email.");
       setLoading(false);
       return;
     }
@@ -55,9 +56,11 @@ export default function OrderConfirmationPage() {
     const load = async () => {
       attempts += 1;
       try {
-        const res = await fetch(
-          `/api/orders/confirmation?payment_id=${encodeURIComponent(paymentId)}`
-        );
+        const params = new URLSearchParams({
+          payment_id: paymentId,
+          email,
+        });
+        const res = await fetch(`/api/orders/confirmation?${params.toString()}`);
         const json = (await res.json()) as ApiResponse<ConfirmationOrder>;
         if (res.ok && json.data) {
           setOrder(json.data);
@@ -77,7 +80,7 @@ export default function OrderConfirmationPage() {
     };
 
     load();
-  }, [paymentId, clearCart]);
+  }, [paymentId, email, clearCart]);
 
   if (loading) {
     return (

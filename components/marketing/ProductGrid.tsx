@@ -9,6 +9,7 @@ interface ProductGridProps {
   limit?: number;
   title?: string;
   subtitle?: string;
+  description?: string;
   showViewAll?: boolean;
 }
 
@@ -17,6 +18,7 @@ export default async function ProductGrid({
   limit = 4,
   title = "Featured Collection",
   subtitle = "Curated Favorites",
+  description,
   showViewAll = true,
 }: ProductGridProps) {
   let items: ProductWithMeta[] = products ?? [];
@@ -42,6 +44,7 @@ export default async function ProductGrid({
             align="left"
             eyebrow={subtitle}
             title={title}
+            description={description}
             className="max-w-xl"
           />
           {showViewAll && (

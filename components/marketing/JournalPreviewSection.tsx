@@ -6,9 +6,10 @@ export default function JournalPreviewSection() {
   const posts = JOURNAL_POSTS.slice(0, 3);
 
   return (
-    <section className="bg-cream py-20 lg:py-28">
+    <section className="bg-gradient-to-b from-white to-lavender-light py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <AnimatedSectionHeader
+          accent="lavender"
           eyebrow="The Journal"
           title="Rituals, Ingredients & Slow Living"
           description="Guides from our apothecary on building a bath routine that feels intentional."
@@ -17,17 +18,17 @@ export default function JournalPreviewSection() {
           {posts.map((post) => (
             <StaggerItem key={post.slug}>
               <article
-                className="group flex h-full flex-col border border-green/10 bg-white p-8 transition-shadow hover:shadow-md"
+                className="lavender-card-accent group flex h-full flex-col p-8 transition-all hover:border-lavender/30 hover:shadow-md"
                 style={{ borderRadius: "2px" }}
               >
-                <span className="label-caps text-terra">{post.category}</span>
-                <h3 className="mt-3 font-serif text-2xl text-green group-hover:text-terra">
+                <span className="label-caps text-lavender-3">{post.category}</span>
+                <h3 className="mt-3 font-serif text-2xl text-green group-hover:text-lavender-3">
                   <Link href={`/journal/${post.slug}`}>{post.title}</Link>
                 </h3>
-                <p className="mt-3 flex-1 text-sm leading-relaxed text-muted">
+                <p className="mt-3 flex-1 text-sm leading-relaxed text-text/85">
                   {post.excerpt}
                 </p>
-                <p className="mt-6 text-xs text-muted">
+                <p className="mt-6 text-xs text-text/70">
                   {post.readMinutes} min read
                 </p>
               </article>
@@ -37,7 +38,7 @@ export default function JournalPreviewSection() {
         <div className="mt-10 text-center">
           <Link
             href="/journal"
-            className="label-caps text-green transition-colors hover:text-terra"
+            className="label-caps text-lavender-3 transition-colors hover:text-lavender"
           >
             Read the journal →
           </Link>

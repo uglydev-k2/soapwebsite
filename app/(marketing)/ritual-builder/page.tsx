@@ -1,6 +1,12 @@
 import RitualBuilder from "@/components/marketing/RitualBuilder";
+import { brandTitle } from "@/lib/brand";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata = { title: "Ritual Builder — mvlusciouslather" };
+export const metadata = buildPageMetadata("/ritual-builder", {
+  title: brandTitle("Ritual Builder"),
+  description:
+    "Build a personalized botanical bath ritual with soaps, scrubs, and body care matched to your preferences.",
+});
 
 export default function RitualBuilderPage() {
   return (

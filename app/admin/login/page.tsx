@@ -64,7 +64,11 @@ export default function AdminLoginPage() {
           <Input
             label="Email"
             type="email"
+            inputMode="email"
             autoComplete="username"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
             variant="admin"
             error={errors.email?.message}
             {...register("email")}

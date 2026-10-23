@@ -101,7 +101,7 @@ export function PurchaseTypeSelector({
           </div>
           <p className="text-xs text-muted">
             Your card is charged today for this order. Future boxes bill automatically on
-            your schedule until you cancel in Square or contact us.
+            your schedule until you contact us to pause or cancel.
           </p>
         </div>
       )}

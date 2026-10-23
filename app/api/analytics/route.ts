@@ -4,9 +4,10 @@ import { requireAdmin, jsonResponse } from "@/lib/api-helpers";
 import { withApiHandler } from "@/lib/api-handler";
 import { isDatabaseConfigured } from "@/lib/env";
 import { getProductSkuMetrics } from "@/lib/admin-analytics";
+import { getTrafficAnalytics } from "@/lib/visitors";
 
 export const GET = withApiHandler("analytics", async (request: NextRequest) => {
-  const { error } = await requireAdmin();
+  const { error } = await requireAdmin("analytics:read");
   if (error) return error;
 
   if (!isDatabaseConfigured()) {
@@ -20,6 +21,13 @@ export const GET = withApiHandler("analytics", async (request: NextRequest) => {
       totalRevenue: 0,
       totalOrders: 0,
       productSkus: [],
+      traffic: {
+        overTime: [],
+        topPages: [],
+        topReferrers: [],
+        totalViews: 0,
+        uniqueVisitors: 0,
+      },
     });
   }
 
@@ -109,6 +117,7 @@ export const GET = withApiHandler("analytics", async (request: NextRequest) => {
 
   const monthlyRevenue = await getMonthlyRevenue();
   const productSkus = await getProductSkuMetrics(since);
+  const traffic = await getTrafficAnalytics(since);
 
   return jsonResponse({
     revenueOverTime,
@@ -120,6 +129,7 @@ export const GET = withApiHandler("analytics", async (request: NextRequest) => {
     totalRevenue: totalOrderRevenue,
     totalOrders: orders.length,
     productSkus,
+    traffic,
   });
 });
 

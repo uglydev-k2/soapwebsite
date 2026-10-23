@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ArrowRight, PackageCheck } from "lucide-react";
+import { ArrowRight, PackageCheck, Truck } from "lucide-react";
 import type { Customer, Order, OrderItem } from "@prisma/client";
 import { Button } from "@/components/ui/Button";
 import { useToastStore } from "@/store/toastStore";
@@ -23,6 +23,33 @@ export function FulfillmentQueue({ orders }: FulfillmentQueueProps) {
   const router = useRouter();
   const addToast = useToastStore((s) => s.addToast);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [labelingId, setLabelingId] = useState<string | null>(null);
+
+  const createLabel = async (orderId: string) => {
+    setLabelingId(orderId);
+    try {
+      const res = await fetch(`/api/orders/${orderId}/label`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ markShipped: true, sendEmail: true }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        addToast(json.error ?? "Failed to create shipping label", "error");
+        return;
+      }
+      const data = json.data as { labelUrl: string; alreadyExists?: boolean };
+      window.open(data.labelUrl, "_blank", "noopener,noreferrer");
+      addToast(
+        data.alreadyExists ? "Opened shipping label" : "Shipping label created"
+      );
+      router.refresh();
+    } catch {
+      addToast("Failed to create shipping label", "error");
+    } finally {
+      setLabelingId(null);
+    }
+  };
 
   const updateStatus = async (orderId: string, status: "PROCESSING" | "SHIPPED") => {
     setUpdatingId(orderId);
@@ -110,6 +137,16 @@ export function FulfillmentQueue({ orders }: FulfillmentQueueProps) {
                       Start Processing
                     </Button>
                   ) : null}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="w-full gap-1 sm:w-auto"
+                    disabled={labelingId === order.id || updatingId === order.id}
+                    onClick={() => createLabel(order.id)}
+                  >
+                    <Truck size={14} />
+                    {labelingId === order.id ? "Creating…" : "Print Label"}
+                  </Button>
                   <Button
                     size="sm"
                     className="w-full sm:w-auto"

@@ -7,7 +7,7 @@ export type PublicStoreSettings = {
 
 export const DEFAULT_PUBLIC_STORE_SETTINGS: PublicStoreSettings = {
   flatShippingRate: 8,
-  freeShippingThreshold: 75,
+  freeShippingThreshold: 65,
 };
 
 export async function getPublicStoreSettings(): Promise<PublicStoreSettings> {

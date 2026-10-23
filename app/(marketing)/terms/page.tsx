@@ -1,6 +1,12 @@
 import { MarketingPage } from "@/components/marketing/MarketingPage";
+import { brandTitle } from "@/lib/brand";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata = { title: "Terms of Service — mvlusciouslather" };
+export const metadata = buildPageMetadata("/terms", {
+  title: brandTitle("Terms of Service"),
+  description:
+    "Terms governing use of the MV Luscious Lather website and purchase of our products.",
+});
 
 export default function TermsPage() {
   return (

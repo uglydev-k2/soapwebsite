@@ -56,6 +56,11 @@ export const OPTIONAL_ENV = [
   "VAPID_SUBJECT",
   "NEXT_PUBLIC_VAPID_PUBLIC_KEY",
   "NEXT_PUBLIC_GA_MEASUREMENT_ID",
+  "SHIPPO_API_TOKEN",
+  "SHIP_FROM_STREET1",
+  "SHIP_FROM_CITY",
+  "SHIP_FROM_STATE",
+  "SHIP_FROM_ZIP",
 ] as const;
 
 export function getGaMeasurementId(): string | undefined {

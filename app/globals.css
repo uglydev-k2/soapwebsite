@@ -12,6 +12,10 @@
   --terra: #963f1a;
   --terra-2: #7a3316;
   --gold: #a88a4a;
+  --lavender: #7d6b9a;
+  --lavender-2: #ebe4f3;
+  --lavender-3: #5c4d78;
+  --lavender-light: #f5f1f8;
   --text: #121212;
   --muted: #3a3530;
   --font-serif: var(--font-cormorant), Georgia, serif;
@@ -42,7 +46,8 @@ html {
     font-family: var(--font-sans);
     font-weight: 500;
     line-height: 1.6;
-    -webkit-font-smoothing: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     overflow-x: clip;
   }
@@ -146,21 +151,42 @@ html {
   }
 
   .card-border {
-    border: 1px solid rgba(44, 74, 62, 0.08);
+    border: 1px solid rgba(92, 77, 120, 0.14);
     border-radius: 2px;
+  }
+
+  .lavender-wash {
+    background: linear-gradient(
+      180deg,
+      var(--lavender-light) 0%,
+      var(--cream-2) 55%,
+      var(--cream) 100%
+    );
+  }
+
+  .lavender-card-accent {
+    border: 1px solid rgba(92, 77, 120, 0.18);
+    border-top: 2px solid rgba(125, 107, 154, 0.45);
+    background: var(--white);
+    box-shadow: 0 1px 3px rgba(92, 77, 120, 0.06);
   }
 }
 
 .ritual-rings {
   background-image: radial-gradient(
-      circle at 20% 80%,
-      rgba(201, 169, 110, 0.06) 0%,
-      transparent 50%
+      circle at 18% 75%,
+      rgba(125, 107, 154, 0.12) 0%,
+      transparent 52%
     ),
     radial-gradient(
-      circle at 80% 20%,
-      rgba(201, 169, 110, 0.04) 0%,
-      transparent 40%
+      circle at 82% 22%,
+      rgba(201, 169, 110, 0.07) 0%,
+      transparent 42%
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(235, 228, 243, 0.35) 0%,
+      transparent 65%
     );
 }
 

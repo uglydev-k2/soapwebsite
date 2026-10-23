@@ -448,3 +448,74 @@ export function renderShippingEmailHtml(data: {
 export function renderOrderItemsHtml(items: EmailOrderItem[]): string {
   return renderShipmentItemsTable(items);
 }
+
+export type WelcomeEmailProduct = {
+  name: string;
+  slug: string;
+  price: number;
+  image?: string | null;
+};
+
+function renderWelcomeProductGrid(products: WelcomeEmailProduct[]): string {
+  if (products.length === 0) return "";
+
+  const siteUrl = getSiteUrl();
+  const rows: string[] = [];
+
+  for (let i = 0; i < products.length; i += 2) {
+    const pair = products.slice(i, i + 2);
+    const cells = pair
+      .map((product) => {
+        const productUrl = `${siteUrl}/collections/${encodeURIComponent(product.slug)}`;
+        const imageUrl = toAbsoluteImageUrl(product.image);
+        const imageBlock = imageUrl
+          ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(product.name)}" width="220" height="220" style="display:block;width:100%;max-width:220px;height:auto;object-fit:cover;border-radius:8px;border:1px solid #e8e2d9;background:#f5f0e8;" />`
+          : `<div style="width:100%;max-width:220px;height:220px;background:linear-gradient(135deg,#3D6454,#2C4A3E);border-radius:8px;border:1px solid #e8e2d9;"></div>`;
+
+        return `
+          <td style="width:50%;padding:8px;vertical-align:top;">
+            <a href="${escapeHtml(productUrl)}" style="text-decoration:none;color:#000;">
+              ${imageBlock}
+              <p style="margin:10px 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:600;color:#2C4A3E;text-transform:uppercase;line-height:1.35;">${escapeHtml(product.name.trim())}</p>
+              <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#963f1a;">${formatUsd(product.price)}</p>
+            </a>
+          </td>
+        `;
+      })
+      .join("");
+
+    rows.push(
+      `<tr>${cells}${pair.length === 1 ? '<td style="width:50%;padding:8px;"></td>' : ""}</tr>`
+    );
+  }
+
+  return `
+    <p style="margin:24px 0 12px;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;color:#000;">Start your ritual with these favorites</p>
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;margin:0 0 20px;">
+      <tbody>${rows.join("")}</tbody>
+    </table>
+  `;
+}
+
+export function renderWelcomeEmailHtml(products: WelcomeEmailProduct[]): string {
+  const brand = escapeHtml(BRAND_DISPLAY_NAME);
+  const siteUrl = getSiteUrl();
+  const productGrid = renderWelcomeProductGrid(products);
+
+  return `
+    <div style="font-family:Georgia,serif;color:#1C1C1C;max-width:560px;margin:0 auto;padding:16px;">
+      <h1 style="color:#2C4A3E;font-weight:300;font-size:28px;margin:0 0 16px;">Welcome to ${brand}</h1>
+      <p style="font-size:15px;line-height:1.6;margin:0 0 16px;">
+        Thank you for joining our botanical ritual. You'll be the first to know about new collections,
+        seasonal scents, and artisanal releases.
+      </p>
+      ${productGrid}
+      <p style="margin:0 0 20px;text-align:center;">
+        <a href="${escapeHtml(siteUrl)}/collections" style="display:inline-block;background:#963f1a;color:#fff;text-decoration:none;padding:12px 24px;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;border-radius:2px;">Shop now</a>
+      </p>
+      <p style="color:#6B5E52;font-size:14px;line-height:1.6;margin:0;">
+        With warmth,<br/>The mvlusciouslather team
+      </p>
+    </div>
+  `;
+}
