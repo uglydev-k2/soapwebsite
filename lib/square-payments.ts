@@ -25,6 +25,9 @@ export async function chargeSquarePayment(input: {
     );
   }
 
+  const line2 = input.line2?.trim();
+  const state = input.state?.trim();
+
   return getSquareClient().payments.create({
     sourceId: input.sourceId,
     idempotencyKey: input.idempotencyKey,
@@ -36,13 +39,13 @@ export async function chargeSquarePayment(input: {
     locationId: getSquareLocationId(),
     referenceId: input.orderNumber.slice(0, 40),
     note: `mvlusciouslather order ${input.orderNumber}`,
-    buyerEmailAddress: input.email,
+    buyerEmailAddress: input.email.trim(),
     shippingAddress: {
-      addressLine1: input.line1,
-      addressLine2: input.line2,
-      locality: input.city,
-      administrativeDistrictLevel1: input.state ?? undefined,
-      postalCode: input.postalCode,
+      addressLine1: input.line1.trim(),
+      addressLine2: line2 || undefined,
+      locality: input.city.trim(),
+      administrativeDistrictLevel1: state || undefined,
+      postalCode: input.postalCode.trim(),
       country: getCountryCode(input.country) as
         | "US"
         | "CA"

@@ -171,13 +171,45 @@ export default function CheckoutPageClient() {
 
     setLoading(true);
     try {
+      const cartItems = items.map((item) => ({
+        productId: item.productId,
+        scentOptionId: item.scentOptionId,
+        quantity: item.quantity,
+        price: item.price,
+        name: item.name,
+        slug: item.slug,
+        image: item.image,
+      }));
+
+      const totalsRes = await fetch("/api/checkout/totals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...data,
+          purchaseType,
+          subscriptionCadence:
+            purchaseType === "subscription" ? subscriptionCadence : undefined,
+          promoCode,
+          items: cartItems,
+        }),
+      });
+      const totalsJson = await totalsRes.json();
+      if (!totalsRes.ok || !totalsJson.data?.total) {
+        addToast(totalsJson.error || "Could not calculate order total.", "error");
+        setLoading(false);
+        return;
+      }
+
+      const chargeTotal = Number(totalsJson.data.total);
+      const chargeAmount = chargeTotal.toFixed(2);
+
       let sourceId: string;
       try {
         const addressLines = [data.line1, data.line2?.trim()].filter(
           (line): line is string => Boolean(line?.trim())
         );
         const token = await squareRef.current.tokenize({
-          amount: totals.total.toFixed(2),
+          amount: chargeAmount,
           intent: "CHARGE",
           billingContact: {
             givenName: data.firstName,
@@ -214,15 +246,7 @@ export default function CheckoutPageClient() {
         subscriptionCadence:
           purchaseType === "subscription" ? subscriptionCadence : undefined,
         promoCode,
-        items: items.map((item) => ({
-          productId: item.productId,
-          scentOptionId: item.scentOptionId,
-          quantity: item.quantity,
-          price: item.price,
-          name: item.name,
-          slug: item.slug,
-          image: item.image,
-        })),
+        items: cartItems,
       };
 
       const parsed = checkoutPaymentSchema.safeParse(payload);

@@ -3,15 +3,8 @@ import { randomUUID } from "crypto";
 import { jsonResponse, errorResponse } from "@/lib/api-helpers";
 import { withApiHandler } from "@/lib/api-handler";
 import { checkoutPaymentSchema } from "@/lib/validations";
-import {
-  calculateOrderTotals,
-  getCheckoutSettings,
-  validateCartItems,
-  calculateCheckoutShipping,
-  applyFreeShippingIfEligible,
-  type ShippingAddress,
-} from "@/lib/checkout";
-import { getBundleLineTotal } from "@/lib/bundle-pricing";
+import { getCheckoutSettings, type ShippingAddress } from "@/lib/checkout";
+import { computeCheckoutTotals } from "@/lib/checkout-totals";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { isSquareConfigured } from "@/lib/square";
@@ -21,11 +14,9 @@ import {
 } from "@/lib/square-payments";
 import { fulfillOrder } from "@/lib/fulfill-order";
 import { generateOrderNumber } from "@/lib/utils";
-import {
-  applySubscriptionDiscount,
-  type PurchaseType,
-} from "@/lib/subscriptions";
-import { validatePromoCode, redeemPromoCode } from "@/lib/promo-codes";
+import type { PurchaseType } from "@/lib/subscriptions";
+import { redeemPromoCode } from "@/lib/promo-codes";
+import { squarePaymentUserMessage } from "@/lib/square-payment-errors";
 import {
   createOrGetSquareCustomer,
   createSquareCardOnFile,
@@ -60,32 +51,12 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
   const purchaseType: PurchaseType = parsed.data.purchaseType;
   const subscriptionCadence = parsed.data.subscriptionCadence;
 
-  const { items: validatedItems, error: cartError } = await validateCartItems(
-    parsed.data.items
-  );
-  if (cartError) return errorResponse(cartError);
-
-  const rawSubtotal = validatedItems.reduce(
-    (sum, item) => sum + getBundleLineTotal(item.price, item.quantity),
-    0
-  );
-
-  let promoDiscount = 0;
-  let promoCodeApplied: string | undefined;
-  if (parsed.data.promoCode?.trim()) {
-    const promoResult = await validatePromoCode(parsed.data.promoCode, rawSubtotal);
-    if (!promoResult.valid) {
-      return errorResponse(promoResult.error);
-    }
-    promoDiscount = promoResult.discountAmount;
-    promoCodeApplied = promoResult.code;
-  }
-
-  const subtotalAfterPromo = Math.max(
-    0,
-    Math.round((rawSubtotal - promoDiscount) * 100) / 100
-  );
-  const subtotal = applySubscriptionDiscount(subtotalAfterPromo, purchaseType);
+  const computed = await computeCheckoutTotals(parsed.data);
+  if (computed.error) return errorResponse(computed.error);
+  const validatedItems = computed.validatedItems!;
+  const totals = computed.totals;
+  const promoCodeApplied = computed.promoCodeApplied;
+  const promoDiscount = computed.promoDiscount ?? 0;
 
   const shippingAddress: ShippingAddress = {
     line1: parsed.data.line1,
@@ -95,15 +66,6 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
     postalCode: parsed.data.postalCode,
     country: parsed.data.country,
   };
-
-  const shippingQuote = applyFreeShippingIfEligible(
-    await calculateCheckoutShipping(validatedItems, shippingAddress),
-    subtotalAfterPromo,
-    settings.freeShippingThreshold,
-    parsed.data.country
-  );
-
-  const totals = calculateOrderTotals(subtotal, settings, shippingQuote.shipping);
 
   let supabaseUserId: string | null = null;
   if (isSupabaseConfigured()) {
@@ -119,7 +81,7 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
   }
 
   const orderNumber = generateOrderNumber();
-  const amountCents = BigInt(Math.round(totals.total * 100));
+  const amountCents = BigInt(totals.totalCents);
 
   let squareCustomerId: string | undefined;
   let subscriptionStatus: "active" | undefined;
@@ -148,8 +110,11 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
       country: parsed.data.country,
     });
   } catch (error) {
-    console.error("[msvee:checkout] Square payment failed:", error);
-    return errorResponse("Payment could not be processed. Please try again.", 402);
+    console.error(
+      "[msvee:checkout] Square payment failed:",
+      formatSquareApiError(error)
+    );
+    return errorResponse(squarePaymentUserMessage(error), 402);
   }
 
   const payment = paymentResponse.payment;

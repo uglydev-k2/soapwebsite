@@ -234,39 +234,39 @@ function refinePurchaseType(
 
 export const checkoutFormSchema = checkoutAddressBase.superRefine(refineUsState);
 
+const checkoutCartItemsSchema = z
+  .array(
+    z.object({
+      productId: z.string().min(1),
+      scentOptionId: z.string().optional(),
+      quantity: z.number().int().min(1),
+      price: z.number().positive(),
+      name: z.string().optional(),
+      slug: z.string().optional(),
+      image: z.string().optional(),
+    })
+  )
+  .min(1, "Cart is empty");
+
 export const checkoutSchema = checkoutAddressBase
   .extend({
-  items: z
-    .array(
-      z.object({
-        productId: z.string().min(1),
-        scentOptionId: z.string().optional(),
-        quantity: z.number().int().min(1),
-        price: z.number().positive(),
-        name: z.string().optional(),
-        slug: z.string().optional(),
-        image: z.string().optional(),
-      })
-    )
-    .min(1, "Cart is empty"),
-})
+    items: checkoutCartItemsSchema,
+  })
   .superRefine(refineUsState);
+
+export const checkoutTotalsSchema = checkoutAddressBase
+  .extend({
+    items: checkoutCartItemsSchema,
+    purchaseType: purchaseTypeSchema.default("one_time"),
+    subscriptionCadence: subscriptionCadenceSchema.optional(),
+    promoCode: z.string().optional(),
+  })
+  .superRefine(refineUsState)
+  .superRefine(refinePurchaseType);
 
 export const checkoutPaymentSchema = checkoutAddressBase
   .extend({
-    items: z
-      .array(
-        z.object({
-        productId: z.string().min(1),
-        scentOptionId: z.string().optional(),
-        quantity: z.number().int().min(1),
-        price: z.number().positive(),
-        name: z.string().optional(),
-        slug: z.string().optional(),
-        image: z.string().optional(),
-      })
-      )
-      .min(1, "Cart is empty"),
+    items: checkoutCartItemsSchema,
     sourceId: z.string().min(1, "Payment token is required"),
     idempotencyKey: z.string().uuid("Invalid payment request"),
     purchaseType: purchaseTypeSchema.default("one_time"),
