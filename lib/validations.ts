@@ -268,6 +268,7 @@ export const checkoutPaymentSchema = checkoutAddressBase
   .extend({
     items: checkoutCartItemsSchema,
     sourceId: z.string().min(1, "Payment token is required"),
+    verificationToken: z.string().optional(),
     idempotencyKey: z.string().uuid("Invalid payment request"),
     purchaseType: purchaseTypeSchema.default("one_time"),
     subscriptionCadence: subscriptionCadenceSchema.optional(),

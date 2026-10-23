@@ -27,17 +27,24 @@ export type SquareTokenizeInput = {
   };
 };
 
+export type SquareTokenizeResult = {
+  token: string;
+  verificationToken?: string;
+};
+
+type SquareVerificationDetails = SquareTokenizeInput & {
+  currencyCode: string;
+  customerInitiated: boolean;
+  sellerKeyedIn: boolean;
+};
+
 type SquareCard = {
   attach: (selector: string) => Promise<void>;
-  tokenize: (
-    verificationDetails?: SquareTokenizeInput & {
-      currencyCode: string;
-      customerInitiated: boolean;
-      sellerKeyedIn: boolean;
-    }
-  ) => Promise<{
+  tokenize: (verificationDetails?: SquareVerificationDetails) => Promise<{
     status: string;
     token?: string;
+    verificationToken?: string;
+    details?: Record<string, unknown>;
     errors?: { message?: string }[];
   }>;
   destroy: () => Promise<void>;
@@ -45,6 +52,10 @@ type SquareCard = {
 
 type SquarePayments = {
   card: () => Promise<SquareCard>;
+  verifyBuyer?: (
+    token: string,
+    verificationDetails: SquareVerificationDetails
+  ) => Promise<{ token?: string }>;
 };
 
 declare global {
@@ -56,7 +67,7 @@ declare global {
 }
 
 export type SquarePaymentFormHandle = {
-  tokenize: (details: SquareTokenizeInput) => Promise<string | null>;
+  tokenize: (details: SquareTokenizeInput) => Promise<SquareTokenizeResult | null>;
   isReady: boolean;
 };
 
@@ -80,9 +91,32 @@ function formatTokenizeError(
   return "Card details could not be verified. Please check and try again.";
 }
 
+function extractVerificationToken(result: unknown): string | undefined {
+  if (!result || typeof result !== "object") return undefined;
+  const record = result as Record<string, unknown>;
+  if (typeof record.verificationToken === "string") {
+    return record.verificationToken;
+  }
+  const details = record.details;
+  if (!details || typeof details !== "object") return undefined;
+  const detailsRecord = details as Record<string, unknown>;
+  if (typeof detailsRecord.verificationToken === "string") {
+    return detailsRecord.verificationToken;
+  }
+  const verification = detailsRecord.verification;
+  if (verification && typeof verification === "object") {
+    const verificationRecord = verification as Record<string, unknown>;
+    if (typeof verificationRecord.token === "string") {
+      return verificationRecord.token;
+    }
+  }
+  return undefined;
+}
+
 export const SquarePaymentForm = forwardRef<SquarePaymentFormHandle>(
   function SquarePaymentForm(_props, ref) {
     const cardRef = useRef<SquareCard | null>(null);
+    const paymentsRef = useRef<SquarePayments | null>(null);
     const [config, setConfig] = useState<CheckoutConfig | null>(null);
     const [scriptLoaded, setScriptLoaded] = useState(false);
     const [ready, setReady] = useState(false);
@@ -112,7 +146,6 @@ export const SquarePaymentForm = forwardRef<SquarePaymentFormHandle>(
           if (!container) {
             throw new Error("Card container not found");
           }
-          // Clear stale iframes from a prior init attempt (e.g. React strict mode).
           container.replaceChildren();
 
           const payments = await window.Square!.payments(
@@ -125,6 +158,7 @@ export const SquarePaymentForm = forwardRef<SquarePaymentFormHandle>(
             await card.destroy();
             return;
           }
+          paymentsRef.current = payments;
           cardRef.current = card;
           setReady(true);
           setInitError("");
@@ -140,6 +174,7 @@ export const SquarePaymentForm = forwardRef<SquarePaymentFormHandle>(
 
       return () => {
         cancelled = true;
+        paymentsRef.current = null;
         cardRef.current?.destroy().catch(() => {});
         cardRef.current = null;
         setReady(false);
@@ -153,7 +188,7 @@ export const SquarePaymentForm = forwardRef<SquarePaymentFormHandle>(
         tokenize: async (details: SquareTokenizeInput) => {
           if (!cardRef.current) return null;
 
-          const verificationDetails = {
+          const verificationDetails: SquareVerificationDetails = {
             ...details,
             currencyCode: "USD",
             customerInitiated: true,
@@ -168,12 +203,33 @@ export const SquarePaymentForm = forwardRef<SquarePaymentFormHandle>(
             throw new Error(formatTokenizeError({ status: "ERROR" }, error));
           }
 
-          if (result.status === "OK" && result.token) {
-            return result.token;
+          if (result.status !== "OK" || !result.token) {
+            console.error("[SquarePaymentForm] tokenize failed:", result);
+            throw new Error(formatTokenizeError(result));
           }
 
-          console.error("[SquarePaymentForm] tokenize failed:", result);
-          throw new Error(formatTokenizeError(result));
+          let verificationToken =
+            extractVerificationToken(result) ??
+            (typeof result.verificationToken === "string"
+              ? result.verificationToken
+              : undefined);
+
+          if (!verificationToken && paymentsRef.current?.verifyBuyer) {
+            try {
+              const verifyResult = await paymentsRef.current.verifyBuyer(
+                result.token,
+                verificationDetails
+              );
+              verificationToken = verifyResult.token;
+            } catch (error) {
+              console.warn("[SquarePaymentForm] verifyBuyer failed:", error);
+            }
+          }
+
+          return {
+            token: result.token,
+            verificationToken,
+          };
         },
       }),
       [ready]

@@ -1,5 +1,6 @@
 import { getCountryCode } from "@/lib/shipping";
 import { getSquareClient, getSquareLocationId } from "@/lib/square";
+import { assertSquarePaymentCreated } from "@/lib/square-payment-response";
 
 export async function chargeSquarePayment(input: {
   sourceId: string;
@@ -17,6 +18,7 @@ export async function chargeSquarePayment(input: {
   country: string;
   /** Required when `sourceId` is a Square card-on-file id (`ccof:…`). */
   customerId?: string;
+  verificationToken?: string;
 }) {
   const isCardOnFile = input.sourceId.startsWith("ccof:");
   if (isCardOnFile && !input.customerId?.trim()) {
@@ -28,10 +30,11 @@ export async function chargeSquarePayment(input: {
   const line2 = input.line2?.trim();
   const state = input.state?.trim();
 
-  return getSquareClient().payments.create({
+  const response = await getSquareClient().payments.create({
     sourceId: input.sourceId,
     idempotencyKey: input.idempotencyKey,
     customerId: input.customerId?.trim() || undefined,
+    verificationToken: input.verificationToken?.trim() || undefined,
     amountMoney: {
       amount: input.amountCents,
       currency: "USD",
@@ -64,6 +67,9 @@ export async function chargeSquarePayment(input: {
     },
     autocomplete: true,
   });
+
+  const payment = assertSquarePaymentCreated(response);
+  return { ...response, payment };
 }
 
 export const SQUARE_PAYMENT_SUCCESS_STATUSES = new Set([

@@ -204,11 +204,12 @@ export default function CheckoutPageClient() {
       const chargeAmount = chargeTotal.toFixed(2);
 
       let sourceId: string;
+      let verificationToken: string | undefined;
       try {
         const addressLines = [data.line1, data.line2?.trim()].filter(
           (line): line is string => Boolean(line?.trim())
         );
-        const token = await squareRef.current.tokenize({
+        const tokenResult = await squareRef.current.tokenize({
           amount: chargeAmount,
           intent: "CHARGE",
           billingContact: {
@@ -223,12 +224,13 @@ export default function CheckoutPageClient() {
             countryCode: data.country,
           },
         });
-        if (!token) {
+        if (!tokenResult?.token) {
           addToast("Please enter valid card details.", "error");
           setLoading(false);
           return;
         }
-        sourceId = token;
+        sourceId = tokenResult.token;
+        verificationToken = tokenResult.verificationToken;
       } catch (err) {
         addToast(
           err instanceof Error ? err.message : "Card verification failed.",
@@ -241,6 +243,7 @@ export default function CheckoutPageClient() {
       const payload = {
         ...data,
         sourceId,
+        verificationToken,
         idempotencyKey: crypto.randomUUID(),
         purchaseType,
         subscriptionCadence:

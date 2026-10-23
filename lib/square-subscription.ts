@@ -1,8 +1,26 @@
 import { randomUUID } from "crypto";
+import { SquareError } from "square";
 import { getSquareClient } from "@/lib/square";
 import { formatSquareBillingPhone } from "@/lib/square-billing-contact";
+import { SquarePaymentFailedError } from "@/lib/square-payment-response";
 
 export function formatSquareApiError(error: unknown): string {
+  if (error instanceof SquarePaymentFailedError) {
+    const fromSquare = error.squareErrors
+      .map((entry) => entry.detail || entry.code)
+      .filter(Boolean)
+      .join("; ");
+    return fromSquare || error.message;
+  }
+
+  if (error instanceof SquareError) {
+    const fromSquare = error.errors
+      .map((entry) => entry.detail || entry.code)
+      .filter(Boolean)
+      .join("; ");
+    return fromSquare || error.message;
+  }
+
   if (!error || typeof error !== "object") {
     return error instanceof Error ? error.message : String(error);
   }

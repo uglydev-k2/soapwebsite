@@ -96,6 +96,7 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
   try {
     paymentResponse = await chargeSquarePayment({
       sourceId: paymentSourceId,
+      verificationToken: parsed.data.verificationToken,
       idempotencyKey: parsed.data.idempotencyKey,
       amountCents,
       orderNumber,
