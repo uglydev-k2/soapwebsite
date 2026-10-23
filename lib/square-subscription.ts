@@ -1,18 +1,38 @@
 import { randomUUID } from "crypto";
 import { getSquareClient } from "@/lib/square";
+import { formatSquareBillingPhone } from "@/lib/square-billing-contact";
 
-export async function createSquareCustomer(input: {
+export function formatSquareApiError(error: unknown): string {
+  if (!error || typeof error !== "object") {
+    return error instanceof Error ? error.message : String(error);
+  }
+  const record = error as {
+    message?: string;
+    errors?: { code?: string; detail?: string; field?: string }[];
+    body?: { errors?: { code?: string; detail?: string; field?: string }[] };
+  };
+  const errors = record.errors ?? record.body?.errors;
+  if (errors?.length) {
+    return errors
+      .map((entry) => entry.detail || entry.code || entry.field)
+      .filter(Boolean)
+      .join("; ");
+  }
+  return record.message ?? "Square API error";
+}
+
+async function createSquareCustomerRecord(input: {
   email: string;
   firstName: string;
   lastName: string;
-  phone?: string;
+  phoneNumber?: string;
 }): Promise<string> {
   const response = await getSquareClient().customers.create({
     idempotencyKey: randomUUID(),
-    emailAddress: input.email,
-    givenName: input.firstName,
-    familyName: input.lastName,
-    phoneNumber: input.phone?.trim() || undefined,
+    emailAddress: input.email.trim(),
+    givenName: input.firstName.trim(),
+    familyName: input.lastName.trim(),
+    phoneNumber: input.phoneNumber,
   });
 
   const customerId = response.customer?.id;
@@ -20,6 +40,76 @@ export async function createSquareCustomer(input: {
     throw new Error("Square customer could not be created");
   }
   return customerId;
+}
+
+export async function createOrGetSquareCustomer(input: {
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  countryCode?: string;
+}): Promise<string> {
+  const client = getSquareClient();
+  const email = input.email.trim();
+  const phoneNumber = formatSquareBillingPhone(
+    input.phone,
+    input.countryCode ?? "US"
+  );
+
+  try {
+    const searchResponse = await client.customers.search({
+      limit: BigInt(1),
+      query: {
+        filter: {
+          emailAddress: {
+            exact: email,
+          },
+        },
+      },
+    });
+
+    const existingId = searchResponse.customers?.[0]?.id;
+    if (existingId) {
+      return existingId;
+    }
+  } catch (error) {
+    console.warn(
+      "[msvee:square] Customer search failed, will try create:",
+      formatSquareApiError(error)
+    );
+  }
+
+  try {
+    return await createSquareCustomerRecord({
+      email,
+      firstName: input.firstName,
+      lastName: input.lastName,
+      phoneNumber,
+    });
+  } catch (error) {
+    if (!phoneNumber) {
+      throw error;
+    }
+    console.warn(
+      "[msvee:square] Customer create with phone failed, retrying without phone:",
+      formatSquareApiError(error)
+    );
+    return createSquareCustomerRecord({
+      email,
+      firstName: input.firstName,
+      lastName: input.lastName,
+    });
+  }
+}
+
+/** @deprecated Use createOrGetSquareCustomer */
+export async function createSquareCustomer(input: {
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+}): Promise<string> {
+  return createOrGetSquareCustomer(input);
 }
 
 /** `sourceId` may be a Web Payments nonce or a Square payment id after CreatePayment. */

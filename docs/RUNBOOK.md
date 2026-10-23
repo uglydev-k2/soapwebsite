@@ -163,6 +163,8 @@ NEXT_PUBLIC_SQUARE_LOCATION_ID
 
 **Sandbox vs production:** `SQUARE_ENVIRONMENT` must match the tokens and application IDs. Sandbox charges do not deposit real money.
 
+**Subscriptions:** The production access token must include **Customers** and **Cards** (create/read) permissions—not payments alone—or saving cards for renewals will fail after checkout. Regenerate the token under Square Developer → MsVee Website → Credentials if subscribe orders pay but no subscription appears in admin.
+
 ### Payment statuses accepted at checkout
 
 The site treats these Square statuses as successful:

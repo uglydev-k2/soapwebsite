@@ -27,8 +27,9 @@ import {
 } from "@/lib/subscriptions";
 import { validatePromoCode, redeemPromoCode } from "@/lib/promo-codes";
 import {
+  createOrGetSquareCustomer,
   createSquareCardOnFile,
-  createSquareCustomer,
+  formatSquareApiError,
 } from "@/lib/square-subscription";
 import { createCustomerSubscription } from "@/lib/customer-subscriptions";
 import { getCheckoutBlockReason } from "@/lib/checkout-guards";
@@ -125,25 +126,8 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
   const paymentSourceId = parsed.data.sourceId;
   let savedCardId: string | undefined;
 
-  if (purchaseType === "subscription") {
-    if (!subscriptionCadence) {
-      return errorResponse("Choose a delivery frequency for your subscription");
-    }
-
-    try {
-      squareCustomerId = await createSquareCustomer({
-        email: parsed.data.email,
-        firstName: parsed.data.firstName,
-        lastName: parsed.data.lastName,
-        phone: parsed.data.phone,
-      });
-    } catch (error) {
-      console.error("[msvee:checkout] Square customer setup failed:", error);
-      return errorResponse(
-        "We could not set up subscription billing. Please try again or choose a one-time purchase.",
-        402
-      );
-    }
+  if (purchaseType === "subscription" && !subscriptionCadence) {
+    return errorResponse("Choose a delivery frequency for your subscription");
   }
 
   let paymentResponse;
@@ -182,18 +166,42 @@ export const POST = withApiHandler("checkout.create", async (request: NextReques
     );
   }
 
-  if (purchaseType === "subscription" && squareCustomerId) {
-    try {
-      savedCardId = await createSquareCardOnFile({
-        customerId: squareCustomerId,
-        sourceId: payment.id,
-        idempotencyKey: randomUUID(),
-      });
-    } catch (error) {
-      console.error(
-        "[msvee:checkout] Card-on-file save failed after payment:",
-        error
-      );
+  if (purchaseType === "subscription") {
+    const paymentCustomerId =
+      typeof payment.customerId === "string" ? payment.customerId : undefined;
+
+    if (paymentCustomerId) {
+      squareCustomerId = paymentCustomerId;
+    } else {
+      try {
+        squareCustomerId = await createOrGetSquareCustomer({
+          email: parsed.data.email,
+          firstName: parsed.data.firstName,
+          lastName: parsed.data.lastName,
+          phone: parsed.data.phone,
+          countryCode: parsed.data.country,
+        });
+      } catch (error) {
+        console.error(
+          "[msvee:checkout] Square customer setup failed after payment:",
+          formatSquareApiError(error)
+        );
+      }
+    }
+
+    if (squareCustomerId) {
+      try {
+        savedCardId = await createSquareCardOnFile({
+          customerId: squareCustomerId,
+          sourceId: payment.id,
+          idempotencyKey: randomUUID(),
+        });
+      } catch (error) {
+        console.error(
+          "[msvee:checkout] Card-on-file save failed after payment:",
+          formatSquareApiError(error)
+        );
+      }
     }
   }
 
