@@ -3,7 +3,11 @@ import "./globals.css";
 import { ToastContainer } from "@/components/ui/Toast";
 import { Providers } from "@/components/Providers";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { rootMetadata, buildOrganizationJsonLd } from "@/lib/seo";
+import {
+  rootMetadata,
+  buildOrganizationJsonLd,
+  buildRetailLocationJsonLd,
+} from "@/lib/seo";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -35,6 +39,7 @@ export default function RootLayout({
       </head>
       <body className="grain">
         <JsonLd data={buildOrganizationJsonLd()} />
+        <JsonLd data={buildRetailLocationJsonLd()} />
         <Providers>
           {children}
           <ToastContainer />

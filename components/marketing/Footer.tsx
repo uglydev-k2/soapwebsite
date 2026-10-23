@@ -3,6 +3,11 @@ import Link from "next/link";
 import { BrandLogo } from "@/components/BrandLogo";
 import { VISIBLE_SHOP_CATEGORY_MENU } from "@/lib/categories";
 import { SOCIAL_HANDLE, SOCIAL_PROFILES, socialProfileLabel } from "@/lib/social";
+import {
+  formatRetailLocationTitle,
+  RETAIL_LOCATION,
+  retailLocationGoogleMapsUrl,
+} from "@/lib/retail-location";
 
 const shopLinks = [
   { label: "All Products", href: "/collections" },
@@ -88,6 +93,27 @@ export default function Footer() {
               Premium botanical bath products handcrafted with intention. Where
               ritual meets luxury.
             </p>
+            <div className="mt-6 text-sm leading-relaxed text-cream/85">
+              <p className="label-caps text-gold">Visit us</p>
+              <p className="mt-2 font-serif text-base text-cream">
+                {formatRetailLocationTitle()}
+              </p>
+              <p className="mt-1">
+                {RETAIL_LOCATION.streetAddress}
+                <br />
+                {RETAIL_LOCATION.city}, {RETAIL_LOCATION.state}{" "}
+                {RETAIL_LOCATION.postalCode}
+              </p>
+              <p className="mt-1 text-cream/70">{RETAIL_LOCATION.hoursLabel}</p>
+              <a
+                href={retailLocationGoogleMapsUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="label-caps mt-2 inline-block text-xs text-gold hover:text-cream"
+              >
+                Directions →
+              </a>
+            </div>
             <div className="mt-6 space-y-3">
               <p className="text-sm text-cream">
                 Follow{" "}

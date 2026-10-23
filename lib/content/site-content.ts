@@ -1,5 +1,10 @@
 import type { PublicStoreSettings } from "@/lib/store-settings";
 import { formatPrice } from "@/lib/utils";
+import {
+  formatRetailAddressSingleLine,
+  formatRetailLocationTitle,
+  RETAIL_LOCATION,
+} from "@/lib/retail-location";
 
 export function getFaqItems(settings: PublicStoreSettings) {
   return [
@@ -36,6 +41,10 @@ export function getFaqItems(settings: PublicStoreSettings) {
       question: "Do you ship internationally?",
       answer:
         "Yes. We ship to select countries via USPS international rates calculated at checkout based on weight and destination.",
+    },
+    {
+      question: "Where can I shop in person?",
+      answer: `Find MV Luscious Lather at ${formatRetailLocationTitle()}, ${formatRetailAddressSingleLine()}. ${RETAIL_LOCATION.hoursLabel}.`,
     },
   ] as const;
 }

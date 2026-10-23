@@ -9,6 +9,7 @@ import {
   CRAFT_PROCESS,
 } from "@/lib/content/about";
 import { BRAND_DISPLAY_NAME } from "@/lib/brand";
+import { RetailLocationCard } from "@/components/marketing/RetailLocationCard";
 
 export function AboutStory() {
   return (
@@ -126,6 +127,10 @@ export function AboutStory() {
             <p className="label-caps mt-1 text-muted">{stat.label}</p>
           </div>
         ))}
+      </div>
+
+      <div className="max-w-xl">
+        <RetailLocationCard />
       </div>
 
       <div className="flex flex-col items-start gap-4 border-t border-green/10 pt-12 sm:flex-row sm:flex-wrap sm:gap-6">

@@ -8,6 +8,11 @@ import {
   brandTitle,
 } from "@/lib/brand";
 import { socialProfileUrls } from "@/lib/social";
+import {
+  formatRetailLocationTitle,
+  RETAIL_LOCATION,
+  retailLocationGoogleMapsUrl,
+} from "@/lib/retail-location";
 const DEFAULT_OG_IMAGE = `${BRAND_SITE_URL}/images/mv-luscious-lather-logo.jpg`;
 
 export const DEFAULT_SITE_DESCRIPTION =
@@ -146,5 +151,46 @@ export function buildOrganizationJsonLd(): Record<string, unknown> {
     description: BRAND_TAGLINE,
     email: BRAND_EMAIL,
     sameAs: socialProfileUrls(),
+  };
+}
+
+export function buildRetailLocationJsonLd(): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Store",
+    name: `${BRAND_DISPLAY_NAME} at ${formatRetailLocationTitle()}`,
+    description: `Shop MV Luscious Lather in person at ${RETAIL_LOCATION.hostName}, ${RETAIL_LOCATION.hostArea}.`,
+    url: `${BRAND_SITE_URL}/contact`,
+    email: BRAND_EMAIL,
+    hasMap: retailLocationGoogleMapsUrl(),
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: `${RETAIL_LOCATION.streetAddress}, ${RETAIL_LOCATION.suite}`,
+      addressLocality: RETAIL_LOCATION.city,
+      addressRegion: RETAIL_LOCATION.state,
+      postalCode: RETAIL_LOCATION.postalCode,
+      addressCountry: RETAIL_LOCATION.country,
+    },
+    openingHoursSpecification: [
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday",
+        ],
+        opens: "10:00",
+        closes: "20:00",
+      },
+    ],
+    parentOrganization: {
+      "@type": "Organization",
+      name: BRAND_DISPLAY_NAME,
+      url: BRAND_SITE_URL,
+    },
   };
 }
