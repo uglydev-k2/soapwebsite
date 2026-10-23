@@ -62,12 +62,17 @@ export default async function CollectionsPage({
     : "featured";
   const products = await getCatalogProducts({ category, scent, concern, sort, q });
   const subscribeQuery = parseQueryValue(searchParams?.subscribe);
-  const subscribeCadence: SubscriptionCadence | undefined =
+  let subscribeCadence: SubscriptionCadence | undefined =
     subscribeQuery === "monthly" ||
     subscribeQuery === "bimonthly" ||
     subscribeQuery === "quarterly"
       ? subscribeQuery
       : undefined;
+  // Product slug links (e.g. ?subscribe=balsam-cedarwood) default to monthly subscribe at checkout.
+  if (!subscribeCadence && subscribeQuery) {
+    const slugMatch = products.some((p) => p.slug === subscribeQuery);
+    if (slugMatch) subscribeCadence = "monthly";
+  }
 
   return (
     <section className="marketing-header-offset min-h-screen bg-cream px-4 pb-24 sm:px-6">
