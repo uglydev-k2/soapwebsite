@@ -6,6 +6,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { vercelApiEnvType } from "./vercel-env-types.mjs";
 
 const TEAM_ID = process.env.VERCEL_TEAM_ID ?? "team_o5SfD9J7DXBQHEAbO5MMahF0";
 const PROJECT_ID = process.env.VERCEL_PROJECT_ID ?? "prj_JnVlKIC313nE3Swh54UVTPyoxRAF";
@@ -35,6 +36,11 @@ const OPTIONAL_KEYS = [
   "VAPID_PRIVATE_KEY",
   "VAPID_SUBJECT",
   "NEXT_PUBLIC_VAPID_PUBLIC_KEY",
+  "SQUARE_ACCESS_TOKEN",
+  "SQUARE_APPLICATION_ID",
+  "SQUARE_LOCATION_ID",
+  "SQUARE_ENVIRONMENT",
+  "CRON_SECRET",
 ];
 
 const KEYS = [...REQUIRED_KEYS, ...OPTIONAL_KEYS];
@@ -115,12 +121,13 @@ for (const key of KEYS) {
     console.log(`Removed old ${key} (${e.target?.join(",")})`);
   }
 
+  const type = vercelApiEnvType(key) ?? "sensitive";
   await api(`/v10/projects/${PROJECT_ID}/env`, {
     method: "POST",
     body: {
       key,
       value,
-      type: "encrypted",
+      type,
       target: TARGETS,
     },
   });

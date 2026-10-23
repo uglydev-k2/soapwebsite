@@ -11,6 +11,7 @@
     "db:backfill-weights": "tsx scripts/backfill-product-weights.ts",
     "env:vercel-checklist": "node scripts/print-vercel-env-checklist.mjs",
     "env:push-vercel": "node scripts/push-vercel-env-api.mjs",
+    "env:fix-secrets": "node scripts/fix-vercel-env-secrets.mjs --redeploy",
     "setup:uploadthing": "node scripts/setup-uploadthing.mjs",
     "start": "next start",
     "lint": "next lint",

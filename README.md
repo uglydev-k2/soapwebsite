@@ -83,7 +83,7 @@ Seed includes sample products, orders, customers, and admin `mvlusciouslather@gm
 ## Production checklist
 
 1. Set all required env vars in `.env.example` (DATABASE_URL, AUTH_SECRET, NEXTAUTH_URL)
-2. Configure Square (`SQUARE_*`, `NEXT_PUBLIC_SQUARE_*`) for checkout
+2. Configure Square (`SQUARE_*`; application ID is server-only, served via `/api/checkout/config`) for checkout
 3. Subscriptions are cart-based and managed in-app (no preassigned Square plan IDs needed)
 4. Set `RESEND_API_KEY` + `RESEND_FROM_EMAIL` for order emails
 5. Optional: `NEXT_PUBLIC_GA_MEASUREMENT_ID`

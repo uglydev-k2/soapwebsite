@@ -157,8 +157,7 @@ Checkout (Square charge)
 SQUARE_ACCESS_TOKEN
 SQUARE_LOCATION_ID
 SQUARE_ENVIRONMENT=production
-NEXT_PUBLIC_SQUARE_APPLICATION_ID
-NEXT_PUBLIC_SQUARE_LOCATION_ID
+SQUARE_APPLICATION_ID
 ```
 
 **Sandbox vs production:** `SQUARE_ENVIRONMENT` must match the tokens and application IDs. Sandbox charges do not deposit real money.
@@ -463,8 +462,7 @@ NEXTAUTH_URL          # https://your-production-domain.com
 SQUARE_ACCESS_TOKEN
 SQUARE_LOCATION_ID
 SQUARE_ENVIRONMENT=production
-NEXT_PUBLIC_SQUARE_APPLICATION_ID
-NEXT_PUBLIC_SQUARE_LOCATION_ID
+SQUARE_APPLICATION_ID
 CRON_SECRET           # subscription renewals
 ```
 

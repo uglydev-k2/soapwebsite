@@ -111,7 +111,8 @@ function buildServiceHealth(missingRequired: string[]): ServiceHealth[] {
   const dbOk = isDatabaseConfigured();
   const squareOk = Boolean(
     process.env.SQUARE_ACCESS_TOKEN?.trim() &&
-      process.env.NEXT_PUBLIC_SQUARE_APPLICATION_ID?.trim()
+      (process.env.SQUARE_APPLICATION_ID?.trim() ||
+        process.env.NEXT_PUBLIC_SQUARE_APPLICATION_ID?.trim())
   );
   const resendOk = Boolean(process.env.RESEND_API_KEY?.trim());
   const uploadOk = isSupabaseConfigured();

@@ -4,11 +4,12 @@ import {
   getSquareScriptUrl,
   isSquareConfigured,
 } from "@/lib/square";
+import { getSquareApplicationId } from "@/lib/square-public-config";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const applicationId = process.env.NEXT_PUBLIC_SQUARE_APPLICATION_ID?.trim();
+  const applicationId = getSquareApplicationId();
 
   if (!applicationId || !isSquareConfigured()) {
     return errorResponse("Square payments are not configured", 503);

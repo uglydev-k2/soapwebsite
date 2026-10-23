@@ -1,26 +1,23 @@
 #!/usr/bin/env node
 /**
- * Set Square (and maintenance) env vars on Vercel via API.
+ * Set Square env vars on Vercel via API (secrets marked sensitive).
  * Usage:
  *   SQUARE_ACCESS_TOKEN=... SQUARE_LOCATION_ID=... node scripts/set-square-vercel-env.mjs
  */
 import { readFileSync, existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { vercelApiEnvType } from "./vercel-env-types.mjs";
 
 const TEAM_ID = "team_o5SfD9J7DXBQHEAbO5MMahF0";
 const PROJECT_ID = "prj_JnVlKIC313nE3Swh54UVTPyoxRAF";
 const TARGETS = ["production", "preview", "development"];
 
 const VARS = {
-  NEXT_PUBLIC_SQUARE_APPLICATION_ID: "sandbox-sq0idb-6tJVJAAx0DaRrbBkjL3A0g",
-  SQUARE_ENVIRONMENT: "sandbox",
+  SQUARE_APPLICATION_ID: "sq0idp-p63YRslhWg8KWRBfQdxbug",
+  SQUARE_ENVIRONMENT: "production",
   SQUARE_ACCESS_TOKEN: process.env.SQUARE_ACCESS_TOKEN?.trim(),
   SQUARE_LOCATION_ID: process.env.SQUARE_LOCATION_ID?.trim(),
-  NEXT_PUBLIC_SQUARE_LOCATION_ID: process.env.SQUARE_LOCATION_ID?.trim(),
-  MAINTENANCE_MODE: "true",
-  MAINTENANCE_MESSAGE:
-    "We're refreshing our shop! Online orders return July 1.",
 };
 
 function loadToken() {
@@ -71,16 +68,25 @@ for (const [key, value] of Object.entries(VARS)) {
     console.log(`Removed ${key} (${e.target?.join(",")})`);
   }
 
+  const type = vercelApiEnvType(key) ?? "sensitive";
   await api(`/v10/projects/${PROJECT_ID}/env`, {
     method: "POST",
     body: {
       key,
       value,
-      type: "encrypted",
+      type,
       target: TARGETS,
     },
   });
-  console.log(`Added ${key} (${value.length} chars)`);
+  console.log(`Added ${key} (${type}, ${value.length} chars)`);
+}
+
+const deprecated = ["NEXT_PUBLIC_SQUARE_APPLICATION_ID", "NEXT_PUBLIC_SQUARE_LOCATION_ID"];
+for (const key of deprecated) {
+  for (const e of envs.filter((x) => x.key === key)) {
+    await api(`/v9/projects/${PROJECT_ID}/env/${e.id}`, { method: "DELETE" });
+    console.log(`Removed deprecated ${key}`);
+  }
 }
 
 console.log("\nDone. Redeploy production for changes to take effect.");
