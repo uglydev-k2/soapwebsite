@@ -50,7 +50,7 @@ function buildSharedImageKeepers(products: Product[]): Map<string, string> {
 
   const keepers = new Map<string, string>();
 
-  for (const [url, sharers] of byUrl) {
+  for (const [url, sharers] of Array.from(byUrl.entries())) {
     if (sharers.length <= 1) continue;
 
     const unrelatedGroups = sharers.reduce<Product[][]>((groups, product) => {
