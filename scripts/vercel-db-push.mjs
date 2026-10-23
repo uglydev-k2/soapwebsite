@@ -84,7 +84,11 @@ if (existsSync(backfillWeightSql)) {
   );
 }
 
-if (existsSync(initSql)) {
+const onVercel = process.env.VERCEL === "1";
+
+// Full init + db push are for fresh local DBs. Production Supabase already has schema;
+// re-running init errors on existing enums (Category already exists) and db push hits P4002.
+if (!onVercel && existsSync(initSql)) {
   console.log("[vercel-db-push] Applying Prisma tables via SQL (Supabase-compatible)…");
   if (
     run(
@@ -96,10 +100,16 @@ if (existsSync(initSql)) {
   console.log("[vercel-db-push] SQL init skipped (tables likely already exist)");
 }
 
-console.log("[vercel-db-push] Trying prisma db push…");
-if (run("npx prisma db push --skip-generate")) {
-  process.exit(0);
+if (!onVercel) {
+  console.log("[vercel-db-push] Trying prisma db push…");
+  if (run("npx prisma db push --skip-generate")) {
+    process.exit(0);
+  }
+  console.log("[vercel-db-push] Schema step finished with warnings — continuing build");
+} else {
+  console.log(
+    "[vercel-db-push] Skipping full init and db push on Vercel (incremental SQL above is enough)"
+  );
 }
 
-console.log("[vercel-db-push] Schema step finished with warnings — continuing build");
 process.exit(0);

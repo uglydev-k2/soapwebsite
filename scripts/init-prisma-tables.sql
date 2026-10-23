@@ -1,20 +1,31 @@
 -- CreateSchema
 CREATE SCHEMA IF NOT EXISTS "public";
 
--- CreateEnum
-CREATE TYPE "public"."Category" AS ENUM ('BAR_SOAP', 'BATH_BODY', 'CANDLES', 'ACCESSORIES', 'GIFT_SET');
+-- CreateEnum (idempotent for re-runs)
+DO $$ BEGIN
+  CREATE TYPE "public"."Category" AS ENUM ('BAR_SOAP', 'BATH_BODY', 'CANDLES', 'ACCESSORIES', 'GIFT_SET');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
--- CreateEnum
-CREATE TYPE "public"."OrderStatus" AS ENUM ('PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED');
+DO $$ BEGIN
+  CREATE TYPE "public"."OrderStatus" AS ENUM ('PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
--- CreateEnum
-CREATE TYPE "public"."Role" AS ENUM ('SUPER_ADMIN', 'ADMIN', 'MODERATOR', 'EDITOR');
+DO $$ BEGIN
+  CREATE TYPE "public"."Role" AS ENUM ('SUPER_ADMIN', 'ADMIN', 'MODERATOR', 'EDITOR');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
--- CreateEnum
-CREATE TYPE "public"."CustomerStatus" AS ENUM ('ACTIVE', 'BANNED', 'INACTIVE');
+DO $$ BEGIN
+  CREATE TYPE "public"."CustomerStatus" AS ENUM ('ACTIVE', 'BANNED', 'INACTIVE');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
--- CreateEnum
-CREATE TYPE "public"."ModerationStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED', 'FLAGGED');
+DO $$ BEGIN
+  CREATE TYPE "public"."ModerationStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED', 'FLAGGED');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- CreateTable
 CREATE TABLE "public"."Product" (
