@@ -41,6 +41,16 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/shop",
+        destination: "/collections",
+        permanent: true,
+      },
+      {
+        source: "/shop/:path*",
+        destination: "/collections/:path*",
+        permanent: true,
+      },
+      {
         source: "/collections/all",
         destination: "/collections",
         permanent: true,
