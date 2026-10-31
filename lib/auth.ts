@@ -3,6 +3,9 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { authConfig } from "@/lib/auth.config";
+import { ensureProductionAuthUrl } from "@/lib/auth-url";
+
+ensureProductionAuthUrl();
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,

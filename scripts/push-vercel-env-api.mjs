@@ -8,8 +8,8 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { vercelApiEnvType } from "./vercel-env-types.mjs";
 
-const TEAM_ID = process.env.VERCEL_TEAM_ID ?? "team_o5SfD9J7DXBQHEAbO5MMahF0";
-const PROJECT_ID = process.env.VERCEL_PROJECT_ID ?? "prj_JnVlKIC313nE3Swh54UVTPyoxRAF";
+const TEAM_ID = process.env.VERCEL_TEAM_ID ?? "team_v59NmJZ5yPRmZnDb3ev4mVqY";
+const PROJECT_ID = process.env.VERCEL_PROJECT_ID ?? "prj_EobuO0mPGfZ0xbZECkgT0SuWZvhD";
 
 const REQUIRED_KEYS = [
   "DATABASE_URL",
@@ -74,6 +74,9 @@ function parseEnvLocal() {
   }
   if (vars.AUTH_SECRET && !vars.NEXTAUTH_SECRET) {
     vars.NEXTAUTH_SECRET = vars.AUTH_SECRET;
+  }
+  if (/localhost|127\.0\.0\.1/i.test(vars.NEXTAUTH_URL ?? "")) {
+    delete vars.NEXTAUTH_URL;
   }
   return vars;
 }
@@ -145,7 +148,7 @@ console.log("\nTriggering production redeploy…");
 const deploy = await api(`/v13/deployments`, {
   method: "POST",
   body: {
-    name: "mzveesoaps",
+    name: "soapwebsite",
     project: PROJECT_ID,
     target: "production",
     gitSource: {
